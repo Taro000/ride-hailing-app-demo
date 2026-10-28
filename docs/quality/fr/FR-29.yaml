@@ -1,0 +1,32 @@
+id: FR-29
+title: 降車時の決済
+status: draft
+version: 1
+basis: inferred
+basis_note: 手順は入力。料金を手配時に確定しアプリ内で決済することは第 1 段階の質問 5、手配時に押さえて降車時に請求することは質問 9 で確認済み
+needs_agreement: false
+approver_candidates: []
+statement: システムは、乗車が終わると、乗客の操作なしに、確定した料金を押さえていた支払い手段で請求し、結果を乗客とドライバーに示す。
+origin: cuj-step
+cuj: CUJ-08
+cuj_step: 決済を行う
+traces_to: [QIU-07, QIU-08, QIU-16]
+proposal: null
+existing: false
+extends: null
+interface:
+  - "外部: 決済のサービス"
+  - "画面: 乗客の Web アプリ（乗車中）"
+  - "画面: ドライバーの Web アプリ（乗車中）"
+acceptance_criteria:
+  - 乗車が終わると、乗客の操作なしに、確定した料金（降車場所を変えたときは変更後の料金）を押さえていた支払い手段で請求し、両方の画面に支払いの完了を示す。
+  - 請求に失敗したとき、FR-31 の扱いに移る。
+  - 請求した額と時刻を乗車の記録に残す。
+quality_hints:
+  - 効率性 (QIU-07) - 到着から T_alight 秒以内に決済が終わる
+  - 経済リスク緩和性 (QIU-08) - 確定した料金どおりに請求する
+changelog:
+  - version: 1
+    date: 2026-10-28
+    change: 作成
+    reason: 第 2 段階の下書き（質問 1〜10 の回答を反映）
