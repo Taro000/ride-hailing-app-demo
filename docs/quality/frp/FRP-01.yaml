@@ -1,0 +1,21 @@
+id: FRP-01
+title: 到着予定時刻に迎車までの時間を含める
+status: proposed
+version: 1
+basis: inferred
+basis_note: FR-03 を変えることは質問 6 で確認済み。見込みの時間の求め方は推定
+needs_agreement: false
+approver_candidates: []
+proposed_by: functional-requirements-to-product-quality
+origin: [QR-08]
+changes: FR-03
+reason: FR-03 は経路と渋滞の情報だけから到着予定時刻を計算するので、手配の前に示す値がいつも実際より早くなる。QR-08 はドライバーが見つかるまでと迎車の時間を含めることを求める。
+suggested_statement: システムは、手配の前に示す目的地への到着予定時刻を、ドライバーが見つかるまでの見込みの時間と、ドライバーが乗車場所に着くまでの見込みの時間と、走行の時間を足して計算する。
+affects: []
+placeholders: []
+resolution: null
+changelog:
+  - version: 1
+    date: 2026-10-30
+    change: 提案
+    reason: 第 3 段階の下書き（質問 1〜14 の回答を反映）
