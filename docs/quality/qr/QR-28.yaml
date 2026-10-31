@@ -1,7 +1,7 @@
 id: QR-28
 title: 乗る場所の正確性
 status: draft
-version: 1
+version: 2
 basis: inferred
 basis_note: データを作るのは乗客（ピンの位置）と乗客の端末（現在地）。点と扱いは推定
 needs_agreement: true
@@ -21,7 +21,7 @@ handling_reason: null
 implies_internal: []
 conflicts:
   - with: QR-03
-    note: 誤差が大きいときにピンで確かめさせると（FRP-03）手配の手間が増える。誤差が D_pickup_accuracy を超えるときだけ確かめさせる
+    note: 誤差が大きいときにピンで確かめさせると（FR-02 版 2）手配の手間が増える。誤差が D_pickup_accuracy を超えるときだけ確かめさせる
 stated_numbers: []
 placeholders: []
 changelog:
@@ -29,3 +29,7 @@ changelog:
     date: 2026-10-30
     change: 作成
     reason: 第 3 段階の下書き（質問 1〜14 の回答を反映）
+  - version: 2
+    date: 2026-10-31
+    change: FRP-03 が FR-02 版 2 として受け入れられたことを競合の記述に反映した
+    reason: 第 3 段階の再実行（第 1 段階 55db34c、第 2 段階 dbb8df9）
