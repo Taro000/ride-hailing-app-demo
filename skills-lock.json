@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "quality-summary-html": {
+      "source": "Taro000/quality-summary-html",
+      "sourceType": "github",
+      "skillPath": "skills/quality-summary-html/SKILL.md",
+      "computedHash": "afe69060df4f73b6f4801059a782017983747b40fc842fa76602a65cf9f2ce1b"
+    }
+  }
+}
