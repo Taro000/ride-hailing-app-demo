@@ -1,9 +1,9 @@
 id: FRP-08
 title: 決済のサービスの記録と毎日突き合わせる
 status: proposed
-version: 1
+version: 2
 basis: inferred
-basis_note: null
+basis_note: 決済のサービスを選ぶまでは自作の仮のスタブで代わりにする（2026-11-01 の利用者の回答）。その間の突き合わせは自分で書いたスタブとの比較になり、SLI-04 は何も確かめない。テスト環境へ差し替えた後に意味を持つ
 needs_agreement: false
 approver_candidates: []
 proposed_by: product-quality-to-slo
@@ -28,3 +28,7 @@ changelog:
   date: '2026-10-31'
   change: 提案
   reason: 第 4 段階の下書き
+- version: 2
+  date: '2026-11-01'
+  change: basis_note に仮の決済スタブの影響を書いた
+  reason: 2026-11-01 の利用者の回答への追随

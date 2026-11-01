@@ -1,9 +1,9 @@
 id: FR-53
 title: 保存期間を過ぎた個人情報を特定できない形に変える
 status: draft
-version: 1
+version: 2
 basis: inferred
-basis_note: 機能は FRP-06 から。記録を残して操作した人と位置を消すことは第 2 段階の質問 12 で確認済み。T_pii_retention は要合意。ほかの受け入れ基準は推定
+basis_note: 機能は FRP-06 から。記録を残して操作した人と位置を消すことは第 2 段階の質問 12 で確認済み。T_pii_retention は 3 年（2026-11-01 の利用者の回答。根拠はまだ書かれていない）。ほかの受け入れ基準は推定
 needs_agreement: true
 approver_candidates: [プロダクトオーナー, 開発の責任者]
 statement: システムは、位置情報と個人情報を含むログとデータが、記録してから T_pii_retention を過ぎると、状態の変化の種類と時刻を残したまま、操作した人と位置を消して、個人を特定できない形に変える。
@@ -27,3 +27,7 @@ changelog:
     date: 2026-10-31
     change: 作成
     reason: FRP-06 を受け入れた（第 2 段階の質問 12）
+  - version: 2
+    date: '2026-11-01'
+    change: T_pii_retention の値を basis_note に書いた
+    reason: 2026-11-01 の利用者の回答への追随

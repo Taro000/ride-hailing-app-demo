@@ -1,9 +1,9 @@
 id: NFR-39
 title: 料金がチームの運賃表に従う
 status: draft
-version: 1
+version: 2
 basis: inferred
-basis_note: チームが運賃表を書き、それと照らすことは質問 3 で確認済み。R_fare はまだない。実在の運賃の定めの中身は書かない
+basis_note: チームが運賃表を書き、それと照らすことは質問 3 で確認済み。R_fare は 2026-11-01 の利用者の回答（context.yaml の制約）。km と分の刻み、1 円未満の端数、消費税の扱いは未定で、それまでは境の値の例を書けない。実在の運賃の定めの中身は書かない
 needs_agreement: true
 approver_candidates:
 - プロダクトオーナー
@@ -20,7 +20,7 @@ conditions:
 slo: null
 gate:
   where: CI
-  check: R_fare の例（距離、時間、降車場所の変更）での計算
+  check: R_fare の例（距離、時間、迎車料金、アプリ手配料、降車場所の変更、許諾の後の取り消しのキャンセル料）での計算
   threshold: すべて一致する
 audit: null
 monitor: null
@@ -29,3 +29,7 @@ changelog:
   date: '2026-10-31'
   change: 作成
   reason: 第 4 段階の下書き（質問 1〜4 の回答を反映）
+- version: 2
+  date: '2026-11-01'
+  change: R_fare の中身が決まったので、確かめる例にキャンセル料を足した
+  reason: 2026-11-01 の利用者の回答への追随

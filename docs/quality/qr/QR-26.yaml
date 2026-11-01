@@ -1,7 +1,7 @@
 id: QR-26
 title: 配備を自動の手順で終える
 status: draft
-version: 1
+version: 2
 basis: inferred
 basis_note: 失敗のシナリオ、点、扱いは推定。扱いは要合意
 needs_agreement: true
@@ -22,11 +22,21 @@ implies_internal: []
 conflicts: []
 stated_numbers: []
 placeholders:
-  - name: T_lead
-    meaning: 最初のコミットから本番に出すまでの時間（第 4 段階で使う）
-    from: QIU-28〜30
+  - name: T_lead_feature
+    meaning: 新しい機能の変更を、最初のコミットから本番に出すまでの時間（24 時間）
+    from: QIU-28
+  - name: T_lead_fix
+    meaning: 既存の機能を直す変更を、最初のコミットから本番に出すまでの時間（8 時間）
+    from: QIU-29
+  - name: T_lead_upgrade
+    meaning: 利用技術の版を上げる変更を、最初のコミットから本番に出すまでの時間（40 時間）
+    from: QIU-30
 changelog:
   - version: 1
     date: 2026-10-30
     change: 作成
     reason: 第 3 段階の下書き（質問 1〜14 の回答を反映）
+  - version: 2
+    date: '2026-11-01'
+    change: T_lead を変更の種類ごとの 3 つの名前に分けた
+    reason: 2026-11-01 の利用者の回答への追随

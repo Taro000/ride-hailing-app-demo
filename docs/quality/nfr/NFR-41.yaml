@@ -1,9 +1,9 @@
 id: NFR-41
 title: 保存期間を過ぎた個人情報
 status: draft
-version: 1
+version: 2
 basis: inferred
-basis_note: T_pii_retention は個人情報の扱いの方針で決まるので、値を付けない（推定。質問 6 は未回答）
+basis_note: T_pii_retention は 3 年（2026-11-01 の利用者の回答。この段階では値を提案していない）
 needs_agreement: true
 approver_candidates:
 - プロダクトオーナー
@@ -30,3 +30,7 @@ changelog:
   date: '2026-10-31'
   change: 作成
   reason: 第 4 段階の下書き（質問 1〜4 の回答を反映）
+- version: 2
+  date: '2026-11-01'
+  change: T_pii_retention の値を basis_note に書いた
+  reason: 2026-11-01 の利用者の回答への追随
