@@ -1,7 +1,7 @@
 id: FRP-07
 title: 状態の変化を画面に示した時刻を記録する
-status: proposed
-version: 1
+status: accepted
+version: 2
 basis: inferred
 basis_note: null
 needs_agreement: false
@@ -16,9 +16,13 @@ affects:
 - NFR-02
 - SLI-02
 placeholders: []
-resolution: null
+resolution: FR-54 として受け入れた（新しい FR）。
 changelog:
 - version: 1
   date: '2026-10-31'
   change: 提案
   reason: 第 4 段階の下書き
+- version: 2
+  date: '2026-11-01'
+  change: 受け入れた（FR-54）
+  reason: 第 2 段階の質問 14〜17（2026-11-01）

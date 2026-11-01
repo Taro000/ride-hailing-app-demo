@@ -1,7 +1,7 @@
 id: FRP-08
 title: 決済のサービスの記録と毎日突き合わせる
-status: proposed
-version: 2
+status: accepted
+version: 3
 basis: inferred
 basis_note: 決済のサービスを選ぶまでは自作の仮のスタブで代わりにする（2026-11-01 の利用者の回答）。その間の突き合わせは自分で書いたスタブとの比較になり、SLI-04 は何も確かめない。テスト環境へ差し替えた後に意味を持つ
 needs_agreement: false
@@ -22,7 +22,7 @@ affects:
 - NFR-38
 - SLI-04
 placeholders: []
-resolution: null
+resolution: FR-55 として受け入れた（新しい FR）。FR-49 に一致しなかった項目を示すことを加えた。仮の決済スタブの間は確かめる意味がない。
 changelog:
 - version: 1
   date: '2026-10-31'
@@ -32,3 +32,7 @@ changelog:
   date: '2026-11-01'
   change: basis_note に仮の決済スタブの影響を書いた
   reason: 2026-11-01 の利用者の回答への追随
+- version: 3
+  date: '2026-11-01'
+  change: 受け入れた（FR-55）
+  reason: 第 2 段階の質問 14〜17（2026-11-01）

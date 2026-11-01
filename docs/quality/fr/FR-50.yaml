@@ -1,12 +1,12 @@
 id: FR-50
 title: 返金
 status: draft
-version: 2
+version: 3
 basis: inferred
 basis_note: QIU-26 から導いた。受け入れ基準は推定
 needs_agreement: false
 approver_candidates: []
-statement: システムは、運営・サポート担当が乗車の請求の一部または全部を、返金できる残りの額の範囲で、理由を添えて返金できるようにし、同じ返金を二度行わない。
+statement: システムは、運営・サポート担当が依頼の請求（運賃、キャンセル料、不在の料金）の一部または全部を、返金できる残りの額の範囲で、理由を添えて返金できるようにし、同じ返金を二度行わない。
 origin: quality-in-use
 cuj: CUJ-16
 cuj_step: null
@@ -33,3 +33,7 @@ changelog:
     date: 2026-10-31
     change: 品質のヒントの特性を経済リスク緩和性から有効性に直した
     reason: 第 1 段階の再実行で、たどる QIU が版 2（有効性）になった
+  - version: 3
+    date: '2026-11-01'
+    change: キャンセル料と不在の料金も返金できるようにした
+    reason: FR-07 版 2 と FR-27 版 2 への追随（第 2 段階の質問 14〜17（2026-11-01））。迎車の遅れでない取り消しでも、ドライバーのせいなら苦情から返金する
