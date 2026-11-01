@@ -1,7 +1,7 @@
 id: FRP-09
 title: 許諾のときに示した迎車の到着予定を記録する
-status: proposed
-version: 1
+status: accepted
+version: 2
 basis: inferred
 basis_note: FR-07 版 2 から推定。提案することは質問 17〜19（2026-11-01）の前提の確認
 needs_agreement: false
@@ -19,9 +19,13 @@ affects:
 - FR-07
 - NFR-12
 placeholders: []
-resolution: null
+resolution: FR-10 版 2 として受け入れた。FR-07 版 3 はこの記録で無料かを決める。
 changelog:
 - version: 1
   date: '2026-11-01'
   change: 提案
   reason: 第 3 段階の再実行（第 2 段階 7d0cb6d）
+- version: 2
+  date: '2026-11-01'
+  change: 受け入れた
+  reason: 第 2 段階の質問 18・19（2026-11-01）

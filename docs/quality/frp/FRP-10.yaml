@@ -1,7 +1,7 @@
 id: FRP-10
 title: 乗車場所から離れた到着の知らせを受け付けない
-status: proposed
-version: 1
+status: accepted
+version: 2
 basis: inferred
 basis_note: QR-49 から。提案することは質問 17〜19（2026-11-01）。現在地を得られないときの扱いは第 2 段階で決める
 needs_agreement: false
@@ -20,9 +20,13 @@ placeholders:
 - name: D_arrival
   meaning: 乗る場所から何メートル以内なら到着を受け付けるか（現在地の誤差を見込む）
   from: FRP-10
-resolution: null
+resolution: FR-25 版 2 として受け入れた。位置を確かめられないときは受け付けて印を付け（質問 18）、その依頼では不在の料金を請求しない（FR-27 版 3）。キャンセル料の判定では着いていないと扱う（FR-07 版 3）。
 changelog:
 - version: 1
   date: '2026-11-01'
   change: 提案
   reason: 第 3 段階の再実行（第 2 段階 7d0cb6d）
+- version: 2
+  date: '2026-11-01'
+  change: 受け入れた
+  reason: 第 2 段階の質問 18・19（2026-11-01）
