@@ -1,20 +1,20 @@
 id: QR-08
 title: 手配の前に示す到着予定時刻の計算
 status: draft
-version: 2
+version: 3
 basis: inferred
-basis_note: 第 1 段階のヒント（データ）から、見分けの確認で機能正確性に移した。迎車までの時間を含めることは質問 6 で確認済み（FRP-01 は FR-03 版 2 として受け入れられた）。点と扱いは推定
+basis_note: 第 1 段階のヒント（データ）から、見分けの確認で機能正確性に移した。迎車までの時間を含めることは質問 6 で確認済み（FRP-01 は FR-03 版 2 として受け入れられた）。点と扱いは推定。迎車の到着予定をここで扱うことは質問 17〜19（2026-11-01）の前提の確認。許諾のときの到着予定を記録する FR がないので FRP-09 を出した
 needs_agreement: true
 approver_candidates: [プロダクトオーナー, 開発の責任者]
 model: product
 layer: external
 characteristic: functional suitability > functional correctness
-statement: システムは、手配の前に示す目的地への到着予定時刻を、ドライバーが見つかるまでと迎車の時間を含めて、実際の到着から外れないように計算する。
-applies_to: [FR-03, FR-12]
+statement: システムは、手配の前に示す目的地への到着予定時刻を、ドライバーが見つかるまでと迎車の時間を含めて、実際の到着から外れないように計算する。許諾のときに示す乗車場所への到着予定時刻も、実際の迎車の到着から外れないように計算する。
+applies_to: [FR-03, FR-07, FR-10, FR-12]
 traces_to: [QIU-02]
 entry_point: null
 stakeholders: [USR-01, 地図・経路・渋滞の情報の外部サービス]
-failure_scenario: 手配の前に示す到着予定時刻が、ドライバーが見つかるまでと迎車の時間を含まず、いつも実際より早い。乗客が電車や約束に間に合わない。FR-03 が経路と渋滞だけから計算する作りなので、ほぼ毎回起こる。
+failure_scenario: 手配の前に示す到着予定時刻が、ドライバーが見つかるまでと迎車の時間を含まず、いつも実際より早い。乗客が電車や約束に間に合わない。FR-03 が経路と渋滞だけから計算する作りなので、ほぼ毎回起こる。許諾のときに示す迎車の到着予定が楽観的すぎると、迎車が遅れたとして無料の取り消しが増えてドライバーがキャンセル料を受け取れず、悲観的すぎると、迎車が遅れていても乗客にキャンセル料がかかる（FR-07）。
 score: {impact: 4, likelihood: 4}
 handling: emphasized
 handling_reason: null
@@ -34,3 +34,7 @@ changelog:
     date: 2026-10-31
     change: FRP-01 の受け入れを根拠に記録した
     reason: 第 3 段階の再実行（第 1 段階 55db34c、第 2 段階 dbb8df9）
+  - version: 3
+    date: '2026-11-01'
+    change: 許諾のときに示す迎車の到着予定を対象に加えた（キャンセル料の判定に使う）
+    reason: 第 3 段階の再実行（第 2 段階 7d0cb6d）

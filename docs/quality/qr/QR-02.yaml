@@ -1,9 +1,9 @@
 id: QR-02
 title: 状態の変化を相手の画面に届ける速さ
 status: draft
-version: 1
+version: 2
 basis: inferred
-basis_note: 失敗のシナリオ、点、扱いは推定。画面への配信の仕組みは未定のため起こりやすさを高めに見た
+basis_note: 失敗のシナリオ、点、扱いは推定。画面への配信の仕組みは未定のため起こりやすさを高めに見た。FR-54（示した時刻の記録）は測るための機能（SLI-02）なので applies_to に入れない（質問 17〜19（2026-11-01）の前提の確認）
 needs_agreement: true
 approver_candidates: [プロダクトオーナー, 開発の責任者]
 model: product
@@ -27,3 +27,7 @@ changelog:
     date: 2026-10-30
     change: 作成
     reason: 第 3 段階の下書き（質問 1〜14 の回答を反映）
+  - version: 2
+    date: '2026-11-01'
+    change: 根拠に FR-54 の扱いを書いた（中身は変えない）
+    reason: 第 3 段階の再実行（第 2 段階 7d0cb6d）

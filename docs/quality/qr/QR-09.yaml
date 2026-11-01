@@ -1,20 +1,20 @@
 id: QR-09
 title: 示した料金どおりに一度だけ請求する
 status: draft
-version: 2
+version: 3
 basis: inferred
-basis_note: 決済はテスト環境（質問 1）なので影響を 5 から 3 に下げた。たどる QIU-08 は版 2 で有効性になった（誰も実際のお金を失わない）が、示した額どおりに一度だけ決済されることは変わらないので点は変えない。FRP-02 は FR-29 版 2 として受け入れられた。点と扱いは推定
+basis_note: 決済はテスト環境（質問 1）なので影響を 5 から 3 に下げた。たどる QIU-08 は版 2 で有効性になった（誰も実際のお金を失わない）が、示した額どおりに一度だけ決済されることは変わらないので点は変えない。FRP-02 は FR-29 版 2 として受け入れられた。キャンセル料と不在の料金をここで扱うことは質問 17〜19（2026-11-01）の前提の確認。取り消しの公正さを扱う QIU はなく、たどる先は QIU-08 のまま。規則が増えたが点は変えない。点と扱いは推定
 needs_agreement: true
 approver_candidates: [プロダクトオーナー, 開発の責任者]
 model: product
 layer: external
 characteristic: functional suitability > functional correctness
-statement: システムは、乗車ごとに、手配時に確定した料金（降車場所を変えたときは乗客が承認した変更後の料金）だけを一度だけ請求し、二重の依頼、二重の押さえ、二重の請求を起こさない。
-applies_to: [FR-05, FR-12, FR-29, FR-30, FR-31]
+statement: システムは、乗車ごとに、手配時に確定した料金（降車場所を変えたときは乗客が承認した変更後の料金）だけを一度だけ請求し、二重の依頼、二重の押さえ、二重の請求を起こさない。許諾の後の取り消しと不在には、決まった額のキャンセル料か不在の料金を一度だけ請求し、迎車が遅れて無料になる取り消しには請求しない。
+applies_to: [FR-03, FR-05, FR-07, FR-12, FR-27, FR-29, FR-30, FR-31]
 traces_to: [QIU-08]
 entry_point: null
 stakeholders: [USR-01, 決済の外部サービス]
-failure_scenario: 降車場所を変えた後も古い料金で請求する。決済のサービスが応答しない請求を確かめる処理（FR-29）が誤り、別の支払い手段でも払わせて二重に請求する。
+failure_scenario: 降車場所を変えた後も古い料金で請求する。決済のサービスが応答しない請求を確かめる処理（FR-29）が誤り、別の支払い手段でも払わせて二重に請求する。迎車が到着予定から T_cancel_grace を過ぎていたのにキャンセル料を請求する。取り消しの操作が二度届き、キャンセル料を二度請求する。
 score: {impact: 3, likelihood: 3}
 handling: emphasized
 handling_reason: null
@@ -23,7 +23,10 @@ conflicts:
   - with: QR-04
     note: 結果の分からない請求を確かめ終えるまで降車時の結果が出ない。乗客は待たずに降りられ、画面に「請求を確かめています」と示す（質問 9）
 stated_numbers: []
-placeholders: []
+placeholders:
+  - name: T_cancel_grace
+    meaning: 許諾のときに示した乗車場所への到着予定時刻から、迎車が何分遅れたらキャンセル料をかけないか
+    from: FR-07
 changelog:
   - version: 1
     date: 2026-10-30
@@ -33,3 +36,7 @@ changelog:
     date: 2026-10-31
     change: FRP-02 の受け入れに合わせて失敗のシナリオを直した。QR-43 の支えを外した（質問 16）
     reason: 第 3 段階の再実行（第 1 段階 55db34c、第 2 段階 dbb8df9）
+  - version: 3
+    date: '2026-11-01'
+    change: キャンセル料と不在の料金を加えた（FR-07・27 版 2）
+    reason: 第 3 段階の再実行（第 2 段階 7d0cb6d）
