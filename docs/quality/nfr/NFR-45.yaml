@@ -1,0 +1,31 @@
+id: NFR-45
+title: 不在の料金とキャンセル料の根拠の見直し
+status: draft
+version: 1
+basis: inferred
+basis_note: QR-49 は最低限守る線なので、軽い監視にした。件数の多いドライバーを見つける値は置かず、料金を取った依頼をすべて一覧にする（デモの規模で読める件数の見込み。推定）。D_arrival の値は NFR-14 の 50 m と同じにする
+needs_agreement: true
+approver_candidates:
+- プロダクトオーナー
+- 開発の責任者
+from:
+- QR-49
+kind: monitor
+cuj: CUJ-07
+statement: 毎日、前日に不在の料金かキャンセル料を請求した依頼を、到着の位置と乗る場所の距離、到着から不在で終えるまでの時間、ドライバーとともに一覧にし、運営・サポート担当に知らせる。あわせて「位置を確かめられなかった」到着の件数をドライバーごとに数える。
+conditions:
+  workload: 少人数の参加者のデモ。件数は未定（運用の事実）。常時稼働し、使うのはデモの回だけ（質問 1）
+  users: デモの参加者（乗客、ドライバー、運営・サポート担当）。エンジニアのテスト用アカウント、合成の監視、負荷試験は除く
+  transactions: null
+slo: null
+gate: null
+audit: null
+monitor:
+  signal: 状態の履歴（FR-39）の到着（FR-25 の位置と印）、不在（FR-27）、取り消し（FR-07）とキャンセル料・不在の料金の請求
+  threshold: 請求した依頼が 1 件でもあれば翌日に一覧を知らせる
+  notifies: 運営・サポート担当（翌日にチャット）。おかしな請求は苦情と同じく返金する（FR-50）
+changelog:
+- version: 1
+  date: '2026-11-01'
+  change: 作成
+  reason: 第 4 段階の再実行（第 2 段階 7d0cb6d・08c3ee0、第 3 段階 156240c・9c28917）

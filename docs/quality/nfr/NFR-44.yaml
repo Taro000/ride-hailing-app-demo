@@ -1,0 +1,32 @@
+id: NFR-44
+title: 最初のデモの前の決済の差し替えの確かめ
+status: draft
+version: 1
+basis: inferred
+basis_note: 決済を選ぶまで仮のスタブで代わりにし、最初のデモの前にテスト環境へ差し替える制約（context.yaml、2026-11-01）から。デモに入る前の確かめにすることは第 4 段階の質問 7〜9（2026-11-01）
+needs_agreement: true
+approver_candidates:
+- プロダクトオーナー
+- 開発の責任者
+from:
+- QR-32
+- QR-09
+kind: gate
+cuj: CUJ-08
+statement: 最初のデモの前に、決済が仮のスタブではなく決済のサービスのテスト環境につながっていること、FR-55 が前日分の押さえ・請求・返金の記録を取り出して突き合わせられることを確かめる。満たさなければデモを始めない。
+conditions:
+  workload: 少人数の参加者のデモ。件数は未定（運用の事実）。常時稼働し、使うのはデモの回だけ（質問 1）
+  users: デモの参加者（乗客、ドライバー、運営・サポート担当）。エンジニアのテスト用アカウント、合成の監視、負荷試験は除く
+  transactions: null
+slo: null
+gate:
+  where: デモに入る前の確かめ（リリース前の確認）
+  check: 本番の設定の決済の接続先がテスト環境であること。テスト用アカウントで押さえ・請求・キャンセル料・返金を一件ずつ行い、翌日の FR-55 の結果がすべて一致すること
+  threshold: すべて満たす
+audit: null
+monitor: null
+changelog:
+- version: 1
+  date: '2026-11-01'
+  change: 作成
+  reason: 第 4 段階の再実行（第 2 段階 7d0cb6d・08c3ee0、第 3 段階 156240c・9c28917）

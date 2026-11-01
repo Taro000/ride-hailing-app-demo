@@ -1,9 +1,9 @@
 id: NFR-15
 title: 評価を送る操作の数
 status: draft
-version: 1
+version: 2
 basis: inferred
-basis_note: 2 回は提案（段階を選ぶ、送る）。T_rate は利用時の品質のしきい値なので、ここでは値を付けない
+basis_note: 2 回は提案（段階を選ぶ、送る）。T_rate は第 1 段階で 15 秒に決まった（QIU-09）。2 回の操作はその中に収まる見込み
 needs_agreement: true
 approver_candidates:
 - プロダクトオーナー
@@ -29,3 +29,7 @@ changelog:
   date: '2026-10-31'
   change: 作成
   reason: 第 4 段階の下書き（質問 1〜4 の回答を反映）
+- version: 2
+  date: '2026-11-01'
+  change: 根拠に T_rate の値を書いた
+  reason: 第 4 段階の再実行（第 2 段階 7d0cb6d・08c3ee0、第 3 段階 156240c・9c28917）
