@@ -1,0 +1,54 @@
+id: DEC-13
+title: 毎日の処理が Stripe の一覧を取り出して突き合わせる（Webhook なし）
+status: draft
+version: 1
+basis: inferred
+basis_note: 提案
+needs_agreement: false
+approver_candidates: []
+stage: architecture
+question: 自分の押さえ・請求・返金の記録を Stripe の記録とどう突き合わせるか
+addresses:
+- DRV-04
+- DRV-27
+- DRV-33
+options:
+- name: 毎日の処理（DEC-05）が前日分の押さえ・確定・返金を Stripe の一覧の API で取り出し（依頼の ID をメタデータに入れておく）、依頼ごとに自分の記録と比べ、結果を追記する。結果が分からない操作もここで確かめる
+  effect: サーバーが止まっていても突き合わせられる。受ける入口が増えない
+  cost: 一覧の取り出しと比べ方を作る
+- name: Webhook でサーバーが Stripe の出来事を受け、写しを持ち続ける
+  effect: 出来事がすぐ分かる
+  cost: サーバーはデモの回にしか動かず、届かなかった出来事の取り直しが要る。署名を確かめる入口が増える
+- name: Stripe の有料の報告を使う
+  effect: 集計を任せられる
+  cost: 有料の機能
+chosen: 毎日の処理（DEC-05）が前日分の押さえ・確定・返金を Stripe の一覧の API で取り出し（依頼の ID をメタデータに入れておく）、依頼ごとに自分の記録と比べ、結果を追記する。結果が分からない操作もここで確かめる
+rationale: TC-08（DRV-18）でサーバーは常時動かないので、出来事を受ける作りより取り出す作りが合う。受ける入口を増やさない（DRV-29）。DRV-26 の費用を増やさない
+rejected:
+- option: Webhook でサーバーが Stripe の出来事を受け、写しを持ち続ける
+  reason: サーバーが常に動かず（TC-08）、入口が増える
+- option: Stripe の有料の報告を使う
+  reason: DRV-26 に反する
+gains:
+- サーバーなしで突き合わせられる
+- 受ける入口が増えない
+costs:
+- 一覧の取り出しと比べ方を作る手間
+sensitive_points:
+- 押さえ直し（DEC-11）で押さえが複数ある乗車の比べ方
+trade_offs: []
+assumptions:
+- 押さえ、確定、返金に依頼の ID をメタデータとして付け、一覧から依頼ごとに集められる
+depends_on:
+- DEC-05
+- DEC-10
+parameters: []
+debt: null
+deferred: false
+revisit_when: null
+as_is: new
+changelog:
+- version: 1
+  date: '2026-11-03'
+  change: 作成
+  reason: 第 2 段階の下書き（質問 1〜12 の回答を反映）

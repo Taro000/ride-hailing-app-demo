@@ -1,0 +1,25 @@
+id: FND-02
+title: 毎日の処理のジョブをデモの期間だけ有効にすることが TC-07 と DRV-18 の文と食い違う
+status: open
+version: 1
+basis: confirmed
+basis_note: 第 2 段階の質問 1 の回答（2026-11-03）
+needs_agreement: false
+approver_candidates: []
+raised_by: architecture-drivers-to-architecture
+raised_in: 2-architecture.md
+to: requirements-to-architecture-drivers
+targets:
+- TC-07
+- TC-08
+- DRV-18
+- DRV-33
+severity: major
+evidence: TC-07 と DRV-18 は「Cloud Run はデモの回と確かめのための短い間だけ配備する。サーバーを動かすのはデモと開発のときだけ」とする。第 2 段階の質問 1 で、毎日の処理を Cloud Scheduler と Cloud Run のジョブにし、デモの期間（最初のデモの回の日から、最後の回の翌朝の処理が終わるまで）だけ有効にすると決まった（DEC-05）。ジョブはデモの回の外にも配備されたまま動く。DRV-33 は「次に動いたときに続ける」とサーバーの起動を前提にしている
+suggestion: TC-07 に「毎日の処理のジョブと定時の起動は、デモの期間だけ有効にする」を足し、DRV-18 の文を合わせる。DRV-33 を「時刻で動く処理は、動かなかった間の分を次の実行で抜けなく続ける」に直す
+resolution: null
+changelog:
+- version: 1
+  date: '2026-11-03'
+  change: 出した
+  reason: 第 2 段階の質問 1 の回答

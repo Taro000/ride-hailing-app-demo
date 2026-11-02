@@ -1,0 +1,56 @@
+id: DEC-15
+title: 位置を状態の履歴とログから切り離す
+status: draft
+version: 1
+basis: inferred
+basis_note: QR-39 の「権限のある人だけが読める形」は入力。分け方は提案（質問 10 は回答なし）
+needs_agreement: false
+approver_candidates: []
+stage: architecture
+question: 状態の履歴に要る位置を、個人情報を守りながらどう持つか
+addresses:
+- DRV-21
+- DRV-32
+- DRV-27
+- DRV-29
+options:
+- name: 位置は位置の記録の表に分け、状態の履歴は参照だけを持つ。位置を読めるのは運営・サポート担当とエンジニアの役割、配車のモジュール、毎日の処理だけ。ログとエラーの記録には座標を書かない（書けない型にする）。保存期間を過ぎると位置の記録を消し、履歴から操作した人を消す
+  effect: 履歴とログに座標がないまま、どの変化にも位置がある
+  cost: 位置を読むたびに表を結ぶ
+- name: 位置を状態の履歴の行に入れ、読める人を API で限る
+  effect: 単純
+  cost: 履歴に座標が残り、DRV-32 と NFR-40 に反する
+- name: 位置を丸めて（100 m ほど）履歴に入れる
+  effect: 個人を特定しにくい
+  cost: NFR-14（50 m）、到着の確かめ（QR-49）、SLI-05 を満たさない
+chosen: 位置は位置の記録の表に分け、状態の履歴は参照だけを持つ。位置を読めるのは運営・サポート担当とエンジニアの役割、配車のモジュール、毎日の処理だけ。ログとエラーの記録には座標を書かない（書けない型にする）。保存期間を過ぎると位置の記録を消し、履歴から操作した人を消す
+rationale: QR-39 は「伏せるか、権限のある人だけが読める形」を許す。原則 DRV-32 は履歴に伏せていない位置を残さないことを、DRV-27（SLI-05）はどの変化にも位置があることを求める。分けて持つと両方を満たし、DRV-21 の保存期間の処理も表を消すだけになる。DRV-32 と DRV-27 の文の食い違いは FND-01 にした
+rejected:
+- option: 位置を状態の履歴の行に入れ、読める人を API で限る
+  reason: 原則 DRV-32 に反する
+- option: 位置を丸めて（100 m ほど）履歴に入れる
+  reason: DRV-27 を満たさない
+gains:
+- 履歴とログに座標がない（NFR-40）
+- どの変化にも位置がある（SLI-05、NFR-14、NFR-45）
+- 保存期間の処理が単純
+costs:
+- 位置を読むたびに表を結ぶ
+sensitive_points:
+- 位置を読める役割とモジュールの範囲
+trade_offs:
+- with: DRV-28
+  note: ログに座標がないので、位置の問題を調べるときは位置の記録を役割の権限で読む
+assumptions: []
+depends_on:
+- DEC-08
+parameters: []
+debt: null
+deferred: false
+revisit_when: null
+as_is: new
+changelog:
+- version: 1
+  date: '2026-11-03'
+  change: 作成
+  reason: 第 2 段階の下書き（質問 1〜12 の回答を反映）

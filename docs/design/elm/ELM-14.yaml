@@ -1,0 +1,27 @@
+id: ELM-14
+title: Cloud Monitoring
+status: draft
+version: 1
+basis: inferred
+basis_note: 提案
+needs_agreement: false
+approver_candidates: []
+kind: external-system
+name: Cloud Monitoring
+responsibility: Cloud Run の標準の指標を見て、アプリが止まったときにチャットへ知らせる規則を一つ持つと想定する
+functions: []
+drivers:
+- DRV-01
+- DRV-28
+decisions:
+- DEC-17
+team: null
+technology: Cloud Monitoring
+runs_on: null
+depends_on: []
+as_is: new
+changelog:
+- version: 1
+  date: '2026-11-03'
+  change: 作成
+  reason: 第 2 段階の下書き（質問 1〜12 の回答を反映）

@@ -1,0 +1,43 @@
+id: ELM-03
+title: 管理とエンジニアの画面
+status: draft
+version: 1
+basis: inferred
+basis_note: 提案
+needs_agreement: false
+approver_candidates: []
+kind: component
+name: 管理とエンジニアの画面
+responsibility: 運営・サポート担当の登録、停止と再開、苦情と対処、請求の記録、返金の画面。エンジニアの状態の履歴の検索と、各変化のトレース ID から Logs Explorer へのつなぎ
+functions:
+- FR-01
+- FR-37
+- FR-40
+- FR-45
+- FR-46
+- FR-47
+- FR-48
+- FR-49
+- FR-50
+drivers:
+- DRV-21
+- DRV-25
+- DRV-28
+- DRV-29
+decisions:
+- DEC-19
+- DEC-20
+- DEC-23
+- DEC-31
+team: TEAM-01
+technology: React（TC-02）。組み立ては Vite（DEC-23、DEC-32）
+runs_on: ELM-16
+depends_on:
+- ELM-04
+- ELM-11
+as_is: new
+changelog:
+- version: 1
+  date: '2026-11-03'
+  change: 作成
+  reason: 第 2 段階の下書き（質問 1〜12 の回答を反映）

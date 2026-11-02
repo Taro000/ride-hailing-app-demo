@@ -1,0 +1,62 @@
+id: DEC-11
+title: 料金が上がる降車場所の変更は押さえ直す
+status: draft
+version: 1
+basis: inferred
+basis_note: 選んだ案は質問 3 で確認済み。Stripe の文書の事実は入力。3D セキュアの前提は推定
+needs_agreement: false
+approver_candidates: []
+stage: architecture
+question: 降車場所の変更で料金が上がるとき、押さえた額をどう増やすか
+addresses:
+- DRV-04
+- DRV-26
+- DRV-30
+options:
+- name: 押さえ直す。新しい料金の額で押さえ、できたら古い押さえを取り消す。できなければ降車場所を変えない（FR-12 AC4）。料金が下がるときは新しい額で押さえ直し、できなければ古い押さえのまま下がった額だけを確定する
+  effect: どのカードでも同じ流れ。押さえの額はいつも確定した料金と同じ
+  cost: 1 回の乗車に押さえが複数になりうる。突き合わせがその場合を扱う
+- name: 押さえの増額を使えるときだけ使う
+  effect: 押さえが一つのまま
+  cost: Mastercard は日本のアカウントの円の取引で使えず、IC+ でない利用者は申し込みが要る（Stripe の文書）。使えないカードの扱いが別に要る
+- name: 料金が上がる変更は断る
+  effect: 最も単純
+  cost: 遠くへの変更がいつも断られ、FR-12 が実質使えない
+- name: 手配のときに多めに押さえる
+  effect: 押さえ直しが要らない
+  cost: 押さえの額が確定した料金と同じこと（NFR-08）に反する
+chosen: 押さえ直す。新しい料金の額で押さえ、できたら古い押さえを取り消す。できなければ降車場所を変えない（FR-12 AC4）。料金が下がるときは新しい額で押さえ直し、できなければ古い押さえのまま下がった額だけを確定する
+rationale: 利用者が選んだ（質問 3）。第 1 段階が第 2 段階に回した DRV-04 と DRV-26 の競合を、カードの種類によらない一つの流れで解く
+rejected:
+- option: 押さえの増額を使えるときだけ使う
+  reason: 円の取引の Mastercard で使えず、申し込みが要る。Stripe がこのアカウントで使えるようにしたときに考え直す
+- option: 料金が上がる変更は断る
+  reason: FR-12 が実質使えない
+- option: 手配のときに多めに押さえる
+  reason: NFR-08 に反する
+gains:
+- 押さえの額がいつも確定した料金と同じ
+- カードの種類によらない
+costs:
+- 押さえ直しと、押さえが複数ある乗車の突き合わせの手間
+sensitive_points:
+- 登録した支払い手段での押さえ直しに本人の確かめ（3D セキュア）が求められると失敗し、降車場所は変わらない
+trade_offs:
+- with: DRV-26
+  note: 押さえ直しと突き合わせの場合が増える
+assumptions:
+- テスト環境の普通のカードでは押さえ直しに本人の確かめが求められない
+depends_on:
+- DEC-10
+- DEC-12
+- DEC-13
+parameters: []
+debt: null
+deferred: false
+revisit_when: null
+as_is: new
+changelog:
+- version: 1
+  date: '2026-11-03'
+  change: 作成
+  reason: 第 2 段階の下書き（質問 1〜12 の回答を反映）

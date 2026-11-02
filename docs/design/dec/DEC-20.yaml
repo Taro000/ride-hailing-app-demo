@@ -1,0 +1,61 @@
+id: DEC-20
+title: 認証はサーバーの中のライブラリ、管理とエンジニアはパスキーも
+status: draft
+version: 1
+basis: inferred
+basis_note: パスキーの範囲は質問 4 で確認済み。外部の認証サービスを使わないことと、ログインの失敗の上限は推定（質問 11 は回答なし）
+needs_agreement: true
+approver_candidates:
+- 開発の責任者
+stage: architecture
+question: 本人だけがログインでき、役割の画面を役割のアカウントだけに使わせるにはどうするか
+addresses:
+- DRV-29
+- DRV-25
+- DRV-21
+- DRV-26
+options:
+- name: サーバーの中の認証のライブラリで、メールアドレスとパスワード（重い計算の関数で保存）、HttpOnly・Secure・SameSite のクッキーのセッション、ログインの回数の制限と一時の停止を行う。管理とエンジニアの役割はパスキーも求める。役割はサーバーのデータで持ち、経路のまとまりごとに一か所で確かめ、自分の依頼かどうかは配車のモジュールで確かめる
+  effect: 認証のデータが Turso にそろい、手元でも同じに動く。最も強い権限の役割は漏れたパスワードだけでは使えない
+  cost: 認証とパスキーを組み込む手間
+- name: 外部の認証のサービス（Firebase Authentication、Identity Platform）
+  effect: 多要素の認証などを任せられる
+  cost: 外部サービスが一つ増え、ブラウザとサーバーの両方に組み込む
+- name: 全員パスキーだけ
+  effect: 漏れたパスワードの心配がなくなる
+  cost: 参加者全員の登録と、端末をなくしたときのやり直しの流れ
+chosen: サーバーの中の認証のライブラリで、メールアドレスとパスワード（重い計算の関数で保存）、HttpOnly・Secure・SameSite のクッキーのセッション、ログインの回数の制限と一時の停止を行う。管理とエンジニアの役割はパスキーも求める。役割はサーバーのデータで持ち、経路のまとまりごとに一か所で確かめ、自分の依頼かどうかは配車のモジュールで確かめる
+rationale: QR-20（重視）と QR-47（DRV-25、交渉できない）を、外部サービスを増やさずに満たす（DRV-26）。漏れた資格情報の被害が最も大きい管理とエンジニアの役割だけにパスキーを足す（質問 4）。TC-06（DRV-18）の Turso と手元の libSQL で同じに動く
+rejected:
+- option: 外部の認証のサービス（Firebase Authentication、Identity Platform）
+  reason: DRV-26 で負け、手元で同じ形にならない
+- option: 全員パスキーだけ
+  reason: DRV-26 で負ける
+gains:
+- 役割の確かめが一か所
+- 管理のアカウントは漏れたパスワードだけでは使えない
+costs:
+- 認証とパスキーを組み込む手間
+sensitive_points:
+- ログインの失敗の上限と一時の停止の長さ
+- 状態を変える要求での送り元の確かめ
+trade_offs:
+- with: DRV-26
+  note: パスキーの部分を作る
+assumptions:
+- ライブラリの候補は Better Auth（第 4 段階で決める）
+depends_on:
+- DEC-08
+parameters:
+- name: ログインの失敗の上限
+  value: 同じアカウントで 5 回続けて失敗すると 15 分止める
+  basis: 提案。数回打ち間違えても止まらない
+debt: null
+deferred: false
+revisit_when: null
+as_is: new
+changelog:
+- version: 1
+  date: '2026-11-03'
+  change: 作成
+  reason: 第 2 段階の下書き（質問 1〜12 の回答を反映）

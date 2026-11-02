@@ -1,0 +1,63 @@
+id: DEC-12
+title: お金の操作を三重の仕組みで一度だけにする
+status: draft
+version: 1
+basis: inferred
+basis_note: Stripe の冪等キーの保持（24 時間）は文書から。仕組みと値は提案
+needs_agreement: true
+approver_candidates:
+- 開発の責任者
+stage: architecture
+question: お金の操作を、二度届いても、応答がなくても、一度だけにするにはどうするか
+addresses:
+- DRV-30
+- DRV-04
+- DRV-11
+options:
+- name: 三重にする。ブラウザの操作キーと最初の結果の記録（効果と同じトランザクション）、Stripe への決まったキー（依頼とお金の操作の種類と押さえの何番目か）、応答がないときは確かめ中にして Stripe の状態を取り出し、まだ起きていないときだけ同じキーで送り直す
+  effect: 二度の送信、応答のない呼び出し、24 時間を過ぎた確かめのどれでも二度動かない
+  cost: 記録の表と確かめの処理の手間
+- name: Stripe の冪等キーだけに頼る
+  effect: 手間が少ない
+  cost: キーは少なくとも 24 時間しか保たれず（文書）、デモの後の確かめで二重に返金しうる。ブラウザの二度の送信で依頼が二つできうる
+- name: 一意の制約だけで二度目を拒む
+  effect: 依頼の二重は防げる
+  cost: 二度目にエラーを返し（FR-05 AC5 は依頼を一つ作ることを求める）、返金の二重は防げない
+chosen: 三重にする。ブラウザの操作キーと最初の結果の記録（効果と同じトランザクション）、Stripe への決まったキー（依頼とお金の操作の種類と押さえの何番目か）、応答がないときは確かめ中にして Stripe の状態を取り出し、まだ起きていないときだけ同じキーで送り直す
+rationale: 原則 DRV-30 を、DEC-10 で確定が一回に限られることと合わせて満たす。サーバーはデモの回にしか動かず（TC-08）、確かめが 24 時間を超えうる（DEC-05）ので、キーだけに頼らない。Stripe の呼び出しは 1 回 2.5 秒で切り、降車のときは 2 回までやり直して最悪 9.0 秒で NFR-25 の 10 秒に収まる（計算）
+rejected:
+- option: Stripe の冪等キーだけに頼る
+  reason: 24 時間を過ぎた確かめで DRV-30 を満たさない
+- option: 一意の制約だけで二度目を拒む
+  reason: FR-05 AC5 と FR-50 AC3 を満たさない
+gains:
+- 二度の送信と応答のない呼び出しでも一度だけ
+- デモの後の確かめでも安全
+costs:
+- 操作キーの記録の表と確かめの処理の手間
+sensitive_points:
+- Stripe の呼び出しのタイムアウトとやり直しの回数（NFR-25 の 10 秒に収める）
+trade_offs:
+- with: DRV-11
+  note: 応答のない確定は確かめ中として残り、乗客は待たずに降りる（FR-29）
+assumptions:
+- Stripe の一覧と取り出しの API で、押さえの状態と返金を依頼ごとに確かめられる
+depends_on:
+- DEC-08
+- DEC-10
+parameters:
+- name: Stripe の呼び出しのタイムアウト
+  value: 1 回 2.5 秒
+  basis: 手配の確定は 1 回で最悪 2.6 秒（NFR-24 の 3 秒の内。計算）
+- name: 降車のときの確定のやり直し
+  value: 2 回（0.5 秒と 1 秒の待ち）
+  basis: 最悪 9.0 秒で NFR-25 の 10 秒の内（計算）
+debt: null
+deferred: false
+revisit_when: null
+as_is: new
+changelog:
+- version: 1
+  date: '2026-11-03'
+  change: 作成
+  reason: 第 2 段階の下書き（質問 1〜12 の回答を反映）

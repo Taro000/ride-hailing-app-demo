@@ -1,0 +1,40 @@
+id: ELM-06
+title: 配備の仕組み
+status: draft
+version: 1
+basis: inferred
+basis_note: 提案
+needs_agreement: false
+approver_candidates: []
+kind: component
+name: 配備の仕組み
+responsibility: ゲートを通ったイメージを作る。デモの期間を始めるときにジョブと定時の起動を有効にし、終えるときに止める。デモを開くときに構造の変更を当ててサービスを配備し、閉じるときに消す。戻しは前のイメージの配備。配備の記録を残す
+functions:
+- FR-41
+- FR-42
+drivers:
+- DRV-15
+- DRV-16
+- DRV-17
+- DRV-18
+- DRV-26
+decisions:
+- DEC-05
+- DEC-06
+- DEC-25
+- DEC-26
+- DEC-27
+team: TEAM-01
+technology: GitHub Actions（TC-14、DEC-27）
+runs_on: ELM-20
+depends_on:
+- ELM-09
+- ELM-07
+- ELM-04
+- ELM-05
+as_is: new
+changelog:
+- version: 1
+  date: '2026-11-03'
+  change: 作成
+  reason: 第 2 段階の下書き（質問 1〜12 の回答を反映）

@@ -1,0 +1,26 @@
+id: FND-03
+title: 規模の事実が設計の前提にない
+status: open
+version: 1
+basis: confirmed
+basis_note: 第 2 段階の質問 7 の回答（2026-11-03）
+needs_agreement: false
+approver_candidates: []
+raised_by: architecture-drivers-to-architecture
+raised_in: 2-architecture.md
+to: requirements-to-architecture-drivers
+targets:
+- DRV-26
+- DRV-01
+- DRV-02
+- DRV-03
+- DRV-27
+severity: minor
+evidence: 第 2 段階の質問 7 で、デモは 1〜2 回で終わり、参加者は 2 人（乗客とドライバー）、1 回の乗車は 2〜3 回、1 回のデモは 1〜2 日と分かった。設計の前提（design-context.yaml）にこの事実がなく、DRV-01〜03・27 の環境は「少人数」としか言わない。この規模では 28 日の SLO が何も見分けず、DRV-26 の実現の判定と第 1 段階の課題 2 の重さが変わる
+suggestion: 設計の前提に規模の事実（PC の「その他」など）を加え、DRV-01〜03・27 の環境に参加者 2 人と乗車の数を書く。DRV-26 の実現の判定と、品質チェーンへの課題 2 の書き方を見直す
+resolution: null
+changelog:
+- version: 1
+  date: '2026-11-03'
+  change: 出した
+  reason: 第 2 段階の質問 7 の回答

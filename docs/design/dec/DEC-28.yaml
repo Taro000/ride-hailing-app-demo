@@ -1,0 +1,64 @@
+id: DEC-28
+title: Turso の無料の枠の復元と、デモの回の終わりの書き出し
+status: draft
+version: 1
+basis: confirmed
+basis_note: 質問 6 で確認済み。復元の期間は Turso の文書
+needs_agreement: true
+approver_candidates:
+- プロダクトオーナー
+stage: architecture
+question: 障害やまちがった書き込みのあと、記録を障害の直前までどう戻すか
+addresses:
+- DRV-13
+- DRV-04
+- DRV-26
+options:
+- name: Turso の時点を指定した復元（無料の枠で直近 24 時間）に頼り、加えてデモの回の終わりごとにデータベースを書き出して開発者の手元に暗号化して置く。復元は新しいデータベースとして作り、接続先を設定で替えて配備し直す
+  effect: 24 時間以内に気づけば直前まで戻せ、それより後は最後のデモの回の終わりまで戻せる
+  cost: 24 時間を過ぎて気づいた障害は直前まで戻せない
+- name: '有料の契約（Developer: 10 日）で復元の期間を延ばす'
+  effect: 10 日まで直前に戻せる
+  cost: 月の費用（未定の値）
+- name: 別の場所へ写し続ける
+  effect: 自分で持てる
+  cost: 作る手間
+chosen: Turso の時点を指定した復元（無料の枠で直近 24 時間）に頼り、加えてデモの回の終わりごとにデータベースを書き出して開発者の手元に暗号化して置く。復元は新しいデータベースとして作り、接続先を設定で替えて配備し直す
+rationale: 利用者が選んだ（質問 6）。DRV-26（PC-01、無料の枠を優先）。障害の多くはデモの最中か翌朝の毎日の処理（06:00）で見つかり、24 時間の内に入る見込み
+rejected:
+- option: '有料の契約（Developer: 10 日）で復元の期間を延ばす'
+  reason: DRV-26 に反する
+- option: 別の場所へ写し続ける
+  reason: DRV-26 で負ける
+gains:
+- 費用がかからない
+costs:
+- 24 時間を過ぎて気づいた障害は直前まで戻せない
+sensitive_points:
+- 障害に気づくまでの時間
+trade_offs:
+- with: DRV-13
+  note: 直前まで戻せるのは 24 時間の内だけ
+assumptions:
+- 復元は新しいデータベースとして作られる（Turso の文書）
+depends_on:
+- DEC-08
+parameters:
+- name: 復元できる期間
+  value: 24 時間
+  basis: Turso の無料の枠（文書）
+- name: データベースの書き出し
+  value: デモの回の終わりごとに一度
+  basis: 24 時間を過ぎて気づいた障害に備える
+debt:
+  what: 24 時間を過ぎて気づいた障害は直前まで戻せない
+  why_accepted: 無料の枠を優先する（PC-01、質問 6）
+  repay_when: 24 時間を過ぎて気づく障害が起きたとき、または有料の契約に移るとき
+deferred: false
+revisit_when: null
+as_is: new
+changelog:
+- version: 1
+  date: '2026-11-03'
+  change: 作成
+  reason: 第 2 段階の下書き（質問 1〜12 の回答を反映）
