@@ -1,0 +1,23 @@
+id: DRV-33
+title: 時刻で動く処理は止まった分を続ける
+status: draft
+version: 1
+basis: inferred
+basis_note: FR-53・FR-55 と、サーバーがデモと開発のときだけ動くこと（質問 4）から導いた原則
+needs_agreement: false
+approver_candidates: []
+kind: principle
+statement: 時刻で動く処理（突き合わせ、履歴の確かめ、保存期間の処理、毎日の監視）は、サーバーが止まっていた間の分を、次に動いたときに抜けなく続ける
+sources: [FR-53, FR-55, NFR-06, TC-08]
+concern_of: [USR-03, USR-04]
+scenario: null
+negotiable: false
+derived_from: [DRV-04, DRV-21, DRV-27, DRV-18]
+priority: null
+primary: false
+conflicts:
+  - with: DRV-18
+    note: サーバーはデモと開発のときだけ動き、Cloud Run では要求の外で CPU が割り当てられないのが既定。品質チェーンの締めの時刻（NFR-06）は課題 1
+placeholders: []
+changelog:
+  - {version: 1, date: 2026-11-02, change: 作成, reason: 第 1 段階の下書き（質問 1〜10 の回答を反映）}

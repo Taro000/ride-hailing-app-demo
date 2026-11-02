@@ -1,0 +1,46 @@
+id: DRV-18
+title: デモの回は Cloud Run と Turso、ふだんは手元で同じ形で開発する
+status: draft
+version: 1
+basis: inferred
+basis_note: 実行の場所は質問 1・2・4・9 で確認済み（利用者の入力の「ローカルだけで完結」を質問 1 で直した）。交渉できないことは質問 9 で確認済み。難しさと順位は推定で要合意
+needs_agreement: true
+approver_candidates: [プロダクトオーナー, 開発の責任者]
+kind: constraint
+statement: デモの回（と確かめのための短い間）だけ Cloud Run と Turso に出し、ふだんは手元の機械で同じ形で開発する。サーバーを動かすのはデモと開発のときだけ。Turso のデータはデモとデモの間も残す
+sources: [TC-06, TC-07, TC-08]
+concern_of: [STK-01]
+scenario: null
+negotiable: false
+derived_from: []
+priority:
+  business: high
+  business_reason: 交渉できない制約（TC-06〜08）
+  difficulty: high
+  difficulty_reason: Cloud Run はインスタンスが増減し、要求の外では CPU が割り当てられず、デモの回にしか動かない。送り続ける接続（DRV-02、03）と時刻で動く処理（DRV-33）とぶつかる。手元と Cloud Run・Turso で同じ形を保つ。置き場所は作った後に替えにくい
+  rank: 1
+primary: true
+conflicts:
+  - with: DRV-02
+    note: Cloud Run ではつなぎっぱなしの接続がインスタンスに縛られ、Turso には変化の知らせがない（第 2 段階）
+  - with: DRV-03
+    note: Cloud Run のインスタンスの増減の上で現在地を受け続ける（第 2 段階）
+  - with: DRV-33
+    note: サーバーはデモと開発のときだけ動き、Cloud Run では要求の外で CPU が割り当てられないのが既定（第 2 段階で止まった分を続ける）
+  - with: DRV-01
+    note: 品質チェーンは常時稼働を前提にした（品質チェーンへの課題 1）
+  - with: DRV-16
+    note: 本番がデモの回にしかない（品質チェーンへの課題 1）
+  - with: DRV-13
+    note: 障害の直前まで戻すには、Turso の復元の機能に頼るか、別の場所へ写し続ける（第 2 段階）
+  - with: DRV-20
+    note: 解いた。位置情報と画面の点灯に要る HTTPS の入口は、デモの回の Cloud Run が持つ（質問 1・9）
+  - with: DRV-07
+    note: 解いた。iOS の Safari で位置情報と画面の点灯を使う HTTPS の入口は、デモの回の Cloud Run が持つ（質問 1・9）
+  - with: DRV-02
+    note: 解いた。動き回る端末から届く HTTPS の入口は、デモの回の Cloud Run が持つ（質問 1・9）
+  - with: DRV-03
+    note: 解いた。動き回る端末から届く HTTPS の入口は、デモの回の Cloud Run が持つ（質問 1・9）
+placeholders: []
+changelog:
+  - {version: 1, date: 2026-11-02, change: 作成, reason: 第 1 段階の下書き（質問 1〜10 の回答を反映。下書きの「ローカルの機械だけで動かす」を質問 1 で直し、DRV-19 を統合した）}
