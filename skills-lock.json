@@ -1,11 +1,41 @@
 {
   "version": 1,
   "skills": {
+    "architecture-drivers-to-architecture": {
+      "source": "Taro000/req-to-design",
+      "sourceType": "github",
+      "skillPath": "skills/architecture-drivers-to-architecture/SKILL.md",
+      "computedHash": "3b943e57b6e1e09cabc15de9c59395b5fd0e4c38773d57b2cc37e71493f58ec1"
+    },
+    "architecture-to-high-level-design": {
+      "source": "Taro000/req-to-design",
+      "sourceType": "github",
+      "skillPath": "skills/architecture-to-high-level-design/SKILL.md",
+      "computedHash": "93ff35befb7a157ed48ea7097482468f660729cebbcf6b3682b8a6ea3fc635e9"
+    },
+    "design-review": {
+      "source": "Taro000/req-to-design",
+      "sourceType": "github",
+      "skillPath": "skills/design-review/SKILL.md",
+      "computedHash": "8d4d9006d80a2a4c2b8b89907bb0af1b206972ff25dc0b43c65ae3b26ba9fbb1"
+    },
+    "high-level-design-to-detailed-design": {
+      "source": "Taro000/req-to-design",
+      "sourceType": "github",
+      "skillPath": "skills/high-level-design-to-detailed-design/SKILL.md",
+      "computedHash": "b28a0969bc9ec2e63555a6802c4317f52ae893f812f91adff1b15846d1b6095f"
+    },
     "quality-summary-html": {
       "source": "Taro000/quality-summary-html",
       "sourceType": "github",
       "skillPath": "skills/quality-summary-html/SKILL.md",
       "computedHash": "afe69060df4f73b6f4801059a782017983747b40fc842fa76602a65cf9f2ce1b"
+    },
+    "requirements-to-architecture-drivers": {
+      "source": "Taro000/req-to-design",
+      "sourceType": "github",
+      "skillPath": "skills/requirements-to-architecture-drivers/SKILL.md",
+      "computedHash": "442e1ccaf556d948f58515a05cbcf1d3f3e34d491febf51b06136b827c31eb91"
     }
   }
 }
