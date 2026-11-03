@@ -1,14 +1,14 @@
 id: ELM-10
 title: Stripe（テスト環境）
 status: draft
-version: 2
+version: 3
 basis: inferred
 basis_note: 提案
 needs_agreement: false
 approver_candidates: []
 kind: external-system
 name: Stripe（テスト環境）
-responsibility: カードの入力部品、顧客と支払い手段、押さえと確定と取り消し、返金、一覧の取り出しを行うと想定する。約束（SLA、上限）は入力にない
+responsibility: カードの入力部品、顧客と支払い手段、押さえと確定と取り消し、返金、一覧の取り出しを行うと想定する。システムが送る個人の情報は内部の ID だけ（DEC-10）。デモと CI のサンドボックスは、システムを終えるときに消す（DEC-36）。約束（SLA、上限）は入力にない
 functions: []
 drivers:
 - DRV-04
@@ -22,6 +22,7 @@ decisions:
 - DEC-13
 - DEC-25
 - DEC-34
+- DEC-36
 team: null
 technology: Stripe のテスト環境（TC-10）
 runs_on: null
@@ -36,3 +37,7 @@ changelog:
   date: '2026-11-03'
   change: CI のサンドボックス（DEC-25）と制限付きの鍵（DEC-34）を形づくる決定に加えた
   reason: FND-09、13（第 2 段階のレビュー）を受け入れた
+- version: 3
+  date: '2026-11-03'
+  change: 責務に、送るのは内部の ID だけであることと、システムを終えるときにサンドボックスを消すことを書き、DEC-36 を加えた
+  reason: FND-26 を受け入れた（第 2 段階の再実行、3 回目）

@@ -1,14 +1,14 @@
 id: ELM-02
 title: ドライバーの Web アプリ
 status: draft
-version: 2
+version: 3
 basis: inferred
 basis_note: 提案
 needs_agreement: false
 approver_candidates: []
 kind: component
 name: ドライバーの Web アプリ
-responsibility: 受付、依頼の一覧と内容、許諾、迎車と乗車、到着、確認コード、不在、乗車の終わり、受取額、受ける条件の画面。位置の 10 秒ごとの送信、画面の点灯、音、裏に回った時刻の記録と送信、SSE の受信と最新の状態の取り直し
+responsibility: 受付、依頼の一覧と内容、許諾、迎車と乗車、到着、確認コード、不在、乗車の終わり、受取額、受ける条件の画面。停止されたときの受付の画面と依頼の一覧の変化（FR-47）。位置の 10 秒ごとの送信、画面の点灯、音、裏に回った時刻の記録と送信、SSE の受信と最新の状態の取り直し
 functions:
 - FR-01
 - FR-07
@@ -33,6 +33,7 @@ functions:
 - FR-34
 - FR-37
 - FR-38
+- FR-47
 - FR-52
 - FR-54
 drivers:
@@ -73,3 +74,7 @@ changelog:
   date: '2026-11-03'
   change: 形づくる決定に、SSE の流れの上限と 429（DEC-21）、経路の上限の 503（DEC-33）を加えた
   reason: FND-07、08（第 2 段階のレビュー）を受け入れた
+- version: 3
+  date: '2026-11-03'
+  change: functions に FR-47 を足し、責務に停止されたときの受付の画面と依頼の一覧の変化を書いた
+  reason: FND-49 を受け入れた（第 2 段階の再実行、3 回目）。第 3 段階の IFC-26 が FR-47 を運ぶ
