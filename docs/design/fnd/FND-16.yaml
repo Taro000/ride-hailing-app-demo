@@ -1,0 +1,23 @@
+id: FND-16
+title: コードの分け方で、ユースケースが外部サービスの包みに依存する向きになっている
+status: open
+version: 1
+basis: inferred
+basis_note: コードの分け方のビューと依存の規則、DEC-25・26 の文は入力。向きの判断は推定
+needs_agreement: false
+approver_candidates: []
+raised_by: design-review
+raised_in: reviews/2026-11-03-architecture.md
+to: architecture-drivers-to-architecture
+targets:
+- DEC-26
+- DEC-25
+severity: minor
+evidence: コードの分け方のビューは usecase から adapters への矢印で、ユースケース（packages/application）が Stripe、地図、チャットの包みに依存する。DEC-25 は外部サービスを差し替える口を置くとし、報告書は「Stripe の版を上げる → adapters の Stripe の包みだけ」（DRV-14）とする。口（インタフェース）をどのパッケージに置くかが書かれておらず、矢印の向きのままでは、安定した部分が変わりやすい部分に依存する
+suggestion: 口を application か domain に置き、adapters がそれを実装する向きにし、server と batch が組み立てる。この向きを依存の規則（DEC-26）に加え、CI で確かめる
+resolution: null
+changelog:
+- version: 1
+  date: '2026-11-03'
+  change: 出した
+  reason: 第 2 段階のレビュー（活動 A5）
