@@ -1,0 +1,63 @@
+id: DEC-52
+title: 押さえの結果が分からないときの手配と降車場所の変更
+status: draft
+version: 1
+basis: inferred
+basis_note: 選んだ案と T_hold_wait の 60 秒は質問 2 で確認済み。FR-05 にこの扱いがないこと（第 2 段階の品質チェーンへの課題 1）、DEC-12、Stripe の文書（Search は書いた直後の読み出しに向かない）は入力
+needs_agreement: true
+approver_candidates:
+- プロダクトオーナー
+- 開発の責任者
+stage: high-level-design
+question: 手配の押さえか、降車場所の変更の押さえ直しの結果が分からないとき、乗客に何を返し、いつまで確かめるか
+addresses:
+- IFC-02
+- FR-05
+- FR-12
+- DEC-12
+- DRV-04
+- DRV-11
+options:
+- name: 202 で確かめ中を返し、T_hold_wait（60 秒）まで見回りが確かめる。間に合えば探し始め（変更なら変える）、間に合わなければ押さえを解放して手配をやめる（変更なら変えない）。乗客はその間取り消せる
+  effect: 乗客を長く待たせず、押さえが残らない。「押さえていない」と言うのは、確かめて押さえがないと分かったときか、解放したときだけ
+  cost: 確かめが遅いと、押さえられていた手配も取りやめになる
+- name: 確かめがつくまで待つ（乗客は取り消せる）
+  effect: 押さえられた手配は必ず進む
+  cost: Stripe が止まると乗客はいつまでも「確かめています」のまま
+- name: 失敗として返す
+  effect: 画面が単純
+  cost: 押さえが残ったまま乗客に「押さえていない」と言う。interfaces.md の禁止
+chosen: '202 で確かめ中を返し、T_hold_wait（60 秒）まで見回りが確かめる。間に合えば探し始め（変更なら変える）、間に合わなければ押さえを解放して手配をやめる（変更なら変えない）。乗客はその間取り消せる。手配: 一つ目のトランザクションで依頼を booking（手配の処理中）で書き、押さえが分からなければ hold_checking にして 202 HOLD_PENDING。見回りは Stripe の一覧で照らし、なければ 24 時間の内は同じキーで送り直す（取り消しの求めがなく T_hold_wait の内だけ）。T_hold_wait を過ぎるか乗客が取り消したら、押さえがあれば取り消し、not_booked にする。降車場所の変更も同じで、変更を保留し、間に合わなければ新しい押さえを取り消して変えない'
+rationale: 第 2 段階は FR-05 にこの扱いがないことを品質チェーンへの課題 1 にし、この段のエラーの決まりで確かめ中を置くとした。QIU-03 の T_book（30 秒）を考えると、乗客が待てるのは長くて 1 分ほど
+rejected:
+- option: 確かめがつくまで待つ
+  reason: Stripe が止まると終わりがない
+- option: 失敗として返す
+  reason: 押さえが残りうるのに「押さえていない」と言う
+gains:
+- 確かめ中の手配に出口がある（状態遷移図）
+costs:
+- 見回りに確かめの処理が増える
+sensitive_points:
+- T_hold_wait（短いと押さえられた手配も取りやめ、長いと乗客を待たせる）
+trade_offs:
+- with: DRV-11
+  note: 決まった扱いに移るまで最長 60 秒待たせる
+assumptions:
+- 確かめは Stripe の一覧（顧客と作った時刻で絞り、メタデータで照らす）で行い、Search は使わない（書いた直後の読み出しに向かない。Stripe の文書）
+depends_on:
+- DEC-12
+- DEC-04
+parameters:
+- name: T_hold_wait
+  value: 60 秒
+  basis: T_book（30 秒）の 2 倍。見回り（5 秒）で 10 回ほど確かめられる
+debt: null
+deferred: false
+revisit_when: 品質チェーンが第 2 段階の課題 1（FR-05）に答えたとき
+as_is: new
+changelog:
+- version: 1
+  date: '2026-11-03'
+  change: 作成
+  reason: 第 3 段階（質問 1・2 の回答を反映。質問 3〜5 は回答なし）

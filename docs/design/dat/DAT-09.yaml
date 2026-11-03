@@ -1,0 +1,36 @@
+id: DAT-09
+title: 位置の受信の記録
+status: draft
+version: 1
+basis: inferred
+basis_note: 持ち主と置き場所は第 2 段階の情報のビューと DEC-05・08・15（入力）。主な属性と整合の取り方はこの段の推定。保持期間は品質チェーンの T_pii_retention・T_log_retention と第 2 段階の決定（DEC-14、16、22、28、36）から当てはめた
+needs_agreement: false
+approver_candidates: []
+entity: 位置の受信の記録
+owner: ELM-04
+store: ELM-07
+key_attributes:
+- account_id
+- received_at
+- measured_at
+- lat、lng、accuracy_m
+- speed_mps（サーバーが求めた）
+- role_state（受付中、迎車中、乗車中）
+- suspicious（DEC-29）
+relations:
+- to: DAT-01
+  kind: many-to-one
+  note: アカウント
+consistency: 位置のモジュールが受けるたびに追記し、同じトランザクションで最後の位置（DAT-10）を更新する
+retention: T_log_retention（28 日、仮。DEC-14）。毎日の処理が消す
+classification: personal
+drivers:
+- DRV-03
+- DRV-27
+- DRV-29
+as_is: new
+changelog:
+- version: 1
+  date: '2026-11-03'
+  change: 作成
+  reason: 第 3 段階（質問 1・2 の回答を反映。質問 3〜5 は回答なし）

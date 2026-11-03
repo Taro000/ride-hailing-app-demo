@@ -1,0 +1,32 @@
+id: DAT-26
+title: 配備の記録
+status: draft
+version: 1
+basis: inferred
+basis_note: 持ち主と置き場所は第 2 段階の情報のビューと DEC-05・08・15（入力）。主な属性と整合の取り方はこの段の推定。保持期間は品質チェーンの T_pii_retention・T_log_retention と第 2 段階の決定（DEC-14、16、22、28、36）から当てはめた
+needs_agreement: false
+approver_candidates: []
+entity: 配備と開け閉めの記録
+owner: ELM-06
+store: ELM-07
+key_attributes:
+- deploy_id
+- action（open、close、rollback、start_period、end_period、end_system、build）
+- image_digest（サービスとジョブ）
+- service_revision
+- at
+- changes（コミット、種類、最初のコミットの時刻）
+- reason、forced
+relations: []
+consistency: 配備の仕組みだけが手順の終わりに一行書く（FR-41 AC2、FR-42 AC1）
+retention: システムを終えるとき
+classification: internal
+drivers:
+- DRV-16
+- DRV-18
+as_is: new
+changelog:
+- version: 1
+  date: '2026-11-03'
+  change: 作成
+  reason: 第 3 段階（質問 1・2 の回答を反映。質問 3〜5 は回答なし）

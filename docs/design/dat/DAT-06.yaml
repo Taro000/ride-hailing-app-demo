@@ -1,0 +1,58 @@
+id: DAT-06
+title: 配車依頼
+status: draft
+version: 1
+basis: inferred
+basis_note: 持ち主と置き場所は第 2 段階の情報のビューと DEC-05・08・15（入力）。主な属性と整合の取り方はこの段の推定。保持期間は品質チェーンの T_pii_retention・T_log_retention と第 2 段階の決定（DEC-14、16、22、28、36）から当てはめた
+needs_agreement: false
+approver_candidates: []
+entity: 配車依頼
+owner: ELM-04
+store: ELM-07
+key_attributes:
+- ride_id
+- passenger_id、driver_id（今の担当）
+- state（報告書の状態遷移図）と version
+- pickup、dropoff（今の降車場所）
+- fare_booked、fare_current
+- eta_shown（手配のとき、三つの要素）
+- pickup_eta_at_acceptance（許諾ごとに追記。FR-10 AC2）
+- threshold_at_booking、threshold_current（FR-08 AC3）
+- confirmation_code（担当ごと）と試した回数
+- arrival（時刻、確かめたか、疑わしい印。FR-25、DEC-29）
+- vehicle の写し（許諾のとき）
+- payment_status
+- cancel_requested
+- created_at、ended_at
+- test_account
+relations:
+- to: DAT-07
+  kind: one-to-many
+  note: 状態の履歴
+- to: DAT-13
+  kind: one-to-many
+  note: お金の操作
+- to: DAT-15
+  kind: one-to-one
+  note: 評価
+- to: DAT-17
+  kind: one-to-many
+  note: 苦情
+- to: DAT-11
+  kind: one-to-many
+  note: 経路の写し
+consistency: 配車のモジュールだけが書く（DRV-31）。状態の変化は状態遷移表で許されるものだけを、version の条件付きの書き込みで行い、同じトランザクションで状態の履歴（DAT-07）を追記する。割り当ての条件（停止、迎車中でない、しきい値）は同じトランザクションで確かめ直す（DEC-09）。お金の操作は DEC-12 の三つのトランザクションに分け、依頼の状態はお金の結果を待たない（乗車の終わりは一つ目のトランザクションで書く）。支払いの状態は支払いのモジュールが配車のモジュールの操作を呼んで変える
+retention: 個人に結び付く部分は、記録してから T_pii_retention（3 年）を過ぎると毎日の処理が消して匿名にする（FR-53）。残りはシステムを終えるときに消す（DEC-36）
+classification: personal
+drivers:
+- DRV-05
+- DRV-04
+- DRV-31
+- DRV-27
+- DRV-21
+as_is: new
+changelog:
+- version: 1
+  date: '2026-11-03'
+  change: 作成
+  reason: 第 3 段階（質問 1・2 の回答を反映。質問 3〜5 は回答なし）

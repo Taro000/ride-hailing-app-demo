@@ -1,0 +1,75 @@
+id: IFC-10
+title: 毎日の処理と運用のコマンド
+status: draft
+version: 1
+basis: inferred
+basis_note: DEC-05（Cloud Scheduler と Cloud Run のジョブ、毎朝 06:00、追いつき）、DEC-13（突き合わせ）、DEC-17（45 分、やり直し 1 回、黙って成功しない）、DEC-37（閉じる前と終える前の確かめ）は入力。処理の順、処理ごとの上限、count-open と period-status のコマンドで ELM-06 が表を直接読まないこと、期間を終えられるかを要約に書くことは推定（DEC-53。FND-19、FND-22 の一部）
+needs_agreement: true
+approver_candidates:
+- 開発の責任者
+kind: batch
+name: 毎日の処理と運用のコマンド
+provider: ELM-05
+consumers:
+- ELM-06
+- ELM-04
+functions:
+- FR-29
+- FR-30
+- FR-36
+- FR-53
+- FR-55
+operations:
+- name: daily
+  does: 'Cloud Scheduler が毎朝 06:00（日本時間）に起動する（デモの期間だけ）。期間を始めるときと手でも起動する。終わっていない日ごとに次の順で動く: (1) 確かめ中のお金の操作を片付ける、(2) Stripe との突き合わせ（FR-55）と NFR-07 の 1 件ごとの知らせ、(3) 履歴の確かめ（SLI-05）と毎日の監視（NFR-09、14、21、24、25、29、45 と消し忘れたサービス）、(4) SLI の集計（SLI-01〜05）、(5) 保存期間の処理（FR-53）と NFR-41、(6) 期間を終える条件の記録と毎日の結果の知らせ'
+- name: count-open
+  does: 終わっていない依頼、処理中と確かめ中のお金の操作、確定も解放もしていない押さえをその場で数える（デモを閉じる前。ELM-06）
+- name: period-status
+  does: 最後のデモの回の翌朝の処理が終わったかと、その記録の数から、期間を終えられるかを返す（期間を終える前。ELM-06）
+- name: 出力の表
+  does: 突き合わせの結果（DAT-23）、毎日の処理の記録（DAT-24）、SLI の日ごとの値（DAT-25）。ELM-04 は DAT-23 を読むだけ（FR-49 AC3）。ELM-06 は period-status を通して DAT-24 を読み、表を直接は読まない（DEC-53）
+format: 'daily は記録（DAT-23〜25）と知らせ（IFC-17）。count-open と period-status は標準出力に JSON 一つ（schema_version、数、依頼 ID と状態だけの一覧）と終わりの符号（0: 0 件・終えられる、10: 残りがある・まだ、20: Turso に届かない、1: そのほかの失敗）'
+protocol: 同じイメージのコマンド（DEC-05）。daily は Cloud Run のジョブの実行。count-open と period-status は ELM-06 がゲートを通ったイメージで動かす（今は GitHub Actions の実行環境で ELM-06 の Turso のトークンを使う。DEC-34。FND-19 で Cloud Run のジョブの実行に移しても、このコマンドの約束は変わらない）
+auth: daily はジョブのサービスアカウントが Secret Manager の Stripe、Turso、チャットの資格情報を読む（DEC-34）。count-open と period-status は読むだけで足りる
+errors:
+- case: 'daily: Stripe から記録を取り出せない'
+  signal: その日の突き合わせを終えたと記録しない。終わりの符号 1
+  caller_does: 知らせ、次の実行で残りの日を続ける（FR-55 AC3、DRV-33）。ジョブの失敗は ELM-14 の二つ目の規則が知らせる（DEC-17）
+- case: 'daily: 確かめ中のお金の操作を片付けられない（Stripe が答えない）'
+  signal: 確かめ中のまま残し、数を記録と知らせに載せる
+  caller_does: 次の実行で続ける。期間を終える条件は満たさない（DEC-37）
+- case: 'daily: Cloud Logging を読み終えられない'
+  signal: その日の SLI-01 を終えたと記録しない
+  caller_does: 次の実行で続ける
+- case: 'daily: 保存期間の処理が途中で失敗'
+  signal: 変えられなかった件数を記録する
+  caller_does: 次の実行で残りを続ける（FR-53 AC3）
+- case: 'daily: 知らせを送れない'
+  signal: 終わりの符号 1（黙って成功しない。DEC-17）
+  caller_does: ジョブの失敗として ELM-14 が知らせる
+- case: 'daily: Turso に届かない（保管に回った、トークン）'
+  signal: 何もせず終わりの符号 1
+  caller_does: 同上。期間を始めるときは ELM-06 が先に止まる（20）
+- case: 'count-open: 残りがある'
+  signal: 10 と一覧（依頼 ID と状態だけ）
+  caller_does: ELM-06 はデモを閉じずに止まり、一覧を示す（DEC-37）
+- case: 'period-status: 翌朝の処理がまだか、残りがある'
+  signal: '10'
+  caller_does: ELM-06 は期間を終えずに止まる。毎日の結果の知らせが「終えられる」を伝えたら動かし直す
+- case: Turso に届かない
+  signal: '20'
+  caller_does: ELM-06 は止まり、手元の手順（IFC-12）で保管から戻すよう示す
+idempotency: daily は日ごとと処理ごとの終わりの記録で、終わった処理を飛ばす（二度動いても数え直さない）。お金の操作の片付けはリース（DAT-13）を取った一つだけが行う（見回りと重なっても一度だけ）。count-open と period-status は読むだけ
+timing:
+  timeout: ジョブの一回 45 分、やり直し 1 回（DEC-17）。処理ごとの上限は報告書の NFR-06 の予算（仮）。Stripe の呼び出しは 1 回 10 秒、読むだけは 3 回まで送り直す。Cloud Logging は 1 回 30 秒
+  ordering: 古い日から順に、日の中は上の順
+  delivery: null
+versioning: 記録と JSON の出力は schema_version を持つ。足すだけ
+observability: 処理ごとに job.task のログ。毎日の結果を知らせ（成功でも送る。DEC-17）、そこに期間を終えられるか（period_end_ready）を書く。ジョブの実行の結果は ELM-14 の二つ目の規則が見る
+spec: null
+as_is: new
+changelog:
+- version: 1
+  date: '2026-11-03'
+  change: 作成
+  reason: 第 3 段階（質問 1・2 の回答を反映。質問 3〜5 は回答なし）

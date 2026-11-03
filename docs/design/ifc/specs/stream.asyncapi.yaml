@@ -1,0 +1,723 @@
+asyncapi: 3.0.0
+info:
+  title: 状態の変化の配信（IFC-08）
+  version: 1.0.0
+  description: Server-Sent Events。GET /api/v1/stream の長い応答。届け方は少なくとも一度（カーソルから送り直す）。一本の流れの中は状態の履歴の通し番号の順。ride.live は最新の値だけ。流れは 30 分で閉じ、25 秒ごとに生存確認のコメントを送る（DEC-03）。本数はアカウントごと 2、IP ごと 6、全体 40 で、超えると 429 と Retry-After（DEC-21）。画面は changeId と依頼の version で二度目と古いものを捨てる。項目は docs/design/ifc/IFC-08.yaml
+defaultContentType: application/json
+servers:
+  demo:
+    host: '{service}-{projectNumber}.asia-northeast1.run.app'
+    protocol: https
+    pathname: /api/v1/stream
+    description: デモの回の Cloud Run のサービス
+    variables:
+      service:
+        default: ride-demo
+      projectNumber:
+        default: '000000000000'
+    security:
+    - $ref: '#/components/securitySchemes/sessionCookie'
+channels:
+  stream:
+    address: /api/v1/stream
+    description: 受け手（乗客かドライバー）ごとの流れ。見てよい変化だけを送る
+    messages:
+      hello:
+        $ref: '#/components/messages/hello'
+      rideUpdated:
+        $ref: '#/components/messages/rideUpdated'
+      rideLive:
+        $ref: '#/components/messages/rideLive'
+      driverRequests:
+        $ref: '#/components/messages/driverRequests'
+      driverStatus:
+        $ref: '#/components/messages/driverStatus'
+      streamClosing:
+        $ref: '#/components/messages/streamClosing'
+operations:
+  send_hello:
+    action: send
+    channel:
+      $ref: '#/channels/stream'
+    messages:
+    - $ref: '#/channels/stream/messages/hello'
+    summary: つないだ直後
+  send_rideUpdated:
+    action: send
+    channel:
+      $ref: '#/channels/stream'
+    messages:
+    - $ref: '#/channels/stream/messages/rideUpdated'
+    summary: 依頼の状態の変化
+  send_rideLive:
+    action: send
+    channel:
+      $ref: '#/channels/stream'
+    messages:
+    - $ref: '#/channels/stream/messages/rideLive'
+    summary: 相手の位置と到着予定（最新の値だけ）
+  send_driverRequests:
+    action: send
+    channel:
+      $ref: '#/channels/stream'
+    messages:
+    - $ref: '#/channels/stream/messages/driverRequests'
+    summary: ドライバーに示してよい依頼の一覧（丸ごと）
+  send_driverStatus:
+    action: send
+    channel:
+      $ref: '#/channels/stream'
+    messages:
+    - $ref: '#/channels/stream/messages/driverStatus'
+    summary: ドライバーの受付と停止の変化
+  send_streamClosing:
+    action: send
+    channel:
+      $ref: '#/channels/stream'
+    messages:
+    - $ref: '#/channels/stream/messages/streamClosing'
+    summary: 閉じる前の知らせ
+components:
+  securitySchemes:
+    sessionCookie:
+      type: httpApiKey
+      name: __Host-rh_session
+      in: cookie
+  messages:
+    hello:
+      name: hello
+      title: つないだ直後
+      headers:
+        type: object
+        properties:
+          event:
+            type: string
+            const: hello
+            description: SSE の event の欄
+          id:
+            type: string
+            description: SSE の id の欄（カーソル。ride.live と stream.closing は持たない）
+      payload:
+        type: object
+        required:
+        - v
+        - appVersion
+        - serverTime
+        - cursor
+        properties:
+          v: &id001
+            type: integer
+            const: 1
+            description: スキーマの版（DEC-49）
+          appVersion:
+            type: string
+          serverTime:
+            type: string
+            format: date-time
+          cursor:
+            type: string
+    rideUpdated:
+      name: ride.updated
+      title: 依頼の状態の変化
+      headers:
+        type: object
+        properties:
+          event:
+            type: string
+            const: ride.updated
+            description: SSE の event の欄
+          id:
+            type: string
+            description: SSE の id の欄（カーソル。ride.live と stream.closing は持たない）
+      summary: changeId は状態の履歴の変化の ID。表示の記録（FR-54）の鍵。丸ごと送り直すときは null
+      payload:
+        type: object
+        required:
+        - v
+        - changeId
+        - changeType
+        - recordedAt
+        - ride
+        properties:
+          v: *id001
+          changeId:
+            anyOf:
+            - type: string
+            - type: 'null'
+          changeType:
+            anyOf:
+            - type: string
+              enum:
+              - requested
+              - accepted
+              - driver_cancelled
+              - relisted
+              - cancelled
+              - arrived
+              - started
+              - no_show
+              - ended
+              - destination_changed
+              - threshold_lowered
+              - charged
+              - charge_failed
+              - refunded
+              - hold_released
+              - not_booked
+            - type: 'null'
+          recordedAt:
+            anyOf:
+            - type: string
+              format: date-time
+            - type: 'null'
+          ride:
+            oneOf:
+            - $ref: '#/components/schemas/PassengerRide'
+            - $ref: '#/components/schemas/DriverRide'
+            description: 受け手の役割の姿
+    rideLive:
+      name: ride.live
+      title: 相手の位置と到着予定（最新の値だけ）
+      headers:
+        type: object
+        properties:
+          event:
+            type: string
+            const: ride.live
+            description: SSE の event の欄
+          id:
+            type: string
+            description: SSE の id の欄（カーソル。ride.live と stream.closing は持たない）
+      payload:
+        type: object
+        required:
+        - v
+        - rideId
+        - counterpart
+        - eta
+        properties:
+          v: *id001
+          rideId:
+            type: string
+          counterpart:
+            anyOf:
+            - type: object
+              required:
+              - position
+              - receivedAt
+              - stale
+              properties:
+                position:
+                  $ref: '#/components/schemas/Position'
+                receivedAt:
+                  type: string
+                  format: date-time
+                stale:
+                  type: boolean
+                  description: 30 秒（T_loc_fresh）より古い（FR-10 AC4）
+            - type: 'null'
+            description: 乗客にはドライバー、迎車中のドライバーには許可した乗客（FR-24）。ないときは null
+          eta:
+            anyOf:
+            - type: object
+              properties:
+                arrivalAt:
+                  type: string
+                  format: date-time
+                target:
+                  type: string
+                  enum:
+                  - pickup
+                  - dropoff
+            - type: 'null'
+    driverRequests:
+      name: driver.requests
+      title: ドライバーに示してよい依頼の一覧（丸ごと）
+      headers:
+        type: object
+        properties:
+          event:
+            type: string
+            const: driver.requests
+            description: SSE の event の欄
+          id:
+            type: string
+            description: SSE の id の欄（カーソル。ride.live と stream.closing は持たない）
+      payload:
+        type: object
+        required:
+        - v
+        - changeId
+        - items
+        - listHash
+        properties:
+          v: *id001
+          changeId:
+            anyOf:
+            - type: string
+            - type: 'null'
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/RequestListItem'
+          listHash:
+            type: string
+    driverStatus:
+      name: driver.status
+      title: ドライバーの受付と停止の変化
+      headers:
+        type: object
+        properties:
+          event:
+            type: string
+            const: driver.status
+            description: SSE の event の欄
+          id:
+            type: string
+            description: SSE の id の欄（カーソル。ride.live と stream.closing は持たない）
+      payload:
+        type: object
+        required:
+        - v
+        - status
+        - suspended
+        - changedAt
+        properties:
+          v: *id001
+          status:
+            type: string
+            enum:
+            - 'off'
+            - receiving
+          suspended:
+            type: boolean
+          changedAt:
+            type: string
+            format: date-time
+    streamClosing:
+      name: stream.closing
+      title: 閉じる前の知らせ
+      headers:
+        type: object
+        properties:
+          event:
+            type: string
+            const: stream.closing
+            description: SSE の event の欄
+          id:
+            type: string
+            description: SSE の id の欄（カーソル。ride.live と stream.closing は持たない）
+      payload:
+        type: object
+        required:
+        - v
+        - reason
+        - reconnectAfterMs
+        properties:
+          v: *id001
+          reason:
+            type: string
+            enum:
+            - rotation
+            - shutdown
+          reconnectAfterMs:
+            type: integer
+  schemas:
+    DriverCard:
+      type: object
+      properties:
+        name:
+          type: string
+        photoUrl:
+          type: string
+          description: GET /api/v1/passenger/rides/{rideId}/driver-photo
+        vehicle:
+          $ref: '#/components/schemas/Vehicle'
+        confirmationCode:
+          type: string
+          description: 乗車の確認コード（担当ごと。FR-09、FR-26）
+          pattern: ^[0-9]{4}$
+      required:
+      - name
+      - photoUrl
+      - vehicle
+      - confirmationCode
+    DriverRide:
+      type: object
+      properties:
+        rideId:
+          type: string
+          pattern: ^ride_[0-9A-HJKMNP-TV-Z]{26}$
+        state:
+          type: string
+          enum:
+          - booking
+          - hold_checking
+          - not_booked
+          - searching
+          - accepted
+          - arrived
+          - in_progress
+          - ended
+          - cancelled
+          - no_show
+        version:
+          type: integer
+          minimum: 1
+        pickup:
+          $ref: '#/components/schemas/Place'
+        dropoff:
+          $ref: '#/components/schemas/Place'
+        payout:
+          $ref: '#/components/schemas/Money'
+        routeToPickup:
+          anyOf:
+          - $ref: '#/components/schemas/Route'
+          - type: 'null'
+        routeToDropoff:
+          anyOf:
+          - $ref: '#/components/schemas/Route'
+          - type: 'null'
+        pickupEta:
+          anyOf:
+          - type: object
+            properties:
+              arrivalAt:
+                type: string
+                format: date-time
+            required:
+            - arrivalAt
+          - type: 'null'
+        passengerSharingLocation:
+          type: boolean
+          description: 乗客が位置を送っているか（FR-24 AC2）
+        arrival:
+          anyOf:
+          - type: object
+            properties:
+              at:
+                type: string
+                format: date-time
+              verified:
+                type: boolean
+            required:
+            - at
+            - verified
+          - type: 'null'
+        noShowAvailableAt:
+          anyOf:
+          - type: string
+            format: date-time
+            description: 不在で終えられる時刻（T_noshow_wait。FR-27 AC2）
+          - type: 'null'
+        payment:
+          $ref: '#/components/schemas/PaymentState'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+      - rideId
+      - state
+      - version
+      - pickup
+      - dropoff
+      - payout
+      - payment
+      - createdAt
+      - updatedAt
+      description: ドライバーに見せる依頼（乗客の名前と連絡先は持たない）
+    Eta:
+      type: object
+      properties:
+        arrivalAt:
+          type: string
+          format: date-time
+          description: 目的地への到着予定時刻
+        components:
+          type: object
+          properties:
+            matchSec:
+              type: integer
+              minimum: 0
+            pickupSec:
+              type: integer
+              minimum: 0
+            rideSec:
+              type: integer
+              minimum: 0
+          required:
+          - matchSec
+          - pickupSec
+          - rideSec
+          description: ドライバーが見つかるまで、迎車、走行の見込み（FR-03 AC2）
+      required:
+      - arrivalAt
+      - components
+    Money:
+      type: object
+      properties:
+        amount:
+          type: integer
+          description: 円の整数（Stripe のゼロ小数通貨。DEC-41）
+          minimum: 0
+        currency:
+          type: string
+          enum:
+          - jpy
+      required:
+      - amount
+      - currency
+    PassengerRide:
+      type: object
+      properties:
+        rideId:
+          type: string
+          pattern: ^ride_[0-9A-HJKMNP-TV-Z]{26}$
+        state:
+          type: string
+          enum:
+          - booking
+          - hold_checking
+          - not_booked
+          - searching
+          - accepted
+          - arrived
+          - in_progress
+          - ended
+          - cancelled
+          - no_show
+        version:
+          type: integer
+          description: 条件付きの書き込みの版。配信で古いものを捨てるのに使う
+          minimum: 1
+        pickup:
+          $ref: '#/components/schemas/Place'
+        dropoff:
+          $ref: '#/components/schemas/Place'
+        fare:
+          type: object
+          properties:
+            booked:
+              $ref: '#/components/schemas/Money'
+            current:
+              $ref: '#/components/schemas/Money'
+          required:
+          - booked
+          - current
+        eta:
+          anyOf:
+          - $ref: '#/components/schemas/Eta'
+          - type: 'null'
+        pickupEta:
+          anyOf:
+          - type: object
+            properties:
+              arrivalAt:
+                type: string
+                format: date-time
+            required:
+            - arrivalAt
+          - type: 'null'
+        matchWaitDeadline:
+          anyOf:
+          - type: string
+            format: date-time
+            description: T_match_wait を過ぎる時刻。過ぎても許諾がなければ FR-08 の案内を出す
+          - type: 'null'
+        threshold:
+          anyOf:
+          - type: number
+          - type: 'null'
+        driver:
+          anyOf:
+          - $ref: '#/components/schemas/DriverCard'
+          - type: 'null'
+        payment:
+          $ref: '#/components/schemas/PaymentState'
+        arrival:
+          anyOf:
+          - type: object
+            properties:
+              at:
+                type: string
+                format: date-time
+              verified:
+                type: boolean
+            required:
+            - at
+            - verified
+          - type: 'null'
+        destinationChangePending:
+          type: boolean
+        cancelRequested:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+      - rideId
+      - state
+      - version
+      - pickup
+      - dropoff
+      - fare
+      - payment
+      - createdAt
+      - updatedAt
+      description: 乗客に見せる依頼
+    PaymentState:
+      type: object
+      properties:
+        state:
+          type: string
+          enum:
+          - none
+          - holding
+          - held
+          - hold_checking
+          - capturing
+          - paid
+          - unpaid
+          - checking
+          - released
+          - partially_refunded
+          - refunded
+          description: 依頼の支払いの状態（報告書の「要素をまたぐ状態」）
+        unpaidAmount:
+          anyOf:
+          - $ref: '#/components/schemas/Money'
+          - type: 'null'
+        reason:
+          anyOf:
+          - type: string
+            description: 失敗の理由（人向けの文）
+          - type: 'null'
+      required:
+      - state
+    Place:
+      type: object
+      properties:
+        label:
+          type: string
+        address:
+          anyOf:
+          - type: string
+          - type: 'null'
+        placeId:
+          anyOf:
+          - type: string
+          - type: 'null'
+        position:
+          $ref: '#/components/schemas/Point'
+      required:
+      - label
+      - position
+    Point:
+      type: object
+      properties:
+        lat:
+          type: number
+          description: 緯度（小数点以下 6 桁以上を保つ。NFR-37）
+          minimum: -90
+          maximum: 90
+        lng:
+          type: number
+          description: 経度
+          minimum: -180
+          maximum: 180
+      required:
+      - lat
+      - lng
+    Position:
+      type: object
+      properties:
+        lat:
+          type: number
+          minimum: -90
+          maximum: 90
+        lng:
+          type: number
+          minimum: -180
+          maximum: 180
+        accuracyM:
+          type: number
+          description: 誤差（m）
+          minimum: 0
+        measuredAt:
+          type: string
+          format: date-time
+          description: 端末が測った時刻
+      required:
+      - lat
+      - lng
+      - accuracyM
+      - measuredAt
+    RequestListItem:
+      type: object
+      properties:
+        rideId:
+          type: string
+          pattern: ^ride_[0-9A-HJKMNP-TV-Z]{26}$
+        listedChangeId:
+          type: string
+          pattern: ^chg_[0-9A-HJKMNP-TV-Z]{26}$
+          description: 一覧に出した変化の ID（FR-54 の表示の記録に使う）
+        pickup:
+          $ref: '#/components/schemas/Place'
+        dropoff:
+          $ref: '#/components/schemas/Place'
+        distanceToPickupM:
+          type: integer
+          description: 直線の距離（DEC-22）
+          minimum: 0
+        payout:
+          $ref: '#/components/schemas/Money'
+        listedAt:
+          type: string
+          format: date-time
+      required:
+      - rideId
+      - listedChangeId
+      - pickup
+      - dropoff
+      - distanceToPickupM
+      - payout
+      - listedAt
+    Route:
+      type: object
+      properties:
+        encodedPolyline:
+          type: string
+          description: Google の経路の線（依頼の間だけ持つ。DEC-22）
+        distanceM:
+          type: integer
+          minimum: 0
+        durationSec:
+          type: integer
+          minimum: 0
+      required:
+      - encodedPolyline
+      - distanceM
+      - durationSec
+    Vehicle:
+      type: object
+      properties:
+        model:
+          type: string
+          maxLength: 100
+        color:
+          type: string
+          maxLength: 50
+        plateNumber:
+          type: string
+          maxLength: 30
+      required:
+      - model
+      - color
+      - plateNumber

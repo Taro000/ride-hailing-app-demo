@@ -1,0 +1,35 @@
+id: DAT-18
+title: 管理の操作の記録
+status: draft
+version: 1
+basis: inferred
+basis_note: 持ち主と置き場所は第 2 段階の情報のビューと DEC-05・08・15（入力）。主な属性と整合の取り方はこの段の推定。保持期間は品質チェーンの T_pii_retention・T_log_retention と第 2 段階の決定（DEC-14、16、22、28、36）から当てはめた
+needs_agreement: false
+approver_candidates: []
+entity: 管理の操作の記録
+owner: ELM-04
+store: ELM-07
+key_attributes:
+- audit_id
+- operator_id
+- operation（登録、変更、停止、再開、対処、返金、設定の符号）
+- target_kind、target_id
+- reason
+- at
+- outcome
+relations:
+- to: DAT-01
+  kind: many-to-one
+  note: 担当
+consistency: 管理のモジュールが操作と同じトランザクションで追記するだけ（DEC-31）。返金は一つ目のトランザクションで要求を、二つ目で結果を追記する
+retention: 担当との結び付きは T_pii_retention で匿名にする（DEC-31）。システムを終えるとき
+classification: personal
+drivers:
+- DRV-29
+- DRV-25
+as_is: new
+changelog:
+- version: 1
+  date: '2026-11-03'
+  change: 作成
+  reason: 第 3 段階（質問 1・2 の回答を反映。質問 3〜5 は回答なし）

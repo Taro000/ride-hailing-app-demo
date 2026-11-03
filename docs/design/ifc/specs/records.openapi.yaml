@@ -1,0 +1,736 @@
+openapi: 3.1.0
+info:
+  title: 画面の記録の API（IFC-05）
+  version: 1.0.0
+  description: 第 3 段階（architecture-to-high-level-design）で決めた部分だけを書く。項目は docs/design/ifc/IFC-05.yaml。仮の値は x-provisional で示す。共通の約束事は DEC-38〜50（エラーの形、ID、時刻、お金、一覧、セッション、ログとトレース、命名、冪等キー、版、タイムアウト）。
+servers:
+- url: https://{service}-{projectNumber}.asia-northeast1.run.app
+  description: デモの回の Cloud Run のサービス（決まった形の URL。DEC-06）
+  variables:
+    service:
+      default: ride-demo
+    projectNumber:
+      default: '000000000000'
+- url: http://localhost:8080
+  description: 手元（DRV-18）
+paths:
+  /api/v1/records/displays:
+    post:
+      operationId: records_displays
+      summary: 状態の変化を相手の画面に示した時刻（まとめて送る）
+      description: |-
+        状態の変化を相手の画面に示した時刻（まとめて送る）
+
+        機能: FR-54
+
+        回数の上限（仮。DEC-55）: アカウントごとに 1 分に 60 回
+      parameters:
+      - $ref: '#/components/parameters/Traceparent'
+      - $ref: '#/components/parameters/ClientTraceId'
+      responses:
+        '202':
+          description: 受けた
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Accepted'
+        '400':
+          description: 'INVALID_REQUEST: 形が違う → その記録を捨てる（送り直さない）'
+          x-error-codes:
+          - INVALID_REQUEST
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                INVALID_REQUEST:
+                  value:
+                    type: urn:ride-hailing-demo:problem:invalid_request
+                    title: 形が違う
+                    status: 400
+                    code: INVALID_REQUEST
+                    detail: 形が違う
+                    traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+        '401':
+          description: 'UNAUTHENTICATED: ログインしていないか、セッションが切れた → ログインの画面へ。操作の途中なら、ログインの後に同じ冪等キーで送る'
+          x-error-codes:
+          - UNAUTHENTICATED
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                UNAUTHENTICATED:
+                  value:
+                    type: urn:ride-hailing-demo:problem:unauthenticated
+                    title: ログインしていないか、セッションが切れた
+                    status: 401
+                    code: UNAUTHENTICATED
+                    detail: ログインしていないか、セッションが切れた
+                    traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+        '403':
+          description: 'FORBIDDEN: 役割が違う、または送り元（Origin）がサービスの URL でない → 送り直さない（画面の誤りとしてブラウザのエラーの記録に残す）'
+          x-error-codes:
+          - FORBIDDEN
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                FORBIDDEN:
+                  value:
+                    type: urn:ride-hailing-demo:problem:forbidden
+                    title: 役割が違う、または送り元（Origin）がサービスの URL でない
+                    status: 403
+                    code: FORBIDDEN
+                    detail: 役割が違う、または送り元（Origin）がサービスの URL でない
+                    traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+        '404':
+          description: 'NOT_FOUND: ない、または自分のものでない（他人の依頼も 404 にする。DRV-29） → 画面を読み直す'
+          x-error-codes:
+          - NOT_FOUND
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                NOT_FOUND:
+                  value:
+                    type: urn:ride-hailing-demo:problem:not_found
+                    title: ない、または自分のものでない（他人の依頼も 404 にする。DRV-29）
+                    status: 404
+                    code: NOT_FOUND
+                    detail: ない、または自分のものでない（他人の依頼も 404 にする。DRV-29）
+                    traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+        '429':
+          description: 'RATE_LIMITED: 回数の上限（DEC-55） → Retry-After まで待つ'
+          x-error-codes:
+          - RATE_LIMITED
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                RATE_LIMITED:
+                  value:
+                    type: urn:ride-hailing-demo:problem:rate_limited
+                    title: 回数の上限（DEC-55）
+                    status: 429
+                    code: RATE_LIMITED
+                    detail: 回数の上限（DEC-55）
+                    traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            Retry-After:
+              $ref: '#/components/headers/RetryAfter'
+        '500':
+          description: 'INTERNAL_ERROR: 想定外の誤り → 読むだけの要求は間を置いて送り直す。状態を変える要求は同じ冪等キーで送り直すか、状態を読み直す'
+          x-error-codes:
+          - INTERNAL_ERROR
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                INTERNAL_ERROR:
+                  value:
+                    type: urn:ride-hailing-demo:problem:internal_error
+                    title: 想定外の誤り
+                    status: 500
+                    code: INTERNAL_ERROR
+                    detail: 想定外の誤り
+                    traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+        '503':
+          description: |-
+            DEPENDENCY_UNAVAILABLE: Turso に届かない → ブラウザに保ち、後で送る
+            ROUTE_TIMEOUT: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33） → 結果が分からないとして扱う。読むだけの要求は送り直す。状態を変える要求は同じ冪等キーで送り直すか、状態を読み直す。新しいキーでは送らない
+          x-error-codes:
+          - DEPENDENCY_UNAVAILABLE
+          - ROUTE_TIMEOUT
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                DEPENDENCY_UNAVAILABLE:
+                  value:
+                    type: urn:ride-hailing-demo:problem:dependency_unavailable
+                    title: Turso に届かない
+                    status: 503
+                    code: DEPENDENCY_UNAVAILABLE
+                    detail: Turso に届かない
+                    traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+                ROUTE_TIMEOUT:
+                  value:
+                    type: urn:ride-hailing-demo:problem:route_timeout
+                    title: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33
+                    status: 503
+                    code: ROUTE_TIMEOUT
+                    detail: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33
+                    traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            Retry-After:
+              $ref: '#/components/headers/RetryAfter'
+      x-route-id: records.displays
+      x-functions:
+      - FR-54
+      x-rate-limit:
+        value: アカウントごとに 1 分に 60 回
+        x-provisional: true
+      security:
+      - sessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DisplayRecords'
+  /api/v1/records/client-errors:
+    post:
+      operationId: records_client_errors
+      summary: ブラウザで起きたエラー（すぐ送る）
+      description: |-
+        ブラウザで起きたエラー（すぐ送る）
+
+        機能: FR-38
+
+        回数の上限（仮。DEC-55）: アカウントごとに 1 分に 60 回
+      parameters:
+      - $ref: '#/components/parameters/Traceparent'
+      - $ref: '#/components/parameters/ClientTraceId'
+      responses:
+        '202':
+          description: 受けた
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Accepted'
+        '400':
+          description: 'INVALID_REQUEST: 形が違う → その記録を捨てる'
+          x-error-codes:
+          - INVALID_REQUEST
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                INVALID_REQUEST:
+                  value:
+                    type: urn:ride-hailing-demo:problem:invalid_request
+                    title: 形が違う
+                    status: 400
+                    code: INVALID_REQUEST
+                    detail: 形が違う
+                    traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+        '401':
+          description: 'UNAUTHENTICATED: ログインしていないか、セッションが切れた → ログインの画面へ。操作の途中なら、ログインの後に同じ冪等キーで送る'
+          x-error-codes:
+          - UNAUTHENTICATED
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                UNAUTHENTICATED:
+                  value:
+                    type: urn:ride-hailing-demo:problem:unauthenticated
+                    title: ログインしていないか、セッションが切れた
+                    status: 401
+                    code: UNAUTHENTICATED
+                    detail: ログインしていないか、セッションが切れた
+                    traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+        '403':
+          description: 'FORBIDDEN: 役割が違う、または送り元（Origin）がサービスの URL でない → 送り直さない（画面の誤りとしてブラウザのエラーの記録に残す）'
+          x-error-codes:
+          - FORBIDDEN
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                FORBIDDEN:
+                  value:
+                    type: urn:ride-hailing-demo:problem:forbidden
+                    title: 役割が違う、または送り元（Origin）がサービスの URL でない
+                    status: 403
+                    code: FORBIDDEN
+                    detail: 役割が違う、または送り元（Origin）がサービスの URL でない
+                    traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+        '404':
+          description: 'NOT_FOUND: ない、または自分のものでない（他人の依頼も 404 にする。DRV-29） → 画面を読み直す'
+          x-error-codes:
+          - NOT_FOUND
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                NOT_FOUND:
+                  value:
+                    type: urn:ride-hailing-demo:problem:not_found
+                    title: ない、または自分のものでない（他人の依頼も 404 にする。DRV-29）
+                    status: 404
+                    code: NOT_FOUND
+                    detail: ない、または自分のものでない（他人の依頼も 404 にする。DRV-29）
+                    traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+        '429':
+          description: 'RATE_LIMITED: 回数の上限（DEC-55） → Retry-After まで待つ'
+          x-error-codes:
+          - RATE_LIMITED
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                RATE_LIMITED:
+                  value:
+                    type: urn:ride-hailing-demo:problem:rate_limited
+                    title: 回数の上限（DEC-55）
+                    status: 429
+                    code: RATE_LIMITED
+                    detail: 回数の上限（DEC-55）
+                    traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            Retry-After:
+              $ref: '#/components/headers/RetryAfter'
+        '500':
+          description: 'INTERNAL_ERROR: 想定外の誤り → 読むだけの要求は間を置いて送り直す。状態を変える要求は同じ冪等キーで送り直すか、状態を読み直す'
+          x-error-codes:
+          - INTERNAL_ERROR
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                INTERNAL_ERROR:
+                  value:
+                    type: urn:ride-hailing-demo:problem:internal_error
+                    title: 想定外の誤り
+                    status: 500
+                    code: INTERNAL_ERROR
+                    detail: 想定外の誤り
+                    traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+        '503':
+          description: |-
+            ROUTE_TIMEOUT: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33） → 結果が分からないとして扱う。読むだけの要求は送り直す。状態を変える要求は同じ冪等キーで送り直すか、状態を読み直す。新しいキーでは送らない
+            DEPENDENCY_UNAVAILABLE: Turso に届かないか遅い（T_db）。状態を変えたかどうかは、一つ目のトランザクションを書けたかによる → ROUTE_TIMEOUT と同じ
+          x-error-codes:
+          - ROUTE_TIMEOUT
+          - DEPENDENCY_UNAVAILABLE
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                ROUTE_TIMEOUT:
+                  value:
+                    type: urn:ride-hailing-demo:problem:route_timeout
+                    title: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33
+                    status: 503
+                    code: ROUTE_TIMEOUT
+                    detail: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33
+                    traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+                DEPENDENCY_UNAVAILABLE:
+                  value:
+                    type: urn:ride-hailing-demo:problem:dependency_unavailable
+                    title: Turso に届かないか遅い（T_db）。状態を変えたかどうかは、一つ目のトラン
+                    status: 503
+                    code: DEPENDENCY_UNAVAILABLE
+                    detail: Turso に届かないか遅い（T_db）。状態を変えたかどうかは、一つ目のトラン
+                    traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            Retry-After:
+              $ref: '#/components/headers/RetryAfter'
+      x-route-id: records.client_errors
+      x-functions:
+      - FR-38
+      x-rate-limit:
+        value: アカウントごとに 1 分に 60 回
+        x-provisional: true
+      security:
+      - sessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClientErrors'
+  /api/v1/records/screen-events:
+    post:
+      operationId: records_screen_events
+      summary: 手配の画面を開いた時刻（FR-02 AC7）と評価の画面を開いた時刻（FR-13 AC4）
+      description: |-
+        手配の画面を開いた時刻（FR-02 AC7）と評価の画面を開いた時刻（FR-13 AC4）
+
+        機能: FR-02、FR-13
+      parameters:
+      - $ref: '#/components/parameters/Traceparent'
+      - $ref: '#/components/parameters/ClientTraceId'
+      responses:
+        '202':
+          description: 受けた
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Accepted'
+        '400':
+          description: 'INVALID_REQUEST: 形が違う → その記録を捨てる'
+          x-error-codes:
+          - INVALID_REQUEST
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                INVALID_REQUEST:
+                  value:
+                    type: urn:ride-hailing-demo:problem:invalid_request
+                    title: 形が違う
+                    status: 400
+                    code: INVALID_REQUEST
+                    detail: 形が違う
+                    traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+        '401':
+          description: 'UNAUTHENTICATED: ログインしていないか、セッションが切れた → ログインの画面へ。操作の途中なら、ログインの後に同じ冪等キーで送る'
+          x-error-codes:
+          - UNAUTHENTICATED
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                UNAUTHENTICATED:
+                  value:
+                    type: urn:ride-hailing-demo:problem:unauthenticated
+                    title: ログインしていないか、セッションが切れた
+                    status: 401
+                    code: UNAUTHENTICATED
+                    detail: ログインしていないか、セッションが切れた
+                    traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+        '403':
+          description: 'FORBIDDEN: 役割が違う、または送り元（Origin）がサービスの URL でない → 送り直さない（画面の誤りとしてブラウザのエラーの記録に残す）'
+          x-error-codes:
+          - FORBIDDEN
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                FORBIDDEN:
+                  value:
+                    type: urn:ride-hailing-demo:problem:forbidden
+                    title: 役割が違う、または送り元（Origin）がサービスの URL でない
+                    status: 403
+                    code: FORBIDDEN
+                    detail: 役割が違う、または送り元（Origin）がサービスの URL でない
+                    traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+        '404':
+          description: 'NOT_FOUND: ない、または自分のものでない（他人の依頼も 404 にする。DRV-29） → 画面を読み直す'
+          x-error-codes:
+          - NOT_FOUND
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                NOT_FOUND:
+                  value:
+                    type: urn:ride-hailing-demo:problem:not_found
+                    title: ない、または自分のものでない（他人の依頼も 404 にする。DRV-29）
+                    status: 404
+                    code: NOT_FOUND
+                    detail: ない、または自分のものでない（他人の依頼も 404 にする。DRV-29）
+                    traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+        '429':
+          description: 'RATE_LIMITED: 回数の上限（DEC-55） → Retry-After まで待つ'
+          x-error-codes:
+          - RATE_LIMITED
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                RATE_LIMITED:
+                  value:
+                    type: urn:ride-hailing-demo:problem:rate_limited
+                    title: 回数の上限（DEC-55）
+                    status: 429
+                    code: RATE_LIMITED
+                    detail: 回数の上限（DEC-55）
+                    traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            Retry-After:
+              $ref: '#/components/headers/RetryAfter'
+        '500':
+          description: 'INTERNAL_ERROR: 想定外の誤り → 読むだけの要求は間を置いて送り直す。状態を変える要求は同じ冪等キーで送り直すか、状態を読み直す'
+          x-error-codes:
+          - INTERNAL_ERROR
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                INTERNAL_ERROR:
+                  value:
+                    type: urn:ride-hailing-demo:problem:internal_error
+                    title: 想定外の誤り
+                    status: 500
+                    code: INTERNAL_ERROR
+                    detail: 想定外の誤り
+                    traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+        '503':
+          description: |-
+            ROUTE_TIMEOUT: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33） → 結果が分からないとして扱う。読むだけの要求は送り直す。状態を変える要求は同じ冪等キーで送り直すか、状態を読み直す。新しいキーでは送らない
+            DEPENDENCY_UNAVAILABLE: Turso に届かないか遅い（T_db）。状態を変えたかどうかは、一つ目のトランザクションを書けたかによる → ROUTE_TIMEOUT と同じ
+          x-error-codes:
+          - ROUTE_TIMEOUT
+          - DEPENDENCY_UNAVAILABLE
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                ROUTE_TIMEOUT:
+                  value:
+                    type: urn:ride-hailing-demo:problem:route_timeout
+                    title: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33
+                    status: 503
+                    code: ROUTE_TIMEOUT
+                    detail: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33
+                    traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+                DEPENDENCY_UNAVAILABLE:
+                  value:
+                    type: urn:ride-hailing-demo:problem:dependency_unavailable
+                    title: Turso に届かないか遅い（T_db）。状態を変えたかどうかは、一つ目のトラン
+                    status: 503
+                    code: DEPENDENCY_UNAVAILABLE
+                    detail: Turso に届かないか遅い（T_db）。状態を変えたかどうかは、一つ目のトラン
+                    traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            Retry-After:
+              $ref: '#/components/headers/RetryAfter'
+      x-route-id: records.screen_events
+      x-functions:
+      - FR-02
+      - FR-13
+      security:
+      - sessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScreenEvents'
+components:
+  securitySchemes:
+    sessionCookie:
+      type: apiKey
+      in: cookie
+      name: __Host-rh_session
+      description: サーバーに置くセッション（DEC-43）。状態を変える要求は Origin がサービスの URL と同じであること（DEC-20）
+  parameters:
+    Traceparent:
+      name: traceparent
+      in: header
+      required: false
+      description: W3C Trace Context。画面は操作ごとに必ず送る（DEC-44）
+      schema:
+        type: string
+        pattern: ^00-[0-9a-f]{32}-[0-9a-f]{16}-0[01]$
+    ClientTraceId:
+      name: X-Client-Trace-Id
+      in: header
+      required: false
+      description: traceparent のトレース ID の写し（Cloud Run が入れ替えても残すため。DEC-44）
+      schema:
+        type: string
+        pattern: ^[0-9a-f]{32}$
+  headers:
+    RetryAfter:
+      description: 待つ秒数
+      schema:
+        type: integer
+        minimum: 0
+    XAppVersion:
+      description: サーバーの版（DEC-49）
+      schema:
+        type: string
+  schemas:
+    Accepted:
+      type: object
+      properties:
+        accepted:
+          type: integer
+          minimum: 0
+        duplicates:
+          type: integer
+          minimum: 0
+      required:
+      - accepted
+      - duplicates
+    ClientErrors:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              clientErrorId:
+                type: string
+                format: uuid
+              occurredAt:
+                type: string
+                format: date-time
+              kind:
+                type: string
+                enum:
+                - render
+                - request
+                - geolocation
+                - wake_lock
+                - audio
+                - map
+                - payment_element
+                - stream
+              message:
+                type: string
+                maxLength: 500
+                description: 入力欄の値と位置を含めない（DEC-23、DEC-44）
+              browser:
+                type: string
+                maxLength: 200
+              traceId:
+                type: string
+                pattern: ^[0-9a-f]{32}$
+              rideId:
+                anyOf:
+                - type: string
+                  pattern: ^ride_[0-9A-HJKMNP-TV-Z]{26}$
+                - type: 'null'
+            required:
+            - clientErrorId
+            - occurredAt
+            - kind
+            - message
+            - browser
+            - traceId
+          maxItems: 100
+      required:
+      - errors
+    DisplayRecords:
+      type: object
+      properties:
+        records:
+          type: array
+          items:
+            type: object
+            properties:
+              changeId:
+                type: string
+                pattern: ^chg_[0-9A-HJKMNP-TV-Z]{26}$
+              displayedAt:
+                type: string
+                format: date-time
+                description: ブラウザの時計
+              afterBackground:
+                type: boolean
+                description: 裏から戻って示した（FR-54 AC2）
+            required:
+            - changeId
+            - displayedAt
+            - afterBackground
+          maxItems: 100
+      required:
+      - records
+    Problem:
+      type: object
+      properties:
+        type:
+          type: string
+          description: 問題の種類の URI。urn:ride-hailing-demo:problem:<code の小文字>（DEC-38）
+          format: uri
+        title:
+          type: string
+          description: 人向けの短い文（日本語）
+        status:
+          type: integer
+          description: HTTP の状態の符号
+        code:
+          type: string
+          description: プログラム向けの変わらない符号（UPPER_SNAKE_CASE。DEC-38、DEC-47）
+          pattern: ^[A-Z][A-Z0-9_]*$
+        detail:
+          type: string
+          description: 人向けの説明（日本語。個人情報を含めない）
+        traceId:
+          type: string
+          description: ブラウザが作ったトレース ID（32 桁の 16 進。DEC-44）
+          pattern: ^[0-9a-f]{32}$
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+                description: JSON Pointer
+              code:
+                type: string
+              message:
+                type: string
+            required:
+            - field
+            - code
+          description: 入力の誤りの欄ごとの中身
+        retryAfterSeconds:
+          type: integer
+          description: 待つ秒数（429 と 503 では Retry-After の見出しと同じ）
+          minimum: 0
+      required:
+      - type
+      - title
+      - status
+      - code
+      - traceId
+      description: RFC 9457 の問題の詳細に code、traceId、errors を足したもの（DEC-38）。content type は application/problem+json
+      additionalProperties: true
+    ScreenEvents:
+      type: object
+      properties:
+        events:
+          type: array
+          items:
+            type: object
+            properties:
+              clientEventId:
+                type: string
+                format: uuid
+              type:
+                type: string
+                enum:
+                - booking_screen_opened
+                - rating_screen_opened
+              at:
+                type: string
+                format: date-time
+              rideId:
+                anyOf:
+                - type: string
+                  pattern: ^ride_[0-9A-HJKMNP-TV-Z]{26}$
+                - type: 'null'
+            required:
+            - clientEventId
+            - type
+            - at
+          maxItems: 100
+      required:
+      - events

@@ -1,0 +1,44 @@
+id: DAT-01
+title: アカウント
+status: draft
+version: 1
+basis: inferred
+basis_note: 持ち主と置き場所は第 2 段階の情報のビューと DEC-05・08・15（入力）。主な属性と整合の取り方はこの段の推定。保持期間は品質チェーンの T_pii_retention・T_log_retention と第 2 段階の決定（DEC-14、16、22、28、36）から当てはめた
+needs_agreement: false
+approver_candidates: []
+entity: アカウント
+owner: ELM-04
+store: ELM-07
+key_attributes:
+- account_id
+- roles（passenger、driver、operator、engineer の組）
+- email（一意。大文字小文字を区別しない）
+- password_hash
+- status（active、invited、locked）
+- failed_logins と locked_until（DEC-20）
+- test_account（FR-01 AC5）
+- created_at、last_used_at
+relations:
+- to: DAT-02
+  kind: one-to-many
+  note: セッションとパスキー
+- to: DAT-03
+  kind: one-to-one
+  note: ドライバーのとき
+- to: DAT-12
+  kind: one-to-one
+  note: 乗客の支払い手段の参照
+consistency: 認証のモジュールだけが書く。作成と役割の付与は一つのトランザクション。ログインの失敗の数と一時の停止は同じ行への条件付きの書き込み（二つのインスタンスでも数がずれない）。ドライバーのアカウントは管理のモジュールが認証のモジュールの操作を呼んで作る（DAT-03 と同じトランザクション）。テスト用の印はエンジニアの API（IFC-07）だけが変え、変えた後の記録に写す
+retention: メールアドレスとパスワードのハッシュは、最後に使ってから T_pii_retention（3 年）を過ぎると消して匿名にする（FR-53）。残りはシステムを終えるとき（DEC-36）
+classification: personal
+drivers:
+- DRV-29
+- DRV-21
+- DRV-25
+- DRV-27
+as_is: new
+changelog:
+- version: 1
+  date: '2026-11-03'
+  change: 作成
+  reason: 第 3 段階（質問 1・2 の回答を反映。質問 3〜5 は回答なし）

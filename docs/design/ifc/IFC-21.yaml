@@ -1,0 +1,59 @@
+id: IFC-21
+title: Google Cloud の管理の操作
+status: draft
+version: 1
+basis: inferred
+basis_note: DEC-27（鍵を置かない連携、main の枝の手順だけ、定義はリポジトリ）と DEC-34 は入力。操作の一覧は推定
+needs_agreement: false
+approver_candidates: []
+kind: http
+name: Google Cloud の管理の操作（外部）
+provider: ELM-19
+consumers:
+- ELM-06
+functions:
+- FR-41
+- FR-42
+operations:
+- name: Artifact Registry
+  does: イメージを置く、読む
+- name: Cloud Run の管理の API（ELM-17）
+  does: サービスとジョブの定義の置き換え、消す、ジョブの実行と終わりの待ち
+- name: Cloud Scheduler
+  does: 定時の起動を作る、止める、再開する、一度動かす、消す
+- name: Cloud Monitoring
+  does: 二つの規則を有効にする、止める、消す
+- name: Secret Manager
+  does: ELM-06 の Turso のトークンを読む。システムを終えるときに秘密を消す
+- name: API Keys
+  does: システムを終えるときに地図の鍵を消す
+format: gcloud と REST（JSON）
+protocol: HTTPS
+auth: 鍵を置かない連携（Workload Identity Federation。main の枝の手順だけ。DEC-27、DEC-34）
+errors:
+- case: 権限がない
+  signal: '403'
+  caller_does: 止まる
+- case: 消すものがない
+  signal: '404'
+  caller_does: 消えたとみなして続ける
+- case: 競合
+  signal: '409'
+  caller_does: 置き換えで解く
+- case: 回数の上限、Google の中の誤り
+  signal: 429、5xx
+  caller_does: gcloud の既定の送り直し。それでも失敗したら止まる
+idempotency: 定義の置き換え（gcloud run services replace など）なので、同じ入力は同じ結果
+timing:
+  timeout: 手順ごとの上限（IFC-11）
+  ordering: null
+  delivery: null
+versioning: gcloud の版は手順で固める
+observability: GitHub Actions の実行のログ（秘密を出さない）と配備の記録（DAT-26）
+spec: null
+as_is: new
+changelog:
+- version: 1
+  date: '2026-11-03'
+  change: 作成
+  reason: 第 3 段階（質問 1・2 の回答を反映。質問 3〜5 は回答なし）
