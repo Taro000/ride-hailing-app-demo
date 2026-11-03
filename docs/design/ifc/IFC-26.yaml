@@ -1,9 +1,9 @@
 id: IFC-26
 title: ドライバーの受付と依頼の画面
 status: draft
-version: 1
+version: 2
 basis: inferred
-basis_note: FR の受け入れ基準は入力。初回の設定の画面、走行中の示し方は推定
+basis_note: FR の受け入れ基準は入力（FR-01 版 3・FR-48 版 2 の設定の符号でパスワードを決めること、符号の出し直しでの再設定）。画面の点灯の解放の行は FND-47。走行中の示し方は推定
 needs_agreement: false
 approver_candidates: []
 kind: screen
@@ -25,9 +25,9 @@ functions:
 - FR-54
 operations:
 - name: ログインと初回の設定
-  does: メールアドレスとパスワード。初めては運営・サポート担当から受けた設定の符号でパスワードを決める（IFC-01 driver-setup）
+  does: メールアドレスとパスワード。初めてと、符号を出し直してもらったとき（パスワードを忘れたとき）は、運営・サポート担当から受けた設定の符号でパスワードを決める（IFC-01 POST /api/v1/auth/setup。FR-01 AC1、FR-48 AC6）
 - name: 受付
-  does: CUJ-06 の始まり。受付を始める・止める。画面の点灯（FR-52）と位置の送信が始まる
+  does: CUJ-06 の始まり。受付を始める・止める。始めると画面の点灯（FR-52 AC1）と位置の送信が始まり、止めて迎車中でも乗車中でもなくなると画面の点灯を解放する（FR-52 AC2）
 - name: 依頼の一覧
   does: CUJ-06「配車依頼を選ぶ」。乗車場所までの距離、乗車場所、降車場所、受取額。新しい依頼は音で知らせる（FR-18）
 - name: 依頼の内容
@@ -36,12 +36,15 @@ format: React の SPA の画面（DEC-23）。文言は日本語（DEC-46）。W
 protocol: iOS の Safari（ELM-15）。IFC-01、IFC-03、IFC-04、IFC-05、IFC-08、IFC-16、IFC-18 を使う
 auth: ドライバーのセッション
 errors:
+- case: '初回の設定: 符号が違う、期限切れ、使用済み、出し直す前のもの'
+  signal: IFC-01 SETUP_CODE_INVALID
+  caller_does: パスワードを決めさせず、運営・サポート担当に符号の出し直しを頼むよう示す（FR-01 AC2）
 - case: '受付: 位置の利用が許可されていない'
   signal: IFC-18 PERMISSION_DENIED
-  caller_does: 受付を始めさせず、許可を求める（FR-17 AC2）
+  caller_does: 受付を始めさせず、許可を求める（FR-17 AC3）
 - case: '受付: 停止されている'
   signal: IFC-03 DRIVER_SUSPENDED、IFC-08 driver.status
-  caller_does: 受付を始めさせずその旨を示す（FR-17 AC3、FR-47）
+  caller_does: 受付を始めさせずその旨を示す（FR-17 AC4、FR-47）
 - case: '受付: 画面の点灯を使えない'
   signal: IFC-18 の失敗
   caller_does: 画面が消えると一覧と現在地の更新が止まることを示す（FR-52 AC4）
@@ -59,7 +62,7 @@ errors:
   caller_does: 理由を示して一覧に戻る（FR-20 AC2〜4、FR-16 AC2）
 - case: 'どこでも: 前面に戻った'
   signal: visibilitychange
-  caller_does: 画面の点灯を取り直し（FR-52 AC3）、一覧を取り直す（FR-17 AC4）
+  caller_does: 画面の点灯を取り直し（FR-52 AC3）、一覧を取り直す（FR-17 AC5）
 idempotency: 画面は操作ごとに冪等キーを一つ作り、応答が分からないときは同じキーでだけ送り直す（API の呼び出しのモジュール。DEC-48）。二度押しは同じキーにまとまる
 timing:
   timeout: API の 15 秒
@@ -74,3 +77,7 @@ changelog:
   date: '2026-11-03'
   change: 作成
   reason: 第 3 段階（質問 1・2 の回答を反映。質問 3〜5 は回答なし）
+- version: 2
+  date: '2026-11-04'
+  change: 初回の設定の API を POST /api/v1/auth/setup に直し、符号の出し直しでのパスワードの再設定と SETUP_CODE_INVALID の行を足した。受付を止めて迎車中でも乗車中でもなくなったら画面の点灯を解放すると書いた。FR-17 の受け入れ基準の番号を版 2 に合わせた
+  reason: '第 3 段階の再実行（2026-11-04）: 品質チェーンの再実行（FR-01 版 3、FR-17 版 2、FR-48 版 2）、FND-47'

@@ -18,7 +18,7 @@ addresses:
 - IFC-28
 - IFC-29
 options:
-- name: 日本語だけ。画面の文言は web-shared の文言のモジュール、誤りの文は contracts の符号の一覧。表示は ja-JP と Asia/Tokyo
+- name: "日本語だけ。画面の文言は web-shared の文言のモジュール、誤りの文は contracts の符号の一覧。表示は ja-JP と Asia/Tokyo。額は「1,234 円」、距離は m と km、時刻は HH:mm（日本時間）、到着予定は分の単位。アクセシビリティの名前も日本語（DRV-24）"
   effect: 置き場所が二つに決まる
   cost: ほかの言語は足せない
 - name: 多言語の仕組みを入れる
@@ -32,7 +32,7 @@ rationale: 市場は日本だけ（第 2 段階の可変性）
 rejected:
 - option: 多言語の仕組みを入れる
   reason: 要らない
-- option: 画面が符号から文を作る
+- option: "サーバーは文を返さず、画面が符号から作る"
   reason: 誤りの文が二か所になる
 gains: []
 costs: []

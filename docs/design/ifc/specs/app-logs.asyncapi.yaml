@@ -1,8 +1,8 @@
 asyncapi: 3.0.0
 info:
   title: アプリの構造化ログ（IFC-09）
-  version: 1.0.0
-  description: ELM-04 と ELM-05 が標準出力に 1 行 1 JSON で書き、Cloud Run が Cloud Logging（ELM-08）に送る。届け方は最善の努力（欠けは 0.1% 未満と仮定。SLI-01）。順は保証しない（timestamp で並べる）。欄は DEC-44。項目は docs/design/ifc/IFC-09.yaml
+  version: 1.1.0
+  description: ELM-04 と ELM-05 が標準出力に 1 行 1 JSON で書き、Cloud Run が Cloud Logging（ELM-08）に送る。届け方は最善の努力（欠けは 0.1% 未満と仮定。SLI-01）。順は保証しない（timestamp で並べる）。欄は DEC-44。どの行にも timestamp、severity、message、logging.googleapis.com/trace、logging.googleapis.com/spanId、client_trace_id、event、schema_version、service、app_version を書く。項目は docs/design/ifc/IFC-09.yaml
 defaultContentType: application/json
 servers:
   cloudrun:
@@ -25,6 +25,10 @@ channels:
         $ref: '#/components/messages/notification'
       jobTask:
         $ref: '#/components/messages/jobTask'
+      authEvent:
+        $ref: '#/components/messages/authEvent'
+      streamEvent:
+        $ref: '#/components/messages/streamEvent'
       appError:
         $ref: '#/components/messages/appError'
 operations:
@@ -64,6 +68,18 @@ operations:
       $ref: '#/channels/stdout'
     messages:
     - $ref: '#/channels/stdout/messages/jobTask'
+  send_authEvent:
+    action: send
+    channel:
+      $ref: '#/channels/stdout'
+    messages:
+    - $ref: '#/channels/stdout/messages/authEvent'
+  send_streamEvent:
+    action: send
+    channel:
+      $ref: '#/channels/stdout'
+    messages:
+    - $ref: '#/channels/stdout/messages/streamEvent'
   send_appError:
     action: send
     channel:
@@ -81,6 +97,9 @@ components:
         - timestamp
         - severity
         - message
+        - logging.googleapis.com/trace
+        - logging.googleapis.com/spanId
+        - client_trace_id
         - event
         - schema_version
         - service
@@ -124,15 +143,17 @@ components:
             type: string
           account_id:
             type: string
+            pattern: ^acc_[0-9A-HJKMNP-TV-Z]{26}$
           account_kind:
             type: string
             enum:
             - participant
-            - test
             - staff
-            - none
+            - test
+            description: participant（乗客とドライバー）、staff（運営・サポート担当とエンジニア）、test（テスト用の印のあるアカウント）。SLI-01 は participant だけを数え、test を除く。staff は SLI-01 の操作を呼ばない（DEC-44）
           ride_id:
             type: string
+            pattern: ^ride_[0-9A-HJKMNP-TV-Z]{26}$
           route_id:
             type: string
           method:
@@ -141,7 +162,7 @@ components:
             type: integer
           elapsed_ms:
             type: integer
-        description: '書かない: 座標、連絡先、名前、場所の検索の語、自由記述、カードの情報、クッキー、トークン、秘密、本文、IP アドレス（DEC-44）'
+        description: '書かない: 座標、連絡先、名前、場所の検索の語、自由記述（苦情、報告）、カードの情報、クッキー、トークン、秘密、Webhook の URL、要求と応答の本文、IP アドレス（入口のログには残る。DEC-44）'
     externalCall:
       name: external.call
       title: 外部の呼び出しごとに一行
@@ -151,6 +172,9 @@ components:
         - timestamp
         - severity
         - message
+        - logging.googleapis.com/trace
+        - logging.googleapis.com/spanId
+        - client_trace_id
         - event
         - schema_version
         - service
@@ -194,15 +218,17 @@ components:
             type: string
           account_id:
             type: string
+            pattern: ^acc_[0-9A-HJKMNP-TV-Z]{26}$
           account_kind:
             type: string
             enum:
             - participant
-            - test
             - staff
-            - none
+            - test
+            description: participant（乗客とドライバー）、staff（運営・サポート担当とエンジニア）、test（テスト用の印のあるアカウント）。SLI-01 は participant だけを数え、test を除く。staff は SLI-01 の操作を呼ばない（DEC-44）
           ride_id:
             type: string
+            pattern: ^ride_[0-9A-HJKMNP-TV-Z]{26}$
           target:
             type: string
             enum:
@@ -224,7 +250,7 @@ components:
             type: string
           idempotency_key:
             type: string
-        description: '書かない: 座標、連絡先、名前、場所の検索の語、自由記述、カードの情報、クッキー、トークン、秘密、本文、IP アドレス（DEC-44）'
+        description: '書かない: 座標、連絡先、名前、場所の検索の語、自由記述（苦情、報告）、カードの情報、クッキー、トークン、秘密、Webhook の URL、要求と応答の本文、IP アドレス（入口のログには残る。DEC-44）'
     moneyOp:
       name: money.op
       title: お金の操作の段
@@ -234,6 +260,9 @@ components:
         - timestamp
         - severity
         - message
+        - logging.googleapis.com/trace
+        - logging.googleapis.com/spanId
+        - client_trace_id
         - event
         - schema_version
         - service
@@ -241,6 +270,8 @@ components:
         - money_op_id
         - kind
         - step
+        - operation_key
+        - stripe_idempotency_key
         properties:
           timestamp:
             type: string
@@ -276,17 +307,20 @@ components:
             type: string
           account_id:
             type: string
+            pattern: ^acc_[0-9A-HJKMNP-TV-Z]{26}$
           account_kind:
             type: string
             enum:
             - participant
-            - test
             - staff
-            - none
+            - test
+            description: participant（乗客とドライバー）、staff（運営・サポート担当とエンジニア）、test（テスト用の印のあるアカウント）。SLI-01 は participant だけを数え、test を除く。staff は SLI-01 の操作を呼ばない（DEC-44）
           ride_id:
             type: string
+            pattern: ^ride_[0-9A-HJKMNP-TV-Z]{26}$
           money_op_id:
             type: string
+            pattern: ^mop_[0-9A-HJKMNP-TV-Z]{26}$
           kind:
             type: string
           step:
@@ -298,9 +332,15 @@ components:
             - checking
             - settled
             - not_happened
+          operation_key:
+            type: string
+            description: お金の操作の操作キー（同じ操作の送り直しで同じ。DEC-12、DEC-48）
+          stripe_idempotency_key:
+            type: string
+            description: Stripe に送る冪等キー（お金の操作ごとに決まる。DEC-12）
           amount:
             type: integer
-        description: '書かない: 座標、連絡先、名前、場所の検索の語、自由記述、カードの情報、クッキー、トークン、秘密、本文、IP アドレス（DEC-44）'
+        description: '書かない: 座標、連絡先、名前、場所の検索の語、自由記述（苦情、報告）、カードの情報、クッキー、トークン、秘密、Webhook の URL、要求と応答の本文、IP アドレス（入口のログには残る。DEC-44）'
     clientError:
       name: client.error
       title: ブラウザのエラー
@@ -310,6 +350,9 @@ components:
         - timestamp
         - severity
         - message
+        - logging.googleapis.com/trace
+        - logging.googleapis.com/spanId
+        - client_trace_id
         - event
         - schema_version
         - service
@@ -351,22 +394,25 @@ components:
             type: string
           account_id:
             type: string
+            pattern: ^acc_[0-9A-HJKMNP-TV-Z]{26}$
           account_kind:
             type: string
             enum:
             - participant
-            - test
             - staff
-            - none
+            - test
+            description: participant（乗客とドライバー）、staff（運営・サポート担当とエンジニア）、test（テスト用の印のあるアカウント）。SLI-01 は participant だけを数え、test を除く。staff は SLI-01 の操作を呼ばない（DEC-44）
           ride_id:
             type: string
+            pattern: ^ride_[0-9A-HJKMNP-TV-Z]{26}$
           client_error_id:
             type: string
+            format: uuid
           kind:
             type: string
           browser:
             type: string
-        description: '書かない: 座標、連絡先、名前、場所の検索の語、自由記述、カードの情報、クッキー、トークン、秘密、本文、IP アドレス（DEC-44）'
+        description: '書かない: 座標、連絡先、名前、場所の検索の語、自由記述（苦情、報告）、カードの情報、クッキー、トークン、秘密、Webhook の URL、要求と応答の本文、IP アドレス（入口のログには残る。DEC-44）'
     notification:
       name: notification.sent / notification.failed
       title: 知らせ
@@ -376,6 +422,9 @@ components:
         - timestamp
         - severity
         - message
+        - logging.googleapis.com/trace
+        - logging.googleapis.com/spanId
+        - client_trace_id
         - event
         - schema_version
         - service
@@ -417,15 +466,17 @@ components:
             type: string
           account_id:
             type: string
+            pattern: ^acc_[0-9A-HJKMNP-TV-Z]{26}$
           account_kind:
             type: string
             enum:
             - participant
-            - test
             - staff
-            - none
+            - test
+            description: participant（乗客とドライバー）、staff（運営・サポート担当とエンジニア）、test（テスト用の印のあるアカウント）。SLI-01 は participant だけを数え、test を除く。staff は SLI-01 の操作を呼ばない（DEC-44）
           ride_id:
             type: string
+            pattern: ^ride_[0-9A-HJKMNP-TV-Z]{26}$
           notification_id:
             type: string
           kind:
@@ -438,7 +489,7 @@ components:
             - info
           count:
             type: integer
-        description: '書かない: 座標、連絡先、名前、場所の検索の語、自由記述、カードの情報、クッキー、トークン、秘密、本文、IP アドレス（DEC-44）'
+        description: '書かない: 座標、連絡先、名前、場所の検索の語、自由記述（苦情、報告）、カードの情報、クッキー、トークン、秘密、Webhook の URL、要求と応答の本文、IP アドレス（入口のログには残る。DEC-44）'
     jobTask:
       name: job.task
       title: 毎日の処理の処理ごと
@@ -448,6 +499,9 @@ components:
         - timestamp
         - severity
         - message
+        - logging.googleapis.com/trace
+        - logging.googleapis.com/spanId
+        - client_trace_id
         - event
         - schema_version
         - service
@@ -490,15 +544,17 @@ components:
             type: string
           account_id:
             type: string
+            pattern: ^acc_[0-9A-HJKMNP-TV-Z]{26}$
           account_kind:
             type: string
             enum:
             - participant
-            - test
             - staff
-            - none
+            - test
+            description: participant（乗客とドライバー）、staff（運営・サポート担当とエンジニア）、test（テスト用の印のあるアカウント）。SLI-01 は participant だけを数え、test を除く。staff は SLI-01 の操作を呼ばない（DEC-44）
           ride_id:
             type: string
+            pattern: ^ride_[0-9A-HJKMNP-TV-Z]{26}$
           business_date:
             type: string
             format: date
@@ -512,7 +568,151 @@ components:
             - failed
           counts:
             type: object
-        description: '書かない: 座標、連絡先、名前、場所の検索の語、自由記述、カードの情報、クッキー、トークン、秘密、本文、IP アドレス（DEC-44）'
+        description: '書かない: 座標、連絡先、名前、場所の検索の語、自由記述（苦情、報告）、カードの情報、クッキー、トークン、秘密、Webhook の URL、要求と応答の本文、IP アドレス（入口のログには残る。DEC-44）'
+    authEvent:
+      name: auth.*
+      title: 認証の結果
+      payload:
+        type: object
+        required:
+        - timestamp
+        - severity
+        - message
+        - logging.googleapis.com/trace
+        - logging.googleapis.com/spanId
+        - client_trace_id
+        - event
+        - schema_version
+        - service
+        - app_version
+        - outcome
+        properties:
+          timestamp:
+            type: string
+            format: date-time
+          severity:
+            type: string
+            enum:
+            - DEBUG
+            - INFO
+            - WARNING
+            - ERROR
+          message:
+            type: string
+          logging.googleapis.com/trace:
+            type: string
+            description: projects/<PROJECT>/traces/<X-Cloud-Trace-Context のトレース ID>
+          logging.googleapis.com/spanId:
+            type: string
+          client_trace_id:
+            type: string
+            pattern: ^[0-9a-f]{32}$
+          event:
+            type: string
+            description: auth. で始まる（ログイン、設定の符号、パスキーの確かめと登録、最初の役割のアカウントの作成、ログアウト）
+          schema_version:
+            type: integer
+            const: 1
+          service:
+            type: string
+            enum:
+            - server
+            - batch
+          app_version:
+            type: string
+          account_id:
+            type: string
+            pattern: ^acc_[0-9A-HJKMNP-TV-Z]{26}$
+          account_kind:
+            type: string
+            enum:
+            - participant
+            - staff
+            - test
+            description: participant（乗客とドライバー）、staff（運営・サポート担当とエンジニア）、test（テスト用の印のあるアカウント）。SLI-01 は participant だけを数え、test を除く。staff は SLI-01 の操作を呼ばない（DEC-44）
+          ride_id:
+            type: string
+            pattern: ^ride_[0-9A-HJKMNP-TV-Z]{26}$
+          outcome:
+            type: string
+            enum:
+            - success
+            - failure
+          error_code:
+            type: string
+            description: 失敗のときの誤りの符号（INVALID_CREDENTIALS、ACCOUNT_LOCKED、PASSKEY_FAILED、SETUP_CODE_INVALID など）
+        description: '書かない: 座標、連絡先、名前、場所の検索の語、自由記述（苦情、報告）、カードの情報、クッキー、トークン、秘密、Webhook の URL、要求と応答の本文、IP アドレス（入口のログには残る。DEC-44）。メールアドレス、パスワード、設定の符号、秘密も書かない（IFC-01）'
+    streamEvent:
+      name: stream.*
+      title: 流れの開け閉め
+      payload:
+        type: object
+        required:
+        - timestamp
+        - severity
+        - message
+        - logging.googleapis.com/trace
+        - logging.googleapis.com/spanId
+        - client_trace_id
+        - event
+        - schema_version
+        - service
+        - app_version
+        properties:
+          timestamp:
+            type: string
+            format: date-time
+          severity:
+            type: string
+            enum:
+            - DEBUG
+            - INFO
+            - WARNING
+            - ERROR
+          message:
+            type: string
+          logging.googleapis.com/trace:
+            type: string
+            description: projects/<PROJECT>/traces/<X-Cloud-Trace-Context のトレース ID>
+          logging.googleapis.com/spanId:
+            type: string
+          client_trace_id:
+            type: string
+            pattern: ^[0-9a-f]{32}$
+          event:
+            type: string
+            description: stream.opened（開いた）、stream.closed（閉じた）、stream.rejected（断った）
+          schema_version:
+            type: integer
+            const: 1
+          service:
+            type: string
+            enum:
+            - server
+            - batch
+          app_version:
+            type: string
+          account_id:
+            type: string
+            pattern: ^acc_[0-9A-HJKMNP-TV-Z]{26}$
+          account_kind:
+            type: string
+            enum:
+            - participant
+            - staff
+            - test
+            description: participant（乗客とドライバー）、staff（運営・サポート担当とエンジニア）、test（テスト用の印のあるアカウント）。SLI-01 は participant だけを数え、test を除く。staff は SLI-01 の操作を呼ばない（DEC-44）
+          ride_id:
+            type: string
+            pattern: ^ride_[0-9A-HJKMNP-TV-Z]{26}$
+          stream_count:
+            type: integer
+            description: そのアカウントの開いている流れの本数
+            minimum: 0
+          reason:
+            type: string
+            description: 閉じた理由（stream.closing の reason の max_age、replaced、shutdown か、回線の切れ）か、断った理由（UNAUTHENTICATED、STREAM_LIMIT）
+        description: '書かない: 座標、連絡先、名前、場所の検索の語、自由記述（苦情、報告）、カードの情報、クッキー、トークン、秘密、Webhook の URL、要求と応答の本文、IP アドレス（入口のログには残る。DEC-44）'
     appError:
       name: app.error
       title: 想定外の誤り
@@ -522,6 +722,9 @@ components:
         - timestamp
         - severity
         - message
+        - logging.googleapis.com/trace
+        - logging.googleapis.com/spanId
+        - client_trace_id
         - event
         - schema_version
         - service
@@ -562,18 +765,20 @@ components:
             type: string
           account_id:
             type: string
+            pattern: ^acc_[0-9A-HJKMNP-TV-Z]{26}$
           account_kind:
             type: string
             enum:
             - participant
-            - test
             - staff
-            - none
+            - test
+            description: participant（乗客とドライバー）、staff（運営・サポート担当とエンジニア）、test（テスト用の印のあるアカウント）。SLI-01 は participant だけを数え、test を除く。staff は SLI-01 の操作を呼ばない（DEC-44）
           ride_id:
             type: string
+            pattern: ^ride_[0-9A-HJKMNP-TV-Z]{26}$
           error_code:
             type: string
           stack:
             type: string
             description: 個人情報を含まないもの
-        description: '書かない: 座標、連絡先、名前、場所の検索の語、自由記述、カードの情報、クッキー、トークン、秘密、本文、IP アドレス（DEC-44）'
+        description: '書かない: 座標、連絡先、名前、場所の検索の語、自由記述（苦情、報告）、カードの情報、クッキー、トークン、秘密、Webhook の URL、要求と応答の本文、IP アドレス（入口のログには残る。DEC-44）'

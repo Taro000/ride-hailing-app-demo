@@ -23,7 +23,7 @@ relations:
   kind: one-to-many
   note: 停止と再開の管理の操作
 consistency: 配車のモジュールだけが書く。受付の開始と停止、停止と再開は version の条件付きの書き込みで、同じトランザクションで変化の記録を追記する。停止は管理のモジュールが配車のモジュールの操作を呼ぶ（二人目の書き手を作らない）。許諾は同じトランザクションで停止を確かめ直す（DEC-09）。変化の記録は配信（IFC-08 driver.status、driver.requests）の出どころ
-retention: 変化の記録は T_pii_retention（FR-17 の受付の時間、FR-47 AC4）。今の状態はシステムを終えるとき
+retention: 変化の記録は T_pii_retention（FR-17 の受付の時間、FR-47 AC4）を過ぎたら、毎日の処理が配車のモジュールを通して消す（FR-53）。今の状態はシステムを終えるとき
 classification: personal
 drivers:
 - DRV-05
@@ -33,5 +33,5 @@ as_is: new
 changelog:
 - version: 1
   date: '2026-11-03'
-  change: 作成
+  change: 作成。保持期間を過ぎた記録を誰が消すかを書いた
   reason: 第 3 段階（質問 1・2 の回答を反映。質問 3〜5 は回答なし）

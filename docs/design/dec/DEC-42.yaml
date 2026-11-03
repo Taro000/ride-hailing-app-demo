@@ -15,7 +15,7 @@ addresses:
 - IFC-06
 - IFC-07
 options:
-- name: 不透明なカーソルと limit。新しい順
+- name: "不透明なカーソルと limit。新しい順。?cursor=&limit= で受け、{items, nextCursor} を返す。状態や種類のような列挙の絞り込みは問い合わせの文字に置いてよい。依頼の一覧（ドライバー）は条件で絞った全部を返す（数件）"
   effect: 追記の多い一覧（履歴、苦情）でも抜けと重なりがない
   cost: ページの番号に飛べない
 - name: ページの番号と offset

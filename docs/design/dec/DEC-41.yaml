@@ -15,7 +15,7 @@ addresses:
 - IFC-13
 - DRV-30
 options:
-- name: 円の整数と通貨の符号。額はサーバーだけが決める
+- name: "円の整数と通貨の符号。額はサーバーだけが決める。{amount: 1234, currency: \"jpy\"}。画面から送られた額は使わない（取り消しの expectedFee は確かめのためだけで、違えば 409）"
   effect: Stripe の円（ゼロ小数通貨）と同じ単位で、丸めは料金のモジュール一か所
   cost: なし
 - name: 小数の文字

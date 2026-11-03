@@ -1,7 +1,7 @@
 id: IFC-07
 title: エンジニアの API
 status: draft
-version: 1
+version: 2
 basis: inferred
 basis_note: FR-40 の受け入れ基準と DEC-19（履歴は管理の画面、ログは Logs Explorer）、DEC-15（エンジニアの役割は位置の記録を読める）は入力。検索の条件の送り方と範囲の上限は推定
 needs_agreement: false
@@ -21,7 +21,7 @@ operations:
 - name: GET /api/v1/engineer/rides/{rideId}/positions
   does: 依頼の位置の記録と、保持の間の位置の受信の記録（原因の特定。DEC-15）
 - name: PATCH /api/v1/engineer/accounts/{accountId}
-  does: テスト用の印を付ける・外す。後の記録に写る（FR-01 AC5）。冪等キーが要る
+  does: テスト用の印を付ける・外す。後の記録に写る（FR-01 AC6）。冪等キーが要る
 format: JSON（UTF-8）。エラーは application/problem+json（DEC-38）。額は円の整数（DEC-41）、時刻は UTC の RFC 3339（DEC-40）
 protocol: HTTPS の要求と応答。Cloud Run の入口から ELM-04 へ。三つの SPA と同じ入口なので CORS は使わない（DEC-23）
 auth: エンジニアの役割のセッションで、パスキーの確かめが済んだもの。経路のまとまり /api/v1/engineer
@@ -62,7 +62,7 @@ errors:
 - case: '共通: Turso に届かないか遅い（T_db）。状態を変えたかどうかは、一つ目のトランザクションを書けたかによる'
   signal: 503 DEPENDENCY_UNAVAILABLE
   caller_does: ROUTE_TIMEOUT と同じ
-idempotency: 検索は読むだけの POST（条件に識別子と時刻を含むので本文で送る。DEC-16）。PATCH は自然に冪等
+idempotency: 検索は読むだけの POST（条件に識別子と時刻を含むので本文で送る。DEC-16）。PATCH も Idempotency-Key を求める（DEC-48）
 timing:
   timeout: ブラウザ 15 秒。サーバーの中は T_route 10 秒
   ordering: null
@@ -76,3 +76,7 @@ changelog:
   date: '2026-11-03'
   change: 作成
   reason: 第 3 段階（質問 1・2 の回答を反映。質問 3〜5 は回答なし）
+- version: 2
+  date: '2026-11-04'
+  change: PATCH もキーを求めると直した（自然に冪等とした記述を外した）。FR-01 の受け入れ基準の番号を版 3 に合わせた（テスト用の印は AC6）
+  reason: '第 3 段階の再実行（2026-11-04）: 品質チェーンの再実行（FR-01 版 3）、FND-43'

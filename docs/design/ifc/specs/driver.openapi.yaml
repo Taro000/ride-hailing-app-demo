@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: ドライバーの API（IFC-03）
-  version: 1.0.0
+  version: 1.1.0
   description: 第 3 段階（architecture-to-high-level-design）で決めた部分だけを書く。項目は docs/design/ifc/IFC-03.yaml。仮の値は x-provisional で示す。共通の約束事は DEC-38〜50（エラーの形、ID、時刻、お金、一覧、セッション、ログとトレース、命名、冪等キー、版、タイムアウト）。
 servers:
 - url: https://{service}-{projectNumber}.asia-northeast1.run.app
@@ -22,6 +22,8 @@ paths:
         受付を始める（今の位置を一つ添える）。画面の点灯は画面が行う（FR-52）
 
         機能: FR-17、FR-47
+
+        回数の上限（仮。DEC-55）: アカウントごとに 1 分に 120 回（そのほかの経路）
       parameters:
       - $ref: '#/components/parameters/Traceparent'
       - $ref: '#/components/parameters/ClientTraceId'
@@ -59,11 +61,14 @@ paths:
                 INVALID_REQUEST:
                   value:
                     type: urn:ride-hailing-demo:problem:invalid_request
-                    title: 要求の形が違う（欄の不足、範囲の外、冪等キーがない）。errors に欄ごとの中
+                    title: 要求の形が違う（欄の不足、範囲の外、冪等キーがない）
                     status: 400
                     code: INVALID_REQUEST
-                    detail: 要求の形が違う（欄の不足、範囲の外、冪等キーがない）。errors に欄ごとの中
+                    detail: 要求の形が違う（欄の不足、範囲の外、冪等キーがない）。errors に欄ごとの中身
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '401':
           description: 'UNAUTHENTICATED: ログインしていないか、セッションが切れた → ログインの画面へ。操作の途中なら、ログインの後に同じ冪等キーで送る'
           x-error-codes:
@@ -81,6 +86,9 @@ paths:
                     code: UNAUTHENTICATED
                     detail: ログインしていないか、セッションが切れた
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '403':
           description: |-
             DRIVER_SUSPENDED: 配車を停止されている（FR-17 AC3、FR-47 AC2） → 受付を始めさせずその旨を示す
@@ -109,6 +117,9 @@ paths:
                     code: FORBIDDEN
                     detail: 役割が違う、または送り元（Origin）がサービスの URL でない
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '404':
           description: 'NOT_FOUND: ない、または自分のものでない（他人の依頼も 404 にする。DRV-29） → 画面を読み直す'
           x-error-codes:
@@ -126,6 +137,9 @@ paths:
                     code: NOT_FOUND
                     detail: ない、または自分のものでない（他人の依頼も 404 にする。DRV-29）
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '409':
           description: 'OPERATION_IN_PROGRESS: 同じ冪等キーの要求がまだ動いている（DEC-48） → Retry-After（1 秒）の後に同じキーで送るか、状態を読み直す'
           x-error-codes:
@@ -146,6 +160,8 @@ paths:
           headers:
             Retry-After:
               $ref: '#/components/headers/RetryAfter'
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '422':
           description: 'IDEMPOTENCY_KEY_REUSED: 同じ冪等キーで中身の違う要求（DEC-48） → 画面の誤り。新しい操作として新しいキーで始める'
           x-error-codes:
@@ -163,6 +179,9 @@ paths:
                     code: IDEMPOTENCY_KEY_REUSED
                     detail: 同じ冪等キーで中身の違う要求（DEC-48）
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '429':
           description: 'RATE_LIMITED: 回数の上限（DEC-55） → Retry-After まで待つ'
           x-error-codes:
@@ -183,6 +202,8 @@ paths:
           headers:
             Retry-After:
               $ref: '#/components/headers/RetryAfter'
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '500':
           description: 'INTERNAL_ERROR: 想定外の誤り → 読むだけの要求は間を置いて送り直す。状態を変える要求は同じ冪等キーで送り直すか、状態を読み直す'
           x-error-codes:
@@ -200,6 +221,9 @@ paths:
                     code: INTERNAL_ERROR
                     detail: 想定外の誤り
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '503':
           description: |-
             ROUTE_TIMEOUT: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33） → 結果が分からないとして扱う。読むだけの要求は送り直す。状態を変える要求は同じ冪等キーで送り直すか、状態を読み直す。新しいキーでは送らない
@@ -215,26 +239,31 @@ paths:
                 ROUTE_TIMEOUT:
                   value:
                     type: urn:ride-hailing-demo:problem:route_timeout
-                    title: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33
+                    title: T_route（10 秒）で切った
                     status: 503
                     code: ROUTE_TIMEOUT
-                    detail: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33
+                    detail: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33）
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
                 DEPENDENCY_UNAVAILABLE:
                   value:
                     type: urn:ride-hailing-demo:problem:dependency_unavailable
-                    title: Turso に届かないか遅い（T_db）。状態を変えたかどうかは、一つ目のトラン
+                    title: Turso に届かないか遅い（T_db）
                     status: 503
                     code: DEPENDENCY_UNAVAILABLE
-                    detail: Turso に届かないか遅い（T_db）。状態を変えたかどうかは、一つ目のトラン
+                    detail: Turso に届かないか遅い（T_db）。状態を変えたかどうかは、一つ目のトランザクションを書けたかによる
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
           headers:
             Retry-After:
               $ref: '#/components/headers/RetryAfter'
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
       x-route-id: driver.reception.start
       x-functions:
       - FR-17
       - FR-47
+      x-rate-limit:
+        value: アカウントごとに 1 分に 120 回（DEC-55 のそのほかの経路）
+        x-provisional: true
       security:
       - sessionCookie: []
       requestBody:
@@ -251,6 +280,8 @@ paths:
         受付を止める。最後の位置を消す（DEC-14）
 
         機能: FR-17
+
+        回数の上限（仮。DEC-55）: アカウントごとに 1 分に 120 回（そのほかの経路）
       parameters:
       - $ref: '#/components/parameters/Traceparent'
       - $ref: '#/components/parameters/ClientTraceId'
@@ -277,11 +308,14 @@ paths:
                 INVALID_REQUEST:
                   value:
                     type: urn:ride-hailing-demo:problem:invalid_request
-                    title: 要求の形が違う（欄の不足、範囲の外、冪等キーがない）。errors に欄ごとの中
+                    title: 要求の形が違う（欄の不足、範囲の外、冪等キーがない）
                     status: 400
                     code: INVALID_REQUEST
-                    detail: 要求の形が違う（欄の不足、範囲の外、冪等キーがない）。errors に欄ごとの中
+                    detail: 要求の形が違う（欄の不足、範囲の外、冪等キーがない）。errors に欄ごとの中身
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '401':
           description: 'UNAUTHENTICATED: ログインしていないか、セッションが切れた → ログインの画面へ。操作の途中なら、ログインの後に同じ冪等キーで送る'
           x-error-codes:
@@ -299,6 +333,9 @@ paths:
                     code: UNAUTHENTICATED
                     detail: ログインしていないか、セッションが切れた
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '403':
           description: 'FORBIDDEN: 役割が違う、または送り元（Origin）がサービスの URL でない → 送り直さない（画面の誤りとしてブラウザのエラーの記録に残す）'
           x-error-codes:
@@ -316,6 +353,9 @@ paths:
                     code: FORBIDDEN
                     detail: 役割が違う、または送り元（Origin）がサービスの URL でない
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '404':
           description: 'NOT_FOUND: ない、または自分のものでない（他人の依頼も 404 にする。DRV-29） → 画面を読み直す'
           x-error-codes:
@@ -333,6 +373,9 @@ paths:
                     code: NOT_FOUND
                     detail: ない、または自分のものでない（他人の依頼も 404 にする。DRV-29）
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '409':
           description: 'OPERATION_IN_PROGRESS: 同じ冪等キーの要求がまだ動いている（DEC-48） → Retry-After（1 秒）の後に同じキーで送るか、状態を読み直す'
           x-error-codes:
@@ -353,6 +396,8 @@ paths:
           headers:
             Retry-After:
               $ref: '#/components/headers/RetryAfter'
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '422':
           description: 'IDEMPOTENCY_KEY_REUSED: 同じ冪等キーで中身の違う要求（DEC-48） → 画面の誤り。新しい操作として新しいキーで始める'
           x-error-codes:
@@ -370,6 +415,9 @@ paths:
                     code: IDEMPOTENCY_KEY_REUSED
                     detail: 同じ冪等キーで中身の違う要求（DEC-48）
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '429':
           description: 'RATE_LIMITED: 回数の上限（DEC-55） → Retry-After まで待つ'
           x-error-codes:
@@ -390,6 +438,8 @@ paths:
           headers:
             Retry-After:
               $ref: '#/components/headers/RetryAfter'
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '500':
           description: 'INTERNAL_ERROR: 想定外の誤り → 読むだけの要求は間を置いて送り直す。状態を変える要求は同じ冪等キーで送り直すか、状態を読み直す'
           x-error-codes:
@@ -407,6 +457,9 @@ paths:
                     code: INTERNAL_ERROR
                     detail: 想定外の誤り
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '503':
           description: |-
             ROUTE_TIMEOUT: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33） → 結果が分からないとして扱う。読むだけの要求は送り直す。状態を変える要求は同じ冪等キーで送り直すか、状態を読み直す。新しいキーでは送らない
@@ -422,25 +475,30 @@ paths:
                 ROUTE_TIMEOUT:
                   value:
                     type: urn:ride-hailing-demo:problem:route_timeout
-                    title: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33
+                    title: T_route（10 秒）で切った
                     status: 503
                     code: ROUTE_TIMEOUT
-                    detail: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33
+                    detail: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33）
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
                 DEPENDENCY_UNAVAILABLE:
                   value:
                     type: urn:ride-hailing-demo:problem:dependency_unavailable
-                    title: Turso に届かないか遅い（T_db）。状態を変えたかどうかは、一つ目のトラン
+                    title: Turso に届かないか遅い（T_db）
                     status: 503
                     code: DEPENDENCY_UNAVAILABLE
-                    detail: Turso に届かないか遅い（T_db）。状態を変えたかどうかは、一つ目のトラン
+                    detail: Turso に届かないか遅い（T_db）。状態を変えたかどうかは、一つ目のトランザクションを書けたかによる
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
           headers:
             Retry-After:
               $ref: '#/components/headers/RetryAfter'
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
       x-route-id: driver.reception.stop
       x-functions:
       - FR-17
+      x-rate-limit:
+        value: アカウントごとに 1 分に 120 回（DEC-55 のそのほかの経路）
+        x-provisional: true
       security:
       - sessionCookie: []
   /api/v1/driver/requests:
@@ -448,11 +506,13 @@ paths:
       operationId: driver_requests_list
       summary: 示してよい依頼の一覧（しきい値、受ける条件、停止を一か所の規則で絞る。DEC-09）
       description: |-
-        示してよい依頼の一覧（しきい値、受ける条件、停止を一か所の規則で絞る。DEC-09）
+        示してよい依頼の一覧（しきい値、受ける条件、停止を一か所の規則で絞る。DEC-09）。しきい値の判定には、評価を送ったときにサーバーの中で計算した評価値を使う（FR-15）
 
-        機能: FR-16、FR-18、FR-34、FR-47
+        機能: FR-16、FR-18、FR-34、FR-47、FR-15
 
         SLI-01 の六つの操作の一つ（route_id で数える）
+
+        回数の上限（仮。DEC-55）: アカウントごとに 1 分に 120 回（そのほかの経路）
       parameters:
       - $ref: '#/components/parameters/Traceparent'
       - $ref: '#/components/parameters/ClientTraceId'
@@ -478,11 +538,14 @@ paths:
                 INVALID_REQUEST:
                   value:
                     type: urn:ride-hailing-demo:problem:invalid_request
-                    title: 要求の形が違う（欄の不足、範囲の外、冪等キーがない）。errors に欄ごとの中
+                    title: 要求の形が違う（欄の不足、範囲の外、冪等キーがない）
                     status: 400
                     code: INVALID_REQUEST
-                    detail: 要求の形が違う（欄の不足、範囲の外、冪等キーがない）。errors に欄ごとの中
+                    detail: 要求の形が違う（欄の不足、範囲の外、冪等キーがない）。errors に欄ごとの中身
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '401':
           description: 'UNAUTHENTICATED: ログインしていないか、セッションが切れた → ログインの画面へ。操作の途中なら、ログインの後に同じ冪等キーで送る'
           x-error-codes:
@@ -500,6 +563,9 @@ paths:
                     code: UNAUTHENTICATED
                     detail: ログインしていないか、セッションが切れた
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '403':
           description: 'FORBIDDEN: 役割が違う、または送り元（Origin）がサービスの URL でない → 送り直さない（画面の誤りとしてブラウザのエラーの記録に残す）'
           x-error-codes:
@@ -517,6 +583,9 @@ paths:
                     code: FORBIDDEN
                     detail: 役割が違う、または送り元（Origin）がサービスの URL でない
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '404':
           description: 'NOT_FOUND: ない、または自分のものでない（他人の依頼も 404 にする。DRV-29） → 画面を読み直す'
           x-error-codes:
@@ -534,6 +603,9 @@ paths:
                     code: NOT_FOUND
                     detail: ない、または自分のものでない（他人の依頼も 404 にする。DRV-29）
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '409':
           description: 'NOT_RECEIVING: 受付中でない（停止されたときを含む） → 受付の画面へ'
           x-error-codes:
@@ -551,6 +623,9 @@ paths:
                     code: NOT_RECEIVING
                     detail: 受付中でない（停止されたときを含む）
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '429':
           description: 'RATE_LIMITED: 回数の上限（DEC-55） → Retry-After まで待つ'
           x-error-codes:
@@ -571,6 +646,8 @@ paths:
           headers:
             Retry-After:
               $ref: '#/components/headers/RetryAfter'
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '500':
           description: 'INTERNAL_ERROR: 想定外の誤り → 読むだけの要求は間を置いて送り直す。状態を変える要求は同じ冪等キーで送り直すか、状態を読み直す'
           x-error-codes:
@@ -588,6 +665,9 @@ paths:
                     code: INTERNAL_ERROR
                     detail: 想定外の誤り
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '503':
           description: |-
             ROUTE_TIMEOUT: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33） → 結果が分からないとして扱う。読むだけの要求は送り直す。状態を変える要求は同じ冪等キーで送り直すか、状態を読み直す。新しいキーでは送らない
@@ -603,30 +683,36 @@ paths:
                 ROUTE_TIMEOUT:
                   value:
                     type: urn:ride-hailing-demo:problem:route_timeout
-                    title: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33
+                    title: T_route（10 秒）で切った
                     status: 503
                     code: ROUTE_TIMEOUT
-                    detail: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33
+                    detail: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33）
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
                 DEPENDENCY_UNAVAILABLE:
                   value:
                     type: urn:ride-hailing-demo:problem:dependency_unavailable
-                    title: Turso に届かないか遅い（T_db）。状態を変えたかどうかは、一つ目のトラン
+                    title: Turso に届かないか遅い（T_db）
                     status: 503
                     code: DEPENDENCY_UNAVAILABLE
-                    detail: Turso に届かないか遅い（T_db）。状態を変えたかどうかは、一つ目のトラン
+                    detail: Turso に届かないか遅い（T_db）。状態を変えたかどうかは、一つ目のトランザクションを書けたかによる
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
           headers:
             Retry-After:
               $ref: '#/components/headers/RetryAfter'
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
       x-route-id: driver.requests.list
       x-functions:
       - FR-16
       - FR-18
       - FR-34
       - FR-47
+      - FR-15
       x-sli:
       - SLI-01
+      x-rate-limit:
+        value: アカウントごとに 1 分に 120 回（DEC-55 のそのほかの経路）
+        x-provisional: true
       security:
       - sessionCookie: []
   /api/v1/driver/requests/{rideId}:
@@ -637,6 +723,8 @@ paths:
         依頼の内容（ピン、経路、受取額、乗車場所までの距離と所要時間、乗車の所要時間）
 
         機能: FR-19、FR-21
+
+        回数の上限（仮。DEC-55）: アカウントごとに 1 分に 120 回（そのほかの経路）
       parameters:
       - $ref: '#/components/parameters/Traceparent'
       - $ref: '#/components/parameters/ClientTraceId'
@@ -645,6 +733,7 @@ paths:
         required: true
         schema:
           type: string
+          pattern: ^ride_[0-9A-HJKMNP-TV-Z]{26}$
       responses:
         '200':
           description: 内容
@@ -667,11 +756,14 @@ paths:
                 INVALID_REQUEST:
                   value:
                     type: urn:ride-hailing-demo:problem:invalid_request
-                    title: 要求の形が違う（欄の不足、範囲の外、冪等キーがない）。errors に欄ごとの中
+                    title: 要求の形が違う（欄の不足、範囲の外、冪等キーがない）
                     status: 400
                     code: INVALID_REQUEST
-                    detail: 要求の形が違う（欄の不足、範囲の外、冪等キーがない）。errors に欄ごとの中
+                    detail: 要求の形が違う（欄の不足、範囲の外、冪等キーがない）。errors に欄ごとの中身
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '401':
           description: 'UNAUTHENTICATED: ログインしていないか、セッションが切れた → ログインの画面へ。操作の途中なら、ログインの後に同じ冪等キーで送る'
           x-error-codes:
@@ -689,6 +781,9 @@ paths:
                     code: UNAUTHENTICATED
                     detail: ログインしていないか、セッションが切れた
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '403':
           description: 'FORBIDDEN: 役割が違う、または送り元（Origin）がサービスの URL でない → 送り直さない（画面の誤りとしてブラウザのエラーの記録に残す）'
           x-error-codes:
@@ -706,6 +801,9 @@ paths:
                     code: FORBIDDEN
                     detail: 役割が違う、または送り元（Origin）がサービスの URL でない
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '404':
           description: 'NOT_FOUND: ない、または自分のものでない（他人の依頼も 404 にする。DRV-29） → 画面を読み直す'
           x-error-codes:
@@ -723,6 +821,9 @@ paths:
                     code: NOT_FOUND
                     detail: ない、または自分のものでない（他人の依頼も 404 にする。DRV-29）
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '409':
           description: |-
             DRIVER_MOVING: 速さが V_moving 以上（FR-21 AC1） → 停車してから操作するよう示す
@@ -751,6 +852,9 @@ paths:
                     code: REQUEST_NO_LONGER_AVAILABLE
                     detail: ほかのドライバーが許諾したか、乗客が取り消した（FR-19 AC2）
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '429':
           description: 'RATE_LIMITED: 回数の上限（DEC-55） → Retry-After まで待つ'
           x-error-codes:
@@ -771,6 +875,8 @@ paths:
           headers:
             Retry-After:
               $ref: '#/components/headers/RetryAfter'
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '500':
           description: 'INTERNAL_ERROR: 想定外の誤り → 読むだけの要求は間を置いて送り直す。状態を変える要求は同じ冪等キーで送り直すか、状態を読み直す'
           x-error-codes:
@@ -788,6 +894,9 @@ paths:
                     code: INTERNAL_ERROR
                     detail: 想定外の誤り
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '503':
           description: |-
             ROUTE_TIMEOUT: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33） → 結果が分からないとして扱う。読むだけの要求は送り直す。状態を変える要求は同じ冪等キーで送り直すか、状態を読み直す。新しいキーでは送らない
@@ -803,26 +912,31 @@ paths:
                 ROUTE_TIMEOUT:
                   value:
                     type: urn:ride-hailing-demo:problem:route_timeout
-                    title: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33
+                    title: T_route（10 秒）で切った
                     status: 503
                     code: ROUTE_TIMEOUT
-                    detail: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33
+                    detail: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33）
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
                 DEPENDENCY_UNAVAILABLE:
                   value:
                     type: urn:ride-hailing-demo:problem:dependency_unavailable
-                    title: Turso に届かないか遅い（T_db）。状態を変えたかどうかは、一つ目のトラン
+                    title: Turso に届かないか遅い（T_db）
                     status: 503
                     code: DEPENDENCY_UNAVAILABLE
-                    detail: Turso に届かないか遅い（T_db）。状態を変えたかどうかは、一つ目のトラン
+                    detail: Turso に届かないか遅い（T_db）。状態を変えたかどうかは、一つ目のトランザクションを書けたかによる
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
           headers:
             Retry-After:
               $ref: '#/components/headers/RetryAfter'
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
       x-route-id: driver.requests.get
       x-functions:
       - FR-19
       - FR-21
+      x-rate-limit:
+        value: アカウントごとに 1 分に 120 回（DEC-55 のそのほかの経路）
+        x-provisional: true
       security:
       - sessionCookie: []
   /api/v1/driver/requests/{rideId}/accept:
@@ -832,9 +946,11 @@ paths:
       description: |-
         許諾する。まだ誰にも割り当てられていなければ、このドライバーに割り当てる（DEC-09）。速さが分からないときは受け付け、分からなかったことを記録する（FR-21 AC3）
 
-        機能: FR-20、FR-16、FR-21、FR-10、FR-23
+        機能: FR-20、FR-16、FR-21、FR-23
 
         SLI-01 の六つの操作の一つ（route_id で数える）
+
+        回数の上限（仮。DEC-55）: アカウントごとに 1 分に 120 回（そのほかの経路）
       parameters:
       - $ref: '#/components/parameters/Traceparent'
       - $ref: '#/components/parameters/ClientTraceId'
@@ -843,6 +959,7 @@ paths:
         required: true
         schema:
           type: string
+          pattern: ^ride_[0-9A-HJKMNP-TV-Z]{26}$
       - $ref: '#/components/parameters/IdempotencyKey'
       responses:
         '200':
@@ -866,11 +983,14 @@ paths:
                 INVALID_REQUEST:
                   value:
                     type: urn:ride-hailing-demo:problem:invalid_request
-                    title: 要求の形が違う（欄の不足、範囲の外、冪等キーがない）。errors に欄ごとの中
+                    title: 要求の形が違う（欄の不足、範囲の外、冪等キーがない）
                     status: 400
                     code: INVALID_REQUEST
-                    detail: 要求の形が違う（欄の不足、範囲の外、冪等キーがない）。errors に欄ごとの中
+                    detail: 要求の形が違う（欄の不足、範囲の外、冪等キーがない）。errors に欄ごとの中身
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '401':
           description: 'UNAUTHENTICATED: ログインしていないか、セッションが切れた → ログインの画面へ。操作の途中なら、ログインの後に同じ冪等キーで送る'
           x-error-codes:
@@ -888,6 +1008,9 @@ paths:
                     code: UNAUTHENTICATED
                     detail: ログインしていないか、セッションが切れた
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '403':
           description: |-
             DRIVER_SUSPENDED: 停止された（QR-16） → 受付の画面へ
@@ -916,6 +1039,9 @@ paths:
                     code: FORBIDDEN
                     detail: 役割が違う、または送り元（Origin）がサービスの URL でない
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '404':
           description: 'NOT_FOUND: ない、または自分のものでない（他人の依頼も 404 にする。DRV-29） → 画面を読み直す'
           x-error-codes:
@@ -933,10 +1059,13 @@ paths:
                     code: NOT_FOUND
                     detail: ない、または自分のものでない（他人の依頼も 404 にする。DRV-29）
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '409':
           description: |-
             ALREADY_TAKEN: ほかのドライバーが許諾した（FR-20 AC2） → その旨を示して一覧に戻る
-            RIDE_CANCELLED: 乗客が取り消した（FR-20 AC3） → その旨を示して一覧に戻る
+            RIDE_CANCELLED: 乗客が取り消したか、手配の時刻から T_request_max を過ぎてシステムが取り消した（FR-20 AC3、FR-08 版 2） → その旨を示して一覧に戻る
             DRIVER_BUSY: 迎車中か乗車中（FR-20 AC4） → 受け付けなかった旨を示す
             NOT_ELIGIBLE: しきい値か評価の件数を満たさない（一覧を見た後に評価値が下がったなど。FR-16 AC2） → 割り当てなかった旨を示して一覧に戻る
             DRIVER_MOVING: 速さが V_moving 以上（FR-21 AC1） → 停車してから操作するよう示す
@@ -964,10 +1093,10 @@ paths:
                 RIDE_CANCELLED:
                   value:
                     type: urn:ride-hailing-demo:problem:ride_cancelled
-                    title: 乗客が取り消した（FR-20 AC3）
+                    title: 乗客が取り消したか、手配の時刻から T_request_max を過ぎてシステムが取り消した（FR-20 AC3、FR-08 版 2）
                     status: 409
                     code: RIDE_CANCELLED
-                    detail: 乗客が取り消した（FR-20 AC3）
+                    detail: 乗客が取り消したか、手配の時刻から T_request_max を過ぎてシステムが取り消した（FR-20 AC3、FR-08 版 2）
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
                 DRIVER_BUSY:
                   value:
@@ -980,10 +1109,10 @@ paths:
                 NOT_ELIGIBLE:
                   value:
                     type: urn:ride-hailing-demo:problem:not_eligible
-                    title: しきい値か評価の件数を満たさない（一覧を見た後に評価値が下がったなど。FR-16
+                    title: しきい値か評価の件数を満たさない（一覧を見た後に評価値が下がったなど。FR-16 AC2）
                     status: 409
                     code: NOT_ELIGIBLE
-                    detail: しきい値か評価の件数を満たさない（一覧を見た後に評価値が下がったなど。FR-16
+                    detail: しきい値か評価の件数を満たさない（一覧を見た後に評価値が下がったなど。FR-16 AC2）
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
                 DRIVER_MOVING:
                   value:
@@ -1004,6 +1133,8 @@ paths:
           headers:
             Retry-After:
               $ref: '#/components/headers/RetryAfter'
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '422':
           description: 'IDEMPOTENCY_KEY_REUSED: 同じ冪等キーで中身の違う要求（DEC-48） → 画面の誤り。新しい操作として新しいキーで始める'
           x-error-codes:
@@ -1021,6 +1152,9 @@ paths:
                     code: IDEMPOTENCY_KEY_REUSED
                     detail: 同じ冪等キーで中身の違う要求（DEC-48）
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '429':
           description: 'RATE_LIMITED: 回数の上限（DEC-55） → Retry-After まで待つ'
           x-error-codes:
@@ -1041,6 +1175,8 @@ paths:
           headers:
             Retry-After:
               $ref: '#/components/headers/RetryAfter'
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '500':
           description: 'INTERNAL_ERROR: 想定外の誤り → 読むだけの要求は間を置いて送り直す。状態を変える要求は同じ冪等キーで送り直すか、状態を読み直す'
           x-error-codes:
@@ -1058,6 +1194,9 @@ paths:
                     code: INTERNAL_ERROR
                     detail: 想定外の誤り
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '503':
           description: |-
             ROUTE_TIMEOUT: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33） → 結果が分からないとして扱う。読むだけの要求は送り直す。状態を変える要求は同じ冪等キーで送り直すか、状態を読み直す。新しいキーでは送らない
@@ -1073,31 +1212,35 @@ paths:
                 ROUTE_TIMEOUT:
                   value:
                     type: urn:ride-hailing-demo:problem:route_timeout
-                    title: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33
+                    title: T_route（10 秒）で切った
                     status: 503
                     code: ROUTE_TIMEOUT
-                    detail: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33
+                    detail: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33）
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
                 DEPENDENCY_UNAVAILABLE:
                   value:
                     type: urn:ride-hailing-demo:problem:dependency_unavailable
-                    title: Turso に届かないか遅い（T_db）。状態を変えたかどうかは、一つ目のトラン
+                    title: Turso に届かないか遅い（T_db）
                     status: 503
                     code: DEPENDENCY_UNAVAILABLE
-                    detail: Turso に届かないか遅い（T_db）。状態を変えたかどうかは、一つ目のトラン
+                    detail: Turso に届かないか遅い（T_db）。状態を変えたかどうかは、一つ目のトランザクションを書けたかによる
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
           headers:
             Retry-After:
               $ref: '#/components/headers/RetryAfter'
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
       x-route-id: driver.requests.accept
       x-functions:
       - FR-20
       - FR-16
       - FR-21
-      - FR-10
       - FR-23
       x-sli:
       - SLI-01
+      x-rate-limit:
+        value: アカウントごとに 1 分に 120 回（DEC-55 のそのほかの経路）
+        x-provisional: true
       security:
       - sessionCookie: []
   /api/v1/driver/rides/active:
@@ -1107,7 +1250,9 @@ paths:
       description: |-
         担当の進行中の依頼
 
-        機能: FR-23、FR-24
+        機能: FR-23
+
+        回数の上限（仮。DEC-55）: アカウントごとに 1 分に 120 回（そのほかの経路）
       parameters:
       - $ref: '#/components/parameters/Traceparent'
       - $ref: '#/components/parameters/ClientTraceId'
@@ -1138,11 +1283,14 @@ paths:
                 INVALID_REQUEST:
                   value:
                     type: urn:ride-hailing-demo:problem:invalid_request
-                    title: 要求の形が違う（欄の不足、範囲の外、冪等キーがない）。errors に欄ごとの中
+                    title: 要求の形が違う（欄の不足、範囲の外、冪等キーがない）
                     status: 400
                     code: INVALID_REQUEST
-                    detail: 要求の形が違う（欄の不足、範囲の外、冪等キーがない）。errors に欄ごとの中
+                    detail: 要求の形が違う（欄の不足、範囲の外、冪等キーがない）。errors に欄ごとの中身
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '401':
           description: 'UNAUTHENTICATED: ログインしていないか、セッションが切れた → ログインの画面へ。操作の途中なら、ログインの後に同じ冪等キーで送る'
           x-error-codes:
@@ -1160,6 +1308,9 @@ paths:
                     code: UNAUTHENTICATED
                     detail: ログインしていないか、セッションが切れた
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '403':
           description: 'FORBIDDEN: 役割が違う、または送り元（Origin）がサービスの URL でない → 送り直さない（画面の誤りとしてブラウザのエラーの記録に残す）'
           x-error-codes:
@@ -1177,6 +1328,9 @@ paths:
                     code: FORBIDDEN
                     detail: 役割が違う、または送り元（Origin）がサービスの URL でない
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '404':
           description: 'NOT_FOUND: ない、または自分のものでない（他人の依頼も 404 にする。DRV-29） → 画面を読み直す'
           x-error-codes:
@@ -1194,6 +1348,9 @@ paths:
                     code: NOT_FOUND
                     detail: ない、または自分のものでない（他人の依頼も 404 にする。DRV-29）
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '429':
           description: 'RATE_LIMITED: 回数の上限（DEC-55） → Retry-After まで待つ'
           x-error-codes:
@@ -1214,6 +1371,8 @@ paths:
           headers:
             Retry-After:
               $ref: '#/components/headers/RetryAfter'
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '500':
           description: 'INTERNAL_ERROR: 想定外の誤り → 読むだけの要求は間を置いて送り直す。状態を変える要求は同じ冪等キーで送り直すか、状態を読み直す'
           x-error-codes:
@@ -1231,6 +1390,9 @@ paths:
                     code: INTERNAL_ERROR
                     detail: 想定外の誤り
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '503':
           description: |-
             ROUTE_TIMEOUT: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33） → 結果が分からないとして扱う。読むだけの要求は送り直す。状態を変える要求は同じ冪等キーで送り直すか、状態を読み直す。新しいキーでは送らない
@@ -1246,26 +1408,30 @@ paths:
                 ROUTE_TIMEOUT:
                   value:
                     type: urn:ride-hailing-demo:problem:route_timeout
-                    title: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33
+                    title: T_route（10 秒）で切った
                     status: 503
                     code: ROUTE_TIMEOUT
-                    detail: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33
+                    detail: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33）
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
                 DEPENDENCY_UNAVAILABLE:
                   value:
                     type: urn:ride-hailing-demo:problem:dependency_unavailable
-                    title: Turso に届かないか遅い（T_db）。状態を変えたかどうかは、一つ目のトラン
+                    title: Turso に届かないか遅い（T_db）
                     status: 503
                     code: DEPENDENCY_UNAVAILABLE
-                    detail: Turso に届かないか遅い（T_db）。状態を変えたかどうかは、一つ目のトラン
+                    detail: Turso に届かないか遅い（T_db）。状態を変えたかどうかは、一つ目のトランザクションを書けたかによる
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
           headers:
             Retry-After:
               $ref: '#/components/headers/RetryAfter'
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
       x-route-id: driver.rides.active
       x-functions:
       - FR-23
-      - FR-24
+      x-rate-limit:
+        value: アカウントごとに 1 分に 120 回（DEC-55 のそのほかの経路）
+        x-provisional: true
       security:
       - sessionCookie: []
   /api/v1/driver/rides/{rideId}/cancel:
@@ -1276,6 +1442,8 @@ paths:
         乗車の前に取り消し、依頼を乗客の依頼のまま、ほかのドライバーに示し直す（押さえはそのまま）
 
         機能: FR-22
+
+        回数の上限（仮。DEC-55）: アカウントごとに 1 分に 120 回（そのほかの経路）
       parameters:
       - $ref: '#/components/parameters/Traceparent'
       - $ref: '#/components/parameters/ClientTraceId'
@@ -1284,6 +1452,7 @@ paths:
         required: true
         schema:
           type: string
+          pattern: ^ride_[0-9A-HJKMNP-TV-Z]{26}$
       - $ref: '#/components/parameters/IdempotencyKey'
       responses:
         '200':
@@ -1307,11 +1476,14 @@ paths:
                 INVALID_REQUEST:
                   value:
                     type: urn:ride-hailing-demo:problem:invalid_request
-                    title: 要求の形が違う（欄の不足、範囲の外、冪等キーがない）。errors に欄ごとの中
+                    title: 要求の形が違う（欄の不足、範囲の外、冪等キーがない）
                     status: 400
                     code: INVALID_REQUEST
-                    detail: 要求の形が違う（欄の不足、範囲の外、冪等キーがない）。errors に欄ごとの中
+                    detail: 要求の形が違う（欄の不足、範囲の外、冪等キーがない）。errors に欄ごとの中身
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '401':
           description: 'UNAUTHENTICATED: ログインしていないか、セッションが切れた → ログインの画面へ。操作の途中なら、ログインの後に同じ冪等キーで送る'
           x-error-codes:
@@ -1329,6 +1501,9 @@ paths:
                     code: UNAUTHENTICATED
                     detail: ログインしていないか、セッションが切れた
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '403':
           description: 'FORBIDDEN: 役割が違う、または送り元（Origin）がサービスの URL でない → 送り直さない（画面の誤りとしてブラウザのエラーの記録に残す）'
           x-error-codes:
@@ -1346,6 +1521,9 @@ paths:
                     code: FORBIDDEN
                     detail: 役割が違う、または送り元（Origin）がサービスの URL でない
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '404':
           description: 'NOT_FOUND: ない、または自分のものでない（他人の依頼も 404 にする。DRV-29） → 画面を読み直す'
           x-error-codes:
@@ -1363,12 +1541,17 @@ paths:
                     code: NOT_FOUND
                     detail: ない、または自分のものでない（他人の依頼も 404 にする。DRV-29）
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '409':
           description: |-
             RIDE_ALREADY_STARTED: 乗車が始まっている（FR-22 AC2） → 取り消さずその旨を示す
+            RIDE_CANCELLED: 取り消された依頼（FND-34） → 読み直して今の状態を示す
             OPERATION_IN_PROGRESS: 同じ冪等キーの要求がまだ動いている（DEC-48） → Retry-After（1 秒）の後に同じキーで送るか、状態を読み直す
           x-error-codes:
           - RIDE_ALREADY_STARTED
+          - RIDE_CANCELLED
           - OPERATION_IN_PROGRESS
           content:
             application/problem+json:
@@ -1383,6 +1566,14 @@ paths:
                     code: RIDE_ALREADY_STARTED
                     detail: 乗車が始まっている（FR-22 AC2）
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+                RIDE_CANCELLED:
+                  value:
+                    type: urn:ride-hailing-demo:problem:ride_cancelled
+                    title: 取り消された依頼（FND-34）
+                    status: 409
+                    code: RIDE_CANCELLED
+                    detail: 取り消された依頼（FND-34）
+                    traceId: 4bf92f3577b34da6a3ce929d0e0e4736
                 OPERATION_IN_PROGRESS:
                   value:
                     type: urn:ride-hailing-demo:problem:operation_in_progress
@@ -1394,6 +1585,8 @@ paths:
           headers:
             Retry-After:
               $ref: '#/components/headers/RetryAfter'
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '422':
           description: 'IDEMPOTENCY_KEY_REUSED: 同じ冪等キーで中身の違う要求（DEC-48） → 画面の誤り。新しい操作として新しいキーで始める'
           x-error-codes:
@@ -1411,6 +1604,9 @@ paths:
                     code: IDEMPOTENCY_KEY_REUSED
                     detail: 同じ冪等キーで中身の違う要求（DEC-48）
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '429':
           description: 'RATE_LIMITED: 回数の上限（DEC-55） → Retry-After まで待つ'
           x-error-codes:
@@ -1431,6 +1627,8 @@ paths:
           headers:
             Retry-After:
               $ref: '#/components/headers/RetryAfter'
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '500':
           description: 'INTERNAL_ERROR: 想定外の誤り → 読むだけの要求は間を置いて送り直す。状態を変える要求は同じ冪等キーで送り直すか、状態を読み直す'
           x-error-codes:
@@ -1448,6 +1646,9 @@ paths:
                     code: INTERNAL_ERROR
                     detail: 想定外の誤り
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '503':
           description: |-
             ROUTE_TIMEOUT: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33） → 結果が分からないとして扱う。読むだけの要求は送り直す。状態を変える要求は同じ冪等キーで送り直すか、状態を読み直す。新しいキーでは送らない
@@ -1463,25 +1664,30 @@ paths:
                 ROUTE_TIMEOUT:
                   value:
                     type: urn:ride-hailing-demo:problem:route_timeout
-                    title: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33
+                    title: T_route（10 秒）で切った
                     status: 503
                     code: ROUTE_TIMEOUT
-                    detail: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33
+                    detail: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33）
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
                 DEPENDENCY_UNAVAILABLE:
                   value:
                     type: urn:ride-hailing-demo:problem:dependency_unavailable
-                    title: Turso に届かないか遅い（T_db）。状態を変えたかどうかは、一つ目のトラン
+                    title: Turso に届かないか遅い（T_db）
                     status: 503
                     code: DEPENDENCY_UNAVAILABLE
-                    detail: Turso に届かないか遅い（T_db）。状態を変えたかどうかは、一つ目のトラン
+                    detail: Turso に届かないか遅い（T_db）。状態を変えたかどうかは、一つ目のトランザクションを書けたかによる
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
           headers:
             Retry-After:
               $ref: '#/components/headers/RetryAfter'
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
       x-route-id: driver.rides.cancel
       x-functions:
       - FR-22
+      x-rate-limit:
+        value: アカウントごとに 1 分に 120 回（DEC-55 のそのほかの経路）
+        x-provisional: true
       security:
       - sessionCookie: []
   /api/v1/driver/rides/{rideId}/arrive:
@@ -1494,6 +1700,8 @@ paths:
         機能: FR-25
 
         SLI-01 の六つの操作の一つ（route_id で数える）
+
+        回数の上限（仮。DEC-55）: アカウントごとに 1 分に 120 回（そのほかの経路）
       parameters:
       - $ref: '#/components/parameters/Traceparent'
       - $ref: '#/components/parameters/ClientTraceId'
@@ -1502,6 +1710,7 @@ paths:
         required: true
         schema:
           type: string
+          pattern: ^ride_[0-9A-HJKMNP-TV-Z]{26}$
       - $ref: '#/components/parameters/IdempotencyKey'
       responses:
         '200':
@@ -1525,11 +1734,14 @@ paths:
                 INVALID_REQUEST:
                   value:
                     type: urn:ride-hailing-demo:problem:invalid_request
-                    title: 要求の形が違う（欄の不足、範囲の外、冪等キーがない）。errors に欄ごとの中
+                    title: 要求の形が違う（欄の不足、範囲の外、冪等キーがない）
                     status: 400
                     code: INVALID_REQUEST
-                    detail: 要求の形が違う（欄の不足、範囲の外、冪等キーがない）。errors に欄ごとの中
+                    detail: 要求の形が違う（欄の不足、範囲の外、冪等キーがない）。errors に欄ごとの中身
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '401':
           description: 'UNAUTHENTICATED: ログインしていないか、セッションが切れた → ログインの画面へ。操作の途中なら、ログインの後に同じ冪等キーで送る'
           x-error-codes:
@@ -1547,6 +1759,9 @@ paths:
                     code: UNAUTHENTICATED
                     detail: ログインしていないか、セッションが切れた
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '403':
           description: 'FORBIDDEN: 役割が違う、または送り元（Origin）がサービスの URL でない → 送り直さない（画面の誤りとしてブラウザのエラーの記録に残す）'
           x-error-codes:
@@ -1564,6 +1779,9 @@ paths:
                     code: FORBIDDEN
                     detail: 役割が違う、または送り元（Origin）がサービスの URL でない
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '404':
           description: 'NOT_FOUND: ない、または自分のものでない（他人の依頼も 404 にする。DRV-29） → 画面を読み直す'
           x-error-codes:
@@ -1581,9 +1799,12 @@ paths:
                     code: NOT_FOUND
                     detail: ない、または自分のものでない（他人の依頼も 404 にする。DRV-29）
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '409':
           description: |-
-            TOO_FAR_FROM_PICKUP: 乗る場所から D_arrival より離れている（FR-25 AC2） → 受け付けず、乗車場所に近づくよう示す（距離を添える）
+            TOO_FAR_FROM_PICKUP: 乗る場所から D_arrival より離れている（FR-25 AC2）。distanceMeters に距離を添える → 受け付けず、乗車場所に近づくよう示す（距離を添える）
             RIDE_CANCELLED: 取り消された依頼（FR-25 AC4） → 受け付けずその旨を示す
             OPERATION_IN_PROGRESS: 同じ冪等キーの要求がまだ動いている（DEC-48） → Retry-After（1 秒）の後に同じキーで送るか、状態を読み直す
           x-error-codes:
@@ -1601,8 +1822,9 @@ paths:
                     title: 乗る場所から D_arrival より離れている（FR-25 AC2）
                     status: 409
                     code: TOO_FAR_FROM_PICKUP
-                    detail: 乗る場所から D_arrival より離れている（FR-25 AC2）
+                    detail: 乗る場所から D_arrival より離れている（FR-25 AC2）。distanceMeters に距離を添える
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+                    distanceMeters: 250
                 RIDE_CANCELLED:
                   value:
                     type: urn:ride-hailing-demo:problem:ride_cancelled
@@ -1622,6 +1844,8 @@ paths:
           headers:
             Retry-After:
               $ref: '#/components/headers/RetryAfter'
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '422':
           description: 'IDEMPOTENCY_KEY_REUSED: 同じ冪等キーで中身の違う要求（DEC-48） → 画面の誤り。新しい操作として新しいキーで始める'
           x-error-codes:
@@ -1639,6 +1863,9 @@ paths:
                     code: IDEMPOTENCY_KEY_REUSED
                     detail: 同じ冪等キーで中身の違う要求（DEC-48）
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '429':
           description: 'RATE_LIMITED: 回数の上限（DEC-55） → Retry-After まで待つ'
           x-error-codes:
@@ -1659,6 +1886,8 @@ paths:
           headers:
             Retry-After:
               $ref: '#/components/headers/RetryAfter'
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '500':
           description: 'INTERNAL_ERROR: 想定外の誤り → 読むだけの要求は間を置いて送り直す。状態を変える要求は同じ冪等キーで送り直すか、状態を読み直す'
           x-error-codes:
@@ -1676,6 +1905,9 @@ paths:
                     code: INTERNAL_ERROR
                     detail: 想定外の誤り
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '503':
           description: |-
             ROUTE_TIMEOUT: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33） → 結果が分からないとして扱う。読むだけの要求は送り直す。状態を変える要求は同じ冪等キーで送り直すか、状態を読み直す。新しいキーでは送らない
@@ -1691,27 +1923,32 @@ paths:
                 ROUTE_TIMEOUT:
                   value:
                     type: urn:ride-hailing-demo:problem:route_timeout
-                    title: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33
+                    title: T_route（10 秒）で切った
                     status: 503
                     code: ROUTE_TIMEOUT
-                    detail: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33
+                    detail: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33）
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
                 DEPENDENCY_UNAVAILABLE:
                   value:
                     type: urn:ride-hailing-demo:problem:dependency_unavailable
-                    title: Turso に届かないか遅い（T_db）。状態を変えたかどうかは、一つ目のトラン
+                    title: Turso に届かないか遅い（T_db）
                     status: 503
                     code: DEPENDENCY_UNAVAILABLE
-                    detail: Turso に届かないか遅い（T_db）。状態を変えたかどうかは、一つ目のトラン
+                    detail: Turso に届かないか遅い（T_db）。状態を変えたかどうかは、一つ目のトランザクションを書けたかによる
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
           headers:
             Retry-After:
               $ref: '#/components/headers/RetryAfter'
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
       x-route-id: driver.rides.arrive
       x-functions:
       - FR-25
       x-sli:
       - SLI-01
+      x-rate-limit:
+        value: アカウントごとに 1 分に 120 回（DEC-55 のそのほかの経路）
+        x-provisional: true
       security:
       - sessionCookie: []
       requestBody:
@@ -1725,11 +1962,13 @@ paths:
       operationId: driver_rides_start
       summary: 乗客から聞いた確認コードが一致したときだけ運転を始める。降車場所までの経路を求める
       description: |-
-        乗客から聞いた確認コードが一致したときだけ運転を始める。降車場所までの経路を求める
+        乗客から聞いた確認コードが一致したときだけ運転を始め、依頼を in_progress にする（FR-26 版 2、第 2 段階の DEC-30 版 2）。その依頼の担当のドライバーのアカウントだけが呼べる（ほかは 404 NOT_FOUND）。降車場所までの経路を求める（得られないときは routeToDropoff が null。FND-47）
 
-        機能: FR-26、FR-23、FR-24
+        機能: FR-26、FR-23
 
         SLI-01 の六つの操作の一つ（route_id で数える）
+
+        回数の上限（仮。DEC-55）: 一つの割り当てで確認コードが 10 回違ったら止める（DEC-55 の確認コード）。アカウントごとに 1 分に 120 回（そのほかの経路）
       parameters:
       - $ref: '#/components/parameters/Traceparent'
       - $ref: '#/components/parameters/ClientTraceId'
@@ -1738,10 +1977,11 @@ paths:
         required: true
         schema:
           type: string
+          pattern: ^ride_[0-9A-HJKMNP-TV-Z]{26}$
       - $ref: '#/components/parameters/IdempotencyKey'
       responses:
         '200':
-          description: 乗車中にした
+          description: 乗車中にした（state が in_progress）。降車場所までの経路を得られないときは ride.routeToDropoff が null（FND-47）
           headers:
             X-App-Version:
               $ref: '#/components/headers/XAppVersion'
@@ -1761,11 +2001,14 @@ paths:
                 INVALID_REQUEST:
                   value:
                     type: urn:ride-hailing-demo:problem:invalid_request
-                    title: 要求の形が違う（欄の不足、範囲の外、冪等キーがない）。errors に欄ごとの中
+                    title: 要求の形が違う（欄の不足、範囲の外、冪等キーがない）
                     status: 400
                     code: INVALID_REQUEST
-                    detail: 要求の形が違う（欄の不足、範囲の外、冪等キーがない）。errors に欄ごとの中
+                    detail: 要求の形が違う（欄の不足、範囲の外、冪等キーがない）。errors に欄ごとの中身
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '401':
           description: 'UNAUTHENTICATED: ログインしていないか、セッションが切れた → ログインの画面へ。操作の途中なら、ログインの後に同じ冪等キーで送る'
           x-error-codes:
@@ -1783,6 +2026,9 @@ paths:
                     code: UNAUTHENTICATED
                     detail: ログインしていないか、セッションが切れた
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '403':
           description: 'FORBIDDEN: 役割が違う、または送り元（Origin）がサービスの URL でない → 送り直さない（画面の誤りとしてブラウザのエラーの記録に残す）'
           x-error-codes:
@@ -1800,8 +2046,11 @@ paths:
                     code: FORBIDDEN
                     detail: 役割が違う、または送り元（Origin）がサービスの URL でない
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '404':
-          description: 'NOT_FOUND: ない、または自分のものでない（他人の依頼も 404 にする。DRV-29） → 画面を読み直す'
+          description: 'NOT_FOUND: ない、またはその依頼の担当のドライバーでない（FR-26 版 2、DRV-29） → 画面を読み直す'
           x-error-codes:
           - NOT_FOUND
           content:
@@ -1812,20 +2061,44 @@ paths:
                 NOT_FOUND:
                   value:
                     type: urn:ride-hailing-demo:problem:not_found
-                    title: ない、または自分のものでない（他人の依頼も 404 にする。DRV-29）
+                    title: ない、またはその依頼の担当のドライバーでない（FR-26 版 2、DRV-29）
                     status: 404
                     code: NOT_FOUND
-                    detail: ない、または自分のものでない（他人の依頼も 404 にする。DRV-29）
+                    detail: ない、またはその依頼の担当のドライバーでない（FR-26 版 2、DRV-29）
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '409':
-          description: 'OPERATION_IN_PROGRESS: 同じ冪等キーの要求がまだ動いている（DEC-48） → Retry-After（1 秒）の後に同じキーで送るか、状態を読み直す'
+          description: |-
+            RIDE_CANCELLED: 取り消された依頼（FND-34） → 読み直して今の状態を示す
+            RIDE_NOT_ARRIVED: 迎車の到着を知らせていない（依頼が arrived でない。FND-34） → 読み直して今の状態を示す
+            OPERATION_IN_PROGRESS: 同じ冪等キーの要求がまだ動いている（DEC-48） → Retry-After（1 秒）の後に同じキーで送るか、状態を読み直す
           x-error-codes:
+          - RIDE_CANCELLED
+          - RIDE_NOT_ARRIVED
           - OPERATION_IN_PROGRESS
           content:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
               examples:
+                RIDE_CANCELLED:
+                  value:
+                    type: urn:ride-hailing-demo:problem:ride_cancelled
+                    title: 取り消された依頼（FND-34）
+                    status: 409
+                    code: RIDE_CANCELLED
+                    detail: 取り消された依頼（FND-34）
+                    traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+                RIDE_NOT_ARRIVED:
+                  value:
+                    type: urn:ride-hailing-demo:problem:ride_not_arrived
+                    title: 迎車の到着を知らせていない（依頼が arrived でない。FND-34）
+                    status: 409
+                    code: RIDE_NOT_ARRIVED
+                    detail: 迎車の到着を知らせていない（依頼が arrived でない。FND-34）
+                    traceId: 4bf92f3577b34da6a3ce929d0e0e4736
                 OPERATION_IN_PROGRESS:
                   value:
                     type: urn:ride-hailing-demo:problem:operation_in_progress
@@ -1837,9 +2110,11 @@ paths:
           headers:
             Retry-After:
               $ref: '#/components/headers/RetryAfter'
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '422':
           description: |-
-            CONFIRMATION_CODE_MISMATCH: 確認コードが一致しない（FR-26 AC2）。残りの回数を添える → 運転を始めさせず、依頼主かどうか確かめるよう示す
+            CONFIRMATION_CODE_MISMATCH: 確認コードが一致しない（FR-26 AC2）。remainingAttempts に残りの回数を添える → 運転を始めさせず、依頼主かどうか確かめるよう示す
             IDEMPOTENCY_KEY_REUSED: 同じ冪等キーで中身の違う要求（DEC-48） → 画面の誤り。新しい操作として新しいキーで始める
           x-error-codes:
           - CONFIRMATION_CODE_MISMATCH
@@ -1852,11 +2127,12 @@ paths:
                 CONFIRMATION_CODE_MISMATCH:
                   value:
                     type: urn:ride-hailing-demo:problem:confirmation_code_mismatch
-                    title: 確認コードが一致しない（FR-26 AC2）。残りの回数を添える
+                    title: 確認コードが一致しない（FR-26 AC2）
                     status: 422
                     code: CONFIRMATION_CODE_MISMATCH
-                    detail: 確認コードが一致しない（FR-26 AC2）。残りの回数を添える
+                    detail: 確認コードが一致しない（FR-26 AC2）。remainingAttempts に残りの回数を添える
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+                    remainingAttempts: 7
                 IDEMPOTENCY_KEY_REUSED:
                   value:
                     type: urn:ride-hailing-demo:problem:idempotency_key_reused
@@ -1865,6 +2141,9 @@ paths:
                     code: IDEMPOTENCY_KEY_REUSED
                     detail: 同じ冪等キーで中身の違う要求（DEC-48）
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '429':
           description: |-
             CONFIRMATION_ATTEMPTS_EXCEEDED: 一つの割り当てで 10 回違った（仮。DEC-55） → 乗客と確かめて、取り消すよう示す
@@ -1896,6 +2175,8 @@ paths:
           headers:
             Retry-After:
               $ref: '#/components/headers/RetryAfter'
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '500':
           description: 'INTERNAL_ERROR: 想定外の誤り → 読むだけの要求は間を置いて送り直す。状態を変える要求は同じ冪等キーで送り直すか、状態を読み直す'
           x-error-codes:
@@ -1913,6 +2194,9 @@ paths:
                     code: INTERNAL_ERROR
                     detail: 想定外の誤り
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '503':
           description: |-
             ROUTE_TIMEOUT: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33） → 結果が分からないとして扱う。読むだけの要求は送り直す。状態を変える要求は同じ冪等キーで送り直すか、状態を読み直す。新しいキーでは送らない
@@ -1928,29 +2212,33 @@ paths:
                 ROUTE_TIMEOUT:
                   value:
                     type: urn:ride-hailing-demo:problem:route_timeout
-                    title: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33
+                    title: T_route（10 秒）で切った
                     status: 503
                     code: ROUTE_TIMEOUT
-                    detail: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33
+                    detail: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33）
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
                 DEPENDENCY_UNAVAILABLE:
                   value:
                     type: urn:ride-hailing-demo:problem:dependency_unavailable
-                    title: Turso に届かないか遅い（T_db）。状態を変えたかどうかは、一つ目のトラン
+                    title: Turso に届かないか遅い（T_db）
                     status: 503
                     code: DEPENDENCY_UNAVAILABLE
-                    detail: Turso に届かないか遅い（T_db）。状態を変えたかどうかは、一つ目のトラン
+                    detail: Turso に届かないか遅い（T_db）。状態を変えたかどうかは、一つ目のトランザクションを書けたかによる
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
           headers:
             Retry-After:
               $ref: '#/components/headers/RetryAfter'
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
       x-route-id: driver.rides.start
       x-functions:
       - FR-26
       - FR-23
-      - FR-24
       x-sli:
       - SLI-01
+      x-rate-limit:
+        value: 一つの割り当てで確認コードが 10 回違ったら止める（DEC-55 の確認コード）。アカウントごとに 1 分に 120 回（DEC-55 のそのほかの経路）
+        x-provisional: true
       security:
       - sessionCookie: []
       requestBody:
@@ -1967,6 +2255,8 @@ paths:
         到着から T_noshow_wait を過ぎたら不在で終える。位置を確かめた到着なら押さえから 500 円を確定し、確かめられなかった到着なら押さえを取り消す
 
         機能: FR-27
+
+        回数の上限（仮。DEC-55）: アカウントごとに 1 分に 120 回（そのほかの経路）
       parameters:
       - $ref: '#/components/parameters/Traceparent'
       - $ref: '#/components/parameters/ClientTraceId'
@@ -1975,6 +2265,7 @@ paths:
         required: true
         schema:
           type: string
+          pattern: ^ride_[0-9A-HJKMNP-TV-Z]{26}$
       - $ref: '#/components/parameters/IdempotencyKey'
       responses:
         '200':
@@ -1998,11 +2289,14 @@ paths:
                 INVALID_REQUEST:
                   value:
                     type: urn:ride-hailing-demo:problem:invalid_request
-                    title: 要求の形が違う（欄の不足、範囲の外、冪等キーがない）。errors に欄ごとの中
+                    title: 要求の形が違う（欄の不足、範囲の外、冪等キーがない）
                     status: 400
                     code: INVALID_REQUEST
-                    detail: 要求の形が違う（欄の不足、範囲の外、冪等キーがない）。errors に欄ごとの中
+                    detail: 要求の形が違う（欄の不足、範囲の外、冪等キーがない）。errors に欄ごとの中身
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '401':
           description: 'UNAUTHENTICATED: ログインしていないか、セッションが切れた → ログインの画面へ。操作の途中なら、ログインの後に同じ冪等キーで送る'
           x-error-codes:
@@ -2020,6 +2314,9 @@ paths:
                     code: UNAUTHENTICATED
                     detail: ログインしていないか、セッションが切れた
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '403':
           description: 'FORBIDDEN: 役割が違う、または送り元（Origin）がサービスの URL でない → 送り直さない（画面の誤りとしてブラウザのエラーの記録に残す）'
           x-error-codes:
@@ -2037,6 +2334,9 @@ paths:
                     code: FORBIDDEN
                     detail: 役割が違う、または送り元（Origin）がサービスの URL でない
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '404':
           description: 'NOT_FOUND: ない、または自分のものでない（他人の依頼も 404 にする。DRV-29） → 画面を読み直す'
           x-error-codes:
@@ -2054,12 +2354,19 @@ paths:
                     code: NOT_FOUND
                     detail: ない、または自分のものでない（他人の依頼も 404 にする。DRV-29）
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '409':
           description: |-
-            NO_SHOW_TOO_EARLY: T_noshow_wait を過ぎていない（FR-27 AC2）。残りの秒数を添える → 受け付けず、あとどれだけ待つかを示す
+            NO_SHOW_TOO_EARLY: T_noshow_wait を過ぎていない（FR-27 AC2）。retryAfterSeconds に残りの秒数を添える → 受け付けず、あとどれだけ待つかを示す
+            RIDE_CANCELLED: 取り消された依頼（FND-34） → 読み直して今の状態を示す
+            RIDE_NOT_ARRIVED: 迎車の到着を知らせていない（依頼が arrived でない。FND-34） → 読み直して今の状態を示す
             OPERATION_IN_PROGRESS: 同じ冪等キーの要求がまだ動いている（DEC-48） → Retry-After（1 秒）の後に同じキーで送るか、状態を読み直す
           x-error-codes:
           - NO_SHOW_TOO_EARLY
+          - RIDE_CANCELLED
+          - RIDE_NOT_ARRIVED
           - OPERATION_IN_PROGRESS
           content:
             application/problem+json:
@@ -2069,10 +2376,27 @@ paths:
                 NO_SHOW_TOO_EARLY:
                   value:
                     type: urn:ride-hailing-demo:problem:no_show_too_early
-                    title: T_noshow_wait を過ぎていない（FR-27 AC2）。残りの秒数を添
+                    title: T_noshow_wait を過ぎていない（FR-27 AC2）
                     status: 409
                     code: NO_SHOW_TOO_EARLY
-                    detail: T_noshow_wait を過ぎていない（FR-27 AC2）。残りの秒数を添
+                    detail: T_noshow_wait を過ぎていない（FR-27 AC2）。retryAfterSeconds に残りの秒数を添える
+                    traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+                    retryAfterSeconds: 120
+                RIDE_CANCELLED:
+                  value:
+                    type: urn:ride-hailing-demo:problem:ride_cancelled
+                    title: 取り消された依頼（FND-34）
+                    status: 409
+                    code: RIDE_CANCELLED
+                    detail: 取り消された依頼（FND-34）
+                    traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+                RIDE_NOT_ARRIVED:
+                  value:
+                    type: urn:ride-hailing-demo:problem:ride_not_arrived
+                    title: 迎車の到着を知らせていない（依頼が arrived でない。FND-34）
+                    status: 409
+                    code: RIDE_NOT_ARRIVED
+                    detail: 迎車の到着を知らせていない（依頼が arrived でない。FND-34）
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
                 OPERATION_IN_PROGRESS:
                   value:
@@ -2085,6 +2409,8 @@ paths:
           headers:
             Retry-After:
               $ref: '#/components/headers/RetryAfter'
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '422':
           description: 'IDEMPOTENCY_KEY_REUSED: 同じ冪等キーで中身の違う要求（DEC-48） → 画面の誤り。新しい操作として新しいキーで始める'
           x-error-codes:
@@ -2102,6 +2428,9 @@ paths:
                     code: IDEMPOTENCY_KEY_REUSED
                     detail: 同じ冪等キーで中身の違う要求（DEC-48）
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '429':
           description: 'RATE_LIMITED: 回数の上限（DEC-55） → Retry-After まで待つ'
           x-error-codes:
@@ -2122,6 +2451,8 @@ paths:
           headers:
             Retry-After:
               $ref: '#/components/headers/RetryAfter'
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '500':
           description: 'INTERNAL_ERROR: 想定外の誤り → 読むだけの要求は間を置いて送り直す。状態を変える要求は同じ冪等キーで送り直すか、状態を読み直す'
           x-error-codes:
@@ -2139,6 +2470,9 @@ paths:
                     code: INTERNAL_ERROR
                     detail: 想定外の誤り
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '503':
           description: |-
             ROUTE_TIMEOUT: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33） → 結果が分からないとして扱う。読むだけの要求は送り直す。状態を変える要求は同じ冪等キーで送り直すか、状態を読み直す。新しいキーでは送らない
@@ -2154,25 +2488,30 @@ paths:
                 ROUTE_TIMEOUT:
                   value:
                     type: urn:ride-hailing-demo:problem:route_timeout
-                    title: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33
+                    title: T_route（10 秒）で切った
                     status: 503
                     code: ROUTE_TIMEOUT
-                    detail: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33
+                    detail: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33）
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
                 DEPENDENCY_UNAVAILABLE:
                   value:
                     type: urn:ride-hailing-demo:problem:dependency_unavailable
-                    title: Turso に届かないか遅い（T_db）。状態を変えたかどうかは、一つ目のトラン
+                    title: Turso に届かないか遅い（T_db）
                     status: 503
                     code: DEPENDENCY_UNAVAILABLE
-                    detail: Turso に届かないか遅い（T_db）。状態を変えたかどうかは、一つ目のトラン
+                    detail: Turso に届かないか遅い（T_db）。状態を変えたかどうかは、一つ目のトランザクションを書けたかによる
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
           headers:
             Retry-After:
               $ref: '#/components/headers/RetryAfter'
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
       x-route-id: driver.rides.no_show
       x-functions:
       - FR-27
+      x-rate-limit:
+        value: アカウントごとに 1 分に 120 回（DEC-55 のそのほかの経路）
+        x-provisional: true
       security:
       - sessionCookie: []
       requestBody:
@@ -2186,11 +2525,13 @@ paths:
       operationId: driver_rides_complete
       summary: 乗車を終え、確定した料金を押さえから確定する（DEC-12。同じキーで 2 回まで送り直す）
       description: |-
-        乗車を終え、確定した料金を押さえから確定する（DEC-12。同じキーで 2 回まで送り直す）
+        乗車を終え、確定した料金を押さえから確定する（DEC-12。同じキーで 2 回まで送り直す）。確かめ中の降車場所の変更があれば取りやめ（当てない）、確定は古い押さえと、変更の前の確定した料金で行う。新しい押さえは確かめを続け、見つかれば取り消す（FR-12 版 4）。経路の上限は T_route_long（20 秒。第 2 段階の DEC-33）で、ブラウザのタイムアウトは 25 秒（DEC-50）
 
         機能: FR-28、FR-29、FR-31
 
         SLI-01 の六つの操作の一つ（route_id で数える）
+
+        回数の上限（仮。DEC-55）: アカウントごとに 1 分に 120 回（そのほかの経路）
       parameters:
       - $ref: '#/components/parameters/Traceparent'
       - $ref: '#/components/parameters/ClientTraceId'
@@ -2199,6 +2540,7 @@ paths:
         required: true
         schema:
           type: string
+          pattern: ^ride_[0-9A-HJKMNP-TV-Z]{26}$
       - $ref: '#/components/parameters/IdempotencyKey'
       responses:
         '200':
@@ -2222,11 +2564,14 @@ paths:
                 INVALID_REQUEST:
                   value:
                     type: urn:ride-hailing-demo:problem:invalid_request
-                    title: 要求の形が違う（欄の不足、範囲の外、冪等キーがない）。errors に欄ごとの中
+                    title: 要求の形が違う（欄の不足、範囲の外、冪等キーがない）
                     status: 400
                     code: INVALID_REQUEST
-                    detail: 要求の形が違う（欄の不足、範囲の外、冪等キーがない）。errors に欄ごとの中
+                    detail: 要求の形が違う（欄の不足、範囲の外、冪等キーがない）。errors に欄ごとの中身
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '401':
           description: 'UNAUTHENTICATED: ログインしていないか、セッションが切れた → ログインの画面へ。操作の途中なら、ログインの後に同じ冪等キーで送る'
           x-error-codes:
@@ -2244,6 +2589,9 @@ paths:
                     code: UNAUTHENTICATED
                     detail: ログインしていないか、セッションが切れた
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '403':
           description: 'FORBIDDEN: 役割が違う、または送り元（Origin）がサービスの URL でない → 送り直さない（画面の誤りとしてブラウザのエラーの記録に残す）'
           x-error-codes:
@@ -2261,6 +2609,9 @@ paths:
                     code: FORBIDDEN
                     detail: 役割が違う、または送り元（Origin）がサービスの URL でない
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '404':
           description: 'NOT_FOUND: ない、または自分のものでない（他人の依頼も 404 にする。DRV-29） → 画面を読み直す'
           x-error-codes:
@@ -2278,12 +2629,17 @@ paths:
                     code: NOT_FOUND
                     detail: ない、または自分のものでない（他人の依頼も 404 にする。DRV-29）
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '409':
           description: |-
-            FAR_FROM_DROPOFF: 最後に指定した降車場所から D_dropoff を超えて離れている（FR-28 AC2）。距離を添える → ドライバーに確かめ、confirmFarFromDropoff: true で新しい冪等キーで送る
+            FAR_FROM_DROPOFF: 最後に指定した降車場所から D_dropoff を超えて離れている（FR-28 AC2）。distanceMeters に距離を添える → ドライバーに確かめ、confirmFarFromDropoff: true で新しい冪等キーで送る
+            RIDE_NOT_IN_PROGRESS: 乗車中でない（依頼が in_progress でない。FND-34） → 読み直して今の状態を示す
             OPERATION_IN_PROGRESS: 同じ冪等キーの要求がまだ動いている（DEC-48） → Retry-After（1 秒）の後に同じキーで送るか、状態を読み直す
           x-error-codes:
           - FAR_FROM_DROPOFF
+          - RIDE_NOT_IN_PROGRESS
           - OPERATION_IN_PROGRESS
           content:
             application/problem+json:
@@ -2293,10 +2649,19 @@ paths:
                 FAR_FROM_DROPOFF:
                   value:
                     type: urn:ride-hailing-demo:problem:far_from_dropoff
-                    title: '最後に指定した降車場所から D_dropoff を超えて離れている（FR-28 '
+                    title: 最後に指定した降車場所から D_dropoff を超えて離れている（FR-28 AC2）
                     status: 409
                     code: FAR_FROM_DROPOFF
-                    detail: '最後に指定した降車場所から D_dropoff を超えて離れている（FR-28 '
+                    detail: 最後に指定した降車場所から D_dropoff を超えて離れている（FR-28 AC2）。distanceMeters に距離を添える
+                    traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+                    distanceMeters: 450
+                RIDE_NOT_IN_PROGRESS:
+                  value:
+                    type: urn:ride-hailing-demo:problem:ride_not_in_progress
+                    title: 乗車中でない（依頼が in_progress でない。FND-34）
+                    status: 409
+                    code: RIDE_NOT_IN_PROGRESS
+                    detail: 乗車中でない（依頼が in_progress でない。FND-34）
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
                 OPERATION_IN_PROGRESS:
                   value:
@@ -2309,6 +2674,8 @@ paths:
           headers:
             Retry-After:
               $ref: '#/components/headers/RetryAfter'
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '422':
           description: 'IDEMPOTENCY_KEY_REUSED: 同じ冪等キーで中身の違う要求（DEC-48） → 画面の誤り。新しい操作として新しいキーで始める'
           x-error-codes:
@@ -2326,6 +2693,9 @@ paths:
                     code: IDEMPOTENCY_KEY_REUSED
                     detail: 同じ冪等キーで中身の違う要求（DEC-48）
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '429':
           description: 'RATE_LIMITED: 回数の上限（DEC-55） → Retry-After まで待つ'
           x-error-codes:
@@ -2346,6 +2716,8 @@ paths:
           headers:
             Retry-After:
               $ref: '#/components/headers/RetryAfter'
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '500':
           description: 'INTERNAL_ERROR: 想定外の誤り → 読むだけの要求は間を置いて送り直す。状態を変える要求は同じ冪等キーで送り直すか、状態を読み直す'
           x-error-codes:
@@ -2363,9 +2735,12 @@ paths:
                     code: INTERNAL_ERROR
                     detail: 想定外の誤り
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '503':
           description: |-
-            ROUTE_TIMEOUT: T_route で切った。乗車は終わっていて、確定が動いていることがある（FND-21） → 同じ冪等キーで送り直すか、依頼を読み直す。配信で結果を待つ
+            ROUTE_TIMEOUT: T_route_long（20 秒。第 2 段階の DEC-33）で切った。乗車は終わっていて、確定が動いていることがある（FND-21） → 同じ冪等キーで送り直すか、依頼を読み直す。配信で結果を待つ
             DEPENDENCY_UNAVAILABLE: Turso に届かないか遅い（T_db）。状態を変えたかどうかは、一つ目のトランザクションを書けたかによる → ROUTE_TIMEOUT と同じ
           x-error-codes:
           - ROUTE_TIMEOUT
@@ -2378,22 +2753,24 @@ paths:
                 ROUTE_TIMEOUT:
                   value:
                     type: urn:ride-hailing-demo:problem:route_timeout
-                    title: T_route で切った。乗車は終わっていて、確定が動いていることがある（FND
+                    title: T_route_long（20 秒。第 2 段階の DEC-33）で切った
                     status: 503
                     code: ROUTE_TIMEOUT
-                    detail: T_route で切った。乗車は終わっていて、確定が動いていることがある（FND
+                    detail: T_route_long（20 秒。第 2 段階の DEC-33）で切った。乗車は終わっていて、確定が動いていることがある（FND-21）
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
                 DEPENDENCY_UNAVAILABLE:
                   value:
                     type: urn:ride-hailing-demo:problem:dependency_unavailable
-                    title: Turso に届かないか遅い（T_db）。状態を変えたかどうかは、一つ目のトラン
+                    title: Turso に届かないか遅い（T_db）
                     status: 503
                     code: DEPENDENCY_UNAVAILABLE
-                    detail: Turso に届かないか遅い（T_db）。状態を変えたかどうかは、一つ目のトラン
+                    detail: Turso に届かないか遅い（T_db）。状態を変えたかどうかは、一つ目のトランザクションを書けたかによる
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
           headers:
             Retry-After:
               $ref: '#/components/headers/RetryAfter'
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
       x-route-id: driver.rides.complete
       x-functions:
       - FR-28
@@ -2401,6 +2778,9 @@ paths:
       - FR-31
       x-sli:
       - SLI-01
+      x-rate-limit:
+        value: アカウントごとに 1 分に 120 回（DEC-55 のそのほかの経路）
+        x-provisional: true
       security:
       - sessionCookie: []
       requestBody:
@@ -2417,6 +2797,8 @@ paths:
         受取額（運賃、手数料、受取額、決済の状態。キャンセル料と不在の料金を含む）
 
         機能: FR-32
+
+        回数の上限（仮。DEC-55）: アカウントごとに 1 分に 120 回（そのほかの経路）
       parameters:
       - $ref: '#/components/parameters/Traceparent'
       - $ref: '#/components/parameters/ClientTraceId'
@@ -2429,12 +2811,13 @@ paths:
       - name: limit
         in: query
         required: false
-        description: 1〜100。既定 20
+        description: 1〜100。既定 20（DEC-42）
         schema:
           type: integer
           minimum: 1
           maximum: 100
           default: 20
+        x-provisional: true
       responses:
         '200':
           description: 新しい順
@@ -2457,11 +2840,14 @@ paths:
                 INVALID_REQUEST:
                   value:
                     type: urn:ride-hailing-demo:problem:invalid_request
-                    title: 要求の形が違う（欄の不足、範囲の外、冪等キーがない）。errors に欄ごとの中
+                    title: 要求の形が違う（欄の不足、範囲の外、冪等キーがない）
                     status: 400
                     code: INVALID_REQUEST
-                    detail: 要求の形が違う（欄の不足、範囲の外、冪等キーがない）。errors に欄ごとの中
+                    detail: 要求の形が違う（欄の不足、範囲の外、冪等キーがない）。errors に欄ごとの中身
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '401':
           description: 'UNAUTHENTICATED: ログインしていないか、セッションが切れた → ログインの画面へ。操作の途中なら、ログインの後に同じ冪等キーで送る'
           x-error-codes:
@@ -2479,6 +2865,9 @@ paths:
                     code: UNAUTHENTICATED
                     detail: ログインしていないか、セッションが切れた
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '403':
           description: 'FORBIDDEN: 役割が違う、または送り元（Origin）がサービスの URL でない → 送り直さない（画面の誤りとしてブラウザのエラーの記録に残す）'
           x-error-codes:
@@ -2496,6 +2885,9 @@ paths:
                     code: FORBIDDEN
                     detail: 役割が違う、または送り元（Origin）がサービスの URL でない
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '404':
           description: 'NOT_FOUND: ない、または自分のものでない（他人の依頼も 404 にする。DRV-29） → 画面を読み直す'
           x-error-codes:
@@ -2513,6 +2905,9 @@ paths:
                     code: NOT_FOUND
                     detail: ない、または自分のものでない（他人の依頼も 404 にする。DRV-29）
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '429':
           description: 'RATE_LIMITED: 回数の上限（DEC-55） → Retry-After まで待つ'
           x-error-codes:
@@ -2533,6 +2928,8 @@ paths:
           headers:
             Retry-After:
               $ref: '#/components/headers/RetryAfter'
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '500':
           description: 'INTERNAL_ERROR: 想定外の誤り → 読むだけの要求は間を置いて送り直す。状態を変える要求は同じ冪等キーで送り直すか、状態を読み直す'
           x-error-codes:
@@ -2550,6 +2947,9 @@ paths:
                     code: INTERNAL_ERROR
                     detail: 想定外の誤り
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '503':
           description: |-
             ROUTE_TIMEOUT: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33） → 結果が分からないとして扱う。読むだけの要求は送り直す。状態を変える要求は同じ冪等キーで送り直すか、状態を読み直す。新しいキーでは送らない
@@ -2565,25 +2965,30 @@ paths:
                 ROUTE_TIMEOUT:
                   value:
                     type: urn:ride-hailing-demo:problem:route_timeout
-                    title: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33
+                    title: T_route（10 秒）で切った
                     status: 503
                     code: ROUTE_TIMEOUT
-                    detail: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33
+                    detail: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33）
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
                 DEPENDENCY_UNAVAILABLE:
                   value:
                     type: urn:ride-hailing-demo:problem:dependency_unavailable
-                    title: Turso に届かないか遅い（T_db）。状態を変えたかどうかは、一つ目のトラン
+                    title: Turso に届かないか遅い（T_db）
                     status: 503
                     code: DEPENDENCY_UNAVAILABLE
-                    detail: Turso に届かないか遅い（T_db）。状態を変えたかどうかは、一つ目のトラン
+                    detail: Turso に届かないか遅い（T_db）。状態を変えたかどうかは、一つ目のトランザクションを書けたかによる
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
           headers:
             Retry-After:
               $ref: '#/components/headers/RetryAfter'
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
       x-route-id: driver.earnings
       x-functions:
       - FR-32
+      x-rate-limit:
+        value: アカウントごとに 1 分に 120 回（DEC-55 のそのほかの経路）
+        x-provisional: true
       security:
       - sessionCookie: []
   /api/v1/driver/conditions:
@@ -2594,6 +2999,8 @@ paths:
         受ける条件の今の値
 
         機能: FR-33
+
+        回数の上限（仮。DEC-55）: アカウントごとに 1 分に 120 回（そのほかの経路）
       parameters:
       - $ref: '#/components/parameters/Traceparent'
       - $ref: '#/components/parameters/ClientTraceId'
@@ -2619,11 +3026,14 @@ paths:
                 INVALID_REQUEST:
                   value:
                     type: urn:ride-hailing-demo:problem:invalid_request
-                    title: 要求の形が違う（欄の不足、範囲の外、冪等キーがない）。errors に欄ごとの中
+                    title: 要求の形が違う（欄の不足、範囲の外、冪等キーがない）
                     status: 400
                     code: INVALID_REQUEST
-                    detail: 要求の形が違う（欄の不足、範囲の外、冪等キーがない）。errors に欄ごとの中
+                    detail: 要求の形が違う（欄の不足、範囲の外、冪等キーがない）。errors に欄ごとの中身
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '401':
           description: 'UNAUTHENTICATED: ログインしていないか、セッションが切れた → ログインの画面へ。操作の途中なら、ログインの後に同じ冪等キーで送る'
           x-error-codes:
@@ -2641,6 +3051,9 @@ paths:
                     code: UNAUTHENTICATED
                     detail: ログインしていないか、セッションが切れた
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '403':
           description: 'FORBIDDEN: 役割が違う、または送り元（Origin）がサービスの URL でない → 送り直さない（画面の誤りとしてブラウザのエラーの記録に残す）'
           x-error-codes:
@@ -2658,6 +3071,9 @@ paths:
                     code: FORBIDDEN
                     detail: 役割が違う、または送り元（Origin）がサービスの URL でない
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '404':
           description: 'NOT_FOUND: ない、または自分のものでない（他人の依頼も 404 にする。DRV-29） → 画面を読み直す'
           x-error-codes:
@@ -2675,6 +3091,9 @@ paths:
                     code: NOT_FOUND
                     detail: ない、または自分のものでない（他人の依頼も 404 にする。DRV-29）
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '429':
           description: 'RATE_LIMITED: 回数の上限（DEC-55） → Retry-After まで待つ'
           x-error-codes:
@@ -2695,6 +3114,8 @@ paths:
           headers:
             Retry-After:
               $ref: '#/components/headers/RetryAfter'
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '500':
           description: 'INTERNAL_ERROR: 想定外の誤り → 読むだけの要求は間を置いて送り直す。状態を変える要求は同じ冪等キーで送り直すか、状態を読み直す'
           x-error-codes:
@@ -2712,6 +3133,9 @@ paths:
                     code: INTERNAL_ERROR
                     detail: 想定外の誤り
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '503':
           description: |-
             ROUTE_TIMEOUT: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33） → 結果が分からないとして扱う。読むだけの要求は送り直す。状態を変える要求は同じ冪等キーで送り直すか、状態を読み直す。新しいキーでは送らない
@@ -2727,25 +3151,30 @@ paths:
                 ROUTE_TIMEOUT:
                   value:
                     type: urn:ride-hailing-demo:problem:route_timeout
-                    title: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33
+                    title: T_route（10 秒）で切った
                     status: 503
                     code: ROUTE_TIMEOUT
-                    detail: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33
+                    detail: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33）
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
                 DEPENDENCY_UNAVAILABLE:
                   value:
                     type: urn:ride-hailing-demo:problem:dependency_unavailable
-                    title: Turso に届かないか遅い（T_db）。状態を変えたかどうかは、一つ目のトラン
+                    title: Turso に届かないか遅い（T_db）
                     status: 503
                     code: DEPENDENCY_UNAVAILABLE
-                    detail: Turso に届かないか遅い（T_db）。状態を変えたかどうかは、一つ目のトラン
+                    detail: Turso に届かないか遅い（T_db）。状態を変えたかどうかは、一つ目のトランザクションを書けたかによる
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
           headers:
             Retry-After:
               $ref: '#/components/headers/RetryAfter'
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
       x-route-id: driver.conditions.get
       x-functions:
       - FR-33
+      x-rate-limit:
+        value: アカウントごとに 1 分に 120 回（DEC-55 のそのほかの経路）
+        x-provisional: true
       security:
       - sessionCookie: []
     put:
@@ -2755,6 +3184,8 @@ paths:
         受ける条件を設定・解除する（null で解除）。値と変えた時刻を記録する
 
         機能: FR-33、FR-34
+
+        回数の上限（仮。DEC-55）: アカウントごとに 1 分に 120 回（そのほかの経路）
       parameters:
       - $ref: '#/components/parameters/Traceparent'
       - $ref: '#/components/parameters/ClientTraceId'
@@ -2786,6 +3217,9 @@ paths:
                     code: INVALID_REQUEST
                     detail: 負の値など、ありえない値（FR-33 AC3）
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '401':
           description: 'UNAUTHENTICATED: ログインしていないか、セッションが切れた → ログインの画面へ。操作の途中なら、ログインの後に同じ冪等キーで送る'
           x-error-codes:
@@ -2803,6 +3237,9 @@ paths:
                     code: UNAUTHENTICATED
                     detail: ログインしていないか、セッションが切れた
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '403':
           description: 'FORBIDDEN: 役割が違う、または送り元（Origin）がサービスの URL でない → 送り直さない（画面の誤りとしてブラウザのエラーの記録に残す）'
           x-error-codes:
@@ -2820,6 +3257,9 @@ paths:
                     code: FORBIDDEN
                     detail: 役割が違う、または送り元（Origin）がサービスの URL でない
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '404':
           description: 'NOT_FOUND: ない、または自分のものでない（他人の依頼も 404 にする。DRV-29） → 画面を読み直す'
           x-error-codes:
@@ -2837,6 +3277,9 @@ paths:
                     code: NOT_FOUND
                     detail: ない、または自分のものでない（他人の依頼も 404 にする。DRV-29）
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '409':
           description: 'OPERATION_IN_PROGRESS: 同じ冪等キーの要求がまだ動いている（DEC-48） → Retry-After（1 秒）の後に同じキーで送るか、状態を読み直す'
           x-error-codes:
@@ -2857,6 +3300,8 @@ paths:
           headers:
             Retry-After:
               $ref: '#/components/headers/RetryAfter'
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '422':
           description: 'IDEMPOTENCY_KEY_REUSED: 同じ冪等キーで中身の違う要求（DEC-48） → 画面の誤り。新しい操作として新しいキーで始める'
           x-error-codes:
@@ -2874,6 +3319,9 @@ paths:
                     code: IDEMPOTENCY_KEY_REUSED
                     detail: 同じ冪等キーで中身の違う要求（DEC-48）
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '429':
           description: 'RATE_LIMITED: 回数の上限（DEC-55） → Retry-After まで待つ'
           x-error-codes:
@@ -2894,6 +3342,8 @@ paths:
           headers:
             Retry-After:
               $ref: '#/components/headers/RetryAfter'
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '500':
           description: 'INTERNAL_ERROR: 想定外の誤り → 読むだけの要求は間を置いて送り直す。状態を変える要求は同じ冪等キーで送り直すか、状態を読み直す'
           x-error-codes:
@@ -2911,6 +3361,9 @@ paths:
                     code: INTERNAL_ERROR
                     detail: 想定外の誤り
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
+          headers:
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
         '503':
           description: |-
             ROUTE_TIMEOUT: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33） → 結果が分からないとして扱う。読むだけの要求は送り直す。状態を変える要求は同じ冪等キーで送り直すか、状態を読み直す。新しいキーでは送らない
@@ -2926,26 +3379,31 @@ paths:
                 ROUTE_TIMEOUT:
                   value:
                     type: urn:ride-hailing-demo:problem:route_timeout
-                    title: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33
+                    title: T_route（10 秒）で切った
                     status: 503
                     code: ROUTE_TIMEOUT
-                    detail: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33
+                    detail: T_route（10 秒）で切った。中の処理は続いていることがある（DEC-33）
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
                 DEPENDENCY_UNAVAILABLE:
                   value:
                     type: urn:ride-hailing-demo:problem:dependency_unavailable
-                    title: Turso に届かないか遅い（T_db）。状態を変えたかどうかは、一つ目のトラン
+                    title: Turso に届かないか遅い（T_db）
                     status: 503
                     code: DEPENDENCY_UNAVAILABLE
-                    detail: Turso に届かないか遅い（T_db）。状態を変えたかどうかは、一つ目のトラン
+                    detail: Turso に届かないか遅い（T_db）。状態を変えたかどうかは、一つ目のトランザクションを書けたかによる
                     traceId: 4bf92f3577b34da6a3ce929d0e0e4736
           headers:
             Retry-After:
               $ref: '#/components/headers/RetryAfter'
+            X-App-Version:
+              $ref: '#/components/headers/XAppVersion'
       x-route-id: driver.conditions.put
       x-functions:
       - FR-33
       - FR-34
+      x-rate-limit:
+        value: アカウントごとに 1 分に 120 回（DEC-55 のそのほかの経路）
+        x-provisional: true
       security:
       - sessionCookie: []
       requestBody:
@@ -2960,7 +3418,7 @@ components:
       type: apiKey
       in: cookie
       name: __Host-rh_session
-      description: サーバーに置くセッション（DEC-43）。状態を変える要求は Origin がサービスの URL と同じであること（DEC-20）
+      description: サーバーに置くセッション（DEC-43）。クッキーは __Host-rh_session（HttpOnly、Secure、SameSite=Strict、Path=/）。状態を変える要求は Origin がサービスの URL と同じであること（DEC-20）
   parameters:
     IdempotencyKey:
       name: Idempotency-Key
@@ -3068,6 +3526,7 @@ components:
           anyOf:
           - $ref: '#/components/schemas/Route'
           - type: 'null'
+          description: 降車場所までの経路。得られないときは null（運転の開始の応答でも null になりうる。FND-47）
         pickupEta:
           anyOf:
           - type: object
@@ -3197,16 +3656,33 @@ components:
           enum:
           - none
           - holding
-          - held
           - hold_checking
+          - held
+          - release_checking
+          - released
           - capturing
+          - checking
           - paid
           - unpaid
-          - checking
-          - released
+          - unpaid_checking
           - partially_refunded
           - refunded
-          description: 依頼の支払いの状態（報告書の「要素をまたぐ状態」）
+          description: |-
+            依頼の支払いの状態（報告書の「要素をまたぐ状態」。13 値）
+            - none: 押さえも請求もない（押さえがないと Stripe の一覧で確かめた場合を含む）
+            - holding: 押さえの処理中
+            - hold_checking: 手配の押さえの結果が分からない間（依頼は hold_checking。DEC-52）
+            - held: 押さえている。降車場所の変更の押さえ直しを確かめている間も held のまま（古い押さえが有効。新しい押さえはお金の操作で追う）
+            - release_checking: 押さえの取り消しの結果が分からない間（無料の取り消し、システムの取り消し、手配をやめた依頼、確かめられなかった到着での不在）
+            - released: 押さえを取り消した（Stripe が取り消しの成功を答えた）
+            - capturing: 確定の処理中
+            - checking: 確定（運賃、キャンセル料、不在の料金）の結果を確かめている間だけ
+            - paid: 払った
+            - unpaid: 請求に失敗した（未払い。払う額は unpaidAmount。キャンセル料と不在の料金の失敗を含む）
+            - unpaid_checking: 未払いの支払いの結果が分からない間（202 PAYMENT_PENDING）
+            - partially_refunded: 一部を返金した
+            - refunded: 全額を返金した
+            返金を確かめている間は paid か partially_refunded のまま（返金の操作で追い、返金できる残りの額から引く）。「押さえていません」と示すのは、Stripe が答えたとき（none、released）だけ
         unpaidAmount:
           anyOf:
           - $ref: '#/components/schemas/Money'
@@ -3305,7 +3781,7 @@ components:
           pattern: ^[A-Z][A-Z0-9_]*$
         detail:
           type: string
-          description: 人向けの説明（日本語。個人情報を含めない）
+          description: 人向けの説明（日本語。個人情報を含めない）。任意（DEC-38）
         traceId:
           type: string
           description: ブラウザが作ったトレース ID（32 桁の 16 進。DEC-44）
@@ -3328,15 +3804,29 @@ components:
           description: 入力の誤りの欄ごとの中身
         retryAfterSeconds:
           type: integer
-          description: 待つ秒数（429 と 503 では Retry-After の見出しと同じ）
+          description: 待つ秒数。429 と 503 では Retry-After の見出しと同じ。NO_SHOW_TOO_EARLY では不在で終えられるまでの残りの秒数。任意
           minimum: 0
+        distanceMeters:
+          type: integer
+          description: 場所からの距離（m）。TOO_FAR_FROM_PICKUP、FAR_FROM_DROPOFF のとき。任意
+          minimum: 0
+        remainingAttempts:
+          type: integer
+          description: 残りの回数。CONFIRMATION_CODE_MISMATCH のとき。任意
+          minimum: 0
+        currentFee:
+          $ref: '#/components/schemas/Money'
+          description: 今の額。CANCELLATION_FEE_CHANGED のとき（この額で確かめ直す）。任意
+        remainingRefundable:
+          $ref: '#/components/schemas/Money'
+          description: 返金できる残りの額。REFUND_EXCEEDS_REMAINING のとき。任意
       required:
       - type
       - title
       - status
       - code
       - traceId
-      description: RFC 9457 の問題の詳細に code、traceId、errors を足したもの（DEC-38）。content type は application/problem+json
+      description: RFC 9457 の問題の詳細に code、traceId、errors と、場合ごとの拡張の欄（retryAfterSeconds、distanceMeters、remainingAttempts、currentFee、remainingRefundable。どれも任意）を足したもの（DEC-38）。content type は application/problem+json
       additionalProperties: true
     Reception:
       type: object

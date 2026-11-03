@@ -14,7 +14,7 @@ addresses:
 - IFC-09
 - DRV-16
 options:
-- name: 経路に v1。足すだけで、知らない欄は両側とも無視する。X-App-Version で古い画面を読み直させる
+- name: "経路に v1。足すだけで、知らない欄は両側とも無視する。X-App-Version で古い画面を読み直させる。配信のメッセージと毎日の処理の出力は v か schema_version を持つ。ログは schema_version。画面は応答の X-App-Version と配信の hello の appVersion が自分と違い、操作の途中でないとき（手配の確定や乗車の終了を待っていないとき）に読み直し、GET で今の状態を取り直す"
   effect: SPA とサーバーは同じイメージで出るが、配備と戻しの前に開いた画面が新しいサーバーと話してもよい（NFR-34）
   cost: 壊す変更は v2 を並べる
 - name: 見出しで版を選ぶ
