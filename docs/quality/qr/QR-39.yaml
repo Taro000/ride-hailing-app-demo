@@ -1,16 +1,16 @@
 id: QR-39
 title: ログの個人情報を伏せる
 status: draft
-version: 2
+version: 3
 basis: inferred
-basis_note: 分類は質問 4 で確認済み。法令の中身と点は推定
+basis_note: 分類は質問 4 で確認済み。法令の中身と点は推定。現在地の受信の記録（FR-17 版 2）を対象に加えたことは推定
 needs_agreement: true
 approver_candidates: [プロダクトオーナー, 開発の責任者, 法令を確かめる担当（推定）]
 model: data
 layer: data-system-dependent
 characteristic: confidentiality
-statement: ログ、ブラウザのエラーの記録、状態の履歴に残す個人情報（位置、連絡先、名前）は、伏せるか、権限のある人だけが読める形で保たれる。
-applies_to: [FR-37, FR-38, FR-39, FR-40]
+statement: ログ、ブラウザのエラーの記録、状態の履歴、現在地の受信の記録に残す個人情報（位置、連絡先、名前）は、伏せるか、権限のある人だけが読める形で保たれる。
+applies_to: [FR-17, FR-37, FR-38, FR-39, FR-40]
 traces_to: []
 entry_point:
   type: law
@@ -36,3 +36,7 @@ changelog:
     date: 2026-10-31
     change: 法令として扱う根拠を記録した
     reason: 第 3 段階の再実行（第 1 段階 55db34c、第 2 段階 dbb8df9）
+  - version: 3
+    date: '2026-11-03'
+    change: 現在地の受信の記録を対象に加えた（FR-17 を対象に足した）
+    reason: 第 2 段階の再実行（2026-11-03）の FR-17 版 2 への追随

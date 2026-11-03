@@ -1,7 +1,7 @@
 id: NFR-15
 title: 評価を送る操作の数
 status: draft
-version: 2
+version: 3
 basis: inferred
 basis_note: 2 回は提案（段階を選ぶ、送る）。T_rate は第 1 段階で 15 秒に決まった（QIU-09）。2 回の操作はその中に収まる見込み
 needs_agreement: true
@@ -14,7 +14,7 @@ kind: gate
 cuj: CUJ-04
 statement: 評価の画面は、段階を選ぶ操作と送る操作の 2 回で評価を送れる。
 conditions:
-  workload: 少人数の参加者のデモ。件数は未定（運用の事実）。常時稼働し、使うのはデモの回だけ（質問 1）
+  workload: 少人数の参加者のデモ。件数は未定（運用の事実）。サーバーはデモの回だけ、毎日の処理はデモの期間だけ動く（2026-11-03 の回答、設計 1-1）
   users: デモの参加者（乗客、ドライバー、運営・サポート担当）。エンジニアのテスト用アカウント、合成の監視、負荷試験は除く
   transactions: null
 slo: null
@@ -33,3 +33,7 @@ changelog:
   date: '2026-11-01'
   change: 根拠に T_rate の値を書いた
   reason: 第 4 段階の再実行（第 2 段階 7d0cb6d・08c3ee0、第 3 段階 156240c・9c28917）
+- version: 3
+  date: '2026-11-03'
+  change: conditions.workload の「常時稼働し、使うのはデモの回だけ」を「サーバーはデモの回だけ、毎日の処理はデモの期間だけ動く」に直した
+  reason: 設計の連鎖が返した課題（常時稼働の前提）への 2026-11-03 の利用者の回答（docs/quality-chain-answers.md の設計 1-1）
