@@ -1,4 +1,4 @@
-# 第 1 段階（requirements-to-architecture-drivers）が書く。更新: 2026-11-03（再実行: FND-01〜03）
+# 第 1 段階（requirements-to-architecture-drivers）が書く。更新: 2026-11-03（再実行: FND-01〜03、FND-18）
 read_from:
   quality_chain: docs/quality/
   other:
@@ -7,6 +7,7 @@ read_from:
     - Stripe の文書（Context7。押さえ、押さえより少ない額の請求、押さえの増額）
     - 第 2 段階の指摘 FND-01〜03 と、そのもとの第 2 段階の質問 1・7 の回答（2026-11-03）
     - 第 1 段階の質問 11〜15 の回答（2026-11-03、再実行）
+    - 第 2 段階の指摘 FND-18 と、そのもとの第 2 段階の質問 17 の回答（2026-11-03、第 2 段階の 2 回目の再実行）
 technology_constraints:
   - id: TC-01
     statement: TypeScript で書く
@@ -39,9 +40,9 @@ technology_constraints:
     source: 利用者の入力（2026-11-02）、第 1 段階の質問 2・9
     basis: confirmed
   - id: TC-07
-    statement: 実行環境は GCP Cloud Run。サーバー（Cloud Run のサービス）は、デモの回と、確かめ（NFR-20、NFR-26）のための短い間だけ配備する。毎日の処理は Cloud Run のジョブとし、定時の起動（Cloud Scheduler）とともに、デモの期間だけ有効にする。デモの期間は、一つのデモの最初の回の日から、最後の回の翌朝の処理が終わるまで。それ以外のときは Cloud Run で何も動かさない。手元でも同じ形で動かす
+    statement: 実行環境は GCP Cloud Run。サーバー（Cloud Run のサービス）は、デモの回と、確かめ（NFR-20、NFR-26）のための短い間だけ配備する。毎日の処理は Cloud Run のジョブとし、定時の起動（Cloud Scheduler）とともに、デモの期間だけ有効にする。デモの期間は、一つのデモの最初の回の日から、最後の回の翌朝の処理が終わるまで。ただし、その翌朝の処理のあとに、確かめ中のお金の操作、確定も解放もしていない押さえ、終わっていない依頼が残っていれば、毎日の処理がそれらをどれも 0 件と記録するまで延びる（第 2 段階の DEC-37。延びるのはそれらが残ったときだけ）。それ以外のときは Cloud Run で何も動かさない。手元でも同じ形で動かす
     kind: platform
-    source: 利用者の入力（2026-11-02）、第 1 段階の質問 1・2・9・12、第 2 段階の質問 1（FND-02）
+    source: 利用者の入力（2026-11-02）、第 1 段階の質問 1・2・9・12、第 2 段階の質問 1（FND-02）・質問 17（FND-18）
     basis: confirmed
   - id: TC-08
     statement: ふだんは手元の機械で開発する。サーバーを動かすのは、デモの回、確かめの短い間（TC-07）と開発のときだけで、常時は動かさない。デモの期間は、毎日の処理のジョブが動く（TC-07）
