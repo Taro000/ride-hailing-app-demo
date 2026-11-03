@@ -1,7 +1,7 @@
 id: DRV-24
 title: アクセシビリティの指針を満たす
 status: draft
-version: 1
+version: 2
 basis: inferred
 basis_note: 要求は QR-48（入口は標準。WCAG 2.2 レベル AA は 2026-11-01 の利用者の回答）。交渉できないことは質問 9 で確認済み。難しさと順位は推定で要合意
 needs_agreement: true
@@ -22,7 +22,7 @@ priority:
 primary: true
 conflicts:
   - with: DRV-26
-    note: 人の確かめ（NFR-23）を一人で回す（品質チェーンへの課題 2）
+    note: 人の確かめ（NFR-23）を一人で回す。量は受け入れた（質問 13）
   - with: DRV-08
     note: ピンを動かして場所を決める操作は、WCAG 2.2 AA のドラッグに代わる操作の求めに当たる（第 2・3 段階）
 placeholders:
@@ -31,3 +31,7 @@ placeholders:
     from: QR-48
 changelog:
   - {version: 1, date: 2026-11-02, change: 作成, reason: 第 1 段階の下書き（質問 1〜10 の回答を反映）}
+  - version: 2
+    date: 2026-11-03
+    change: DRV-26 との競合を、量を受け入れた（質問 13）と書いた
+    reason: 第 1 段階の再実行（質問 13 の回答）

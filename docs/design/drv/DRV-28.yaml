@@ -1,7 +1,7 @@
 id: DRV-28
 title: 一つのトレース ID で原因まで追える
 status: draft
-version: 1
+version: 2
 basis: inferred
 basis_note: 求めは QR-23・24・34、NFR-32・33・38 と PC-04 から（入力）。T_log_retention 28 日は第 4 段階の仮の値。難しさと順位は推定で要合意
 needs_agreement: true
@@ -28,7 +28,7 @@ priority:
 primary: false
 conflicts:
   - with: DRV-26
-    note: ログの検索と通知を自前の最小構成で作る（品質チェーンへの課題 2、要合意）
+    note: ログの検索と通知を自前の最小構成で作る。量は受け入れた（質問 13）
   - with: DRV-21
     note: 品質チェーンで解き済み。ID は残し、位置と連絡先は伏せる（DRV-32）。T_log_retention と T_pii_retention を合わせて決める（要合意）
   - with: DRV-22
@@ -42,3 +42,7 @@ placeholders:
     from: QIU-19
 changelog:
   - {version: 1, date: 2026-11-02, change: 作成, reason: 第 1 段階の下書き（質問 1〜10 の回答を反映）}
+  - version: 2
+    date: 2026-11-03
+    change: DRV-26 との競合を、量を受け入れた（質問 13）と書いた
+    reason: 第 1 段階の再実行（質問 13 の回答）

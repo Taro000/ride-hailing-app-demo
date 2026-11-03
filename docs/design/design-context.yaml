@@ -1,10 +1,12 @@
-# 第 1 段階（requirements-to-architecture-drivers）が書く。更新: 2026-11-02
+# 第 1 段階（requirements-to-architecture-drivers）が書く。更新: 2026-11-03（再実行: FND-01〜03）
 read_from:
   quality_chain: docs/quality/
   other:
     - 利用者の入力（2026-11-02。技術制約、予算と納期、チームの構成、将来の変更）
     - 第 1 段階の質問 1〜10 の回答（2026-11-02）
     - Stripe の文書（Context7。押さえ、押さえより少ない額の請求、押さえの増額）
+    - 第 2 段階の指摘 FND-01〜03 と、そのもとの第 2 段階の質問 1・7 の回答（2026-11-03）
+    - 第 1 段階の質問 11〜15 の回答（2026-11-03、再実行）
 technology_constraints:
   - id: TC-01
     statement: TypeScript で書く
@@ -37,14 +39,14 @@ technology_constraints:
     source: 利用者の入力（2026-11-02）、第 1 段階の質問 2・9
     basis: confirmed
   - id: TC-07
-    statement: 実行環境は GCP Cloud Run。デモの回と、確かめ（NFR-20、NFR-26）のための短い間だけ配備する。手元でも同じ形で動かす
+    statement: 実行環境は GCP Cloud Run。サーバー（Cloud Run のサービス）は、デモの回と、確かめ（NFR-20、NFR-26）のための短い間だけ配備する。毎日の処理は Cloud Run のジョブとし、定時の起動（Cloud Scheduler）とともに、デモの期間だけ有効にする。デモの期間は、一つのデモの最初の回の日から、最後の回の翌朝の処理が終わるまで。それ以外のときは Cloud Run で何も動かさない。手元でも同じ形で動かす
     kind: platform
-    source: 利用者の入力（2026-11-02）、第 1 段階の質問 1・2・9
+    source: 利用者の入力（2026-11-02）、第 1 段階の質問 1・2・9・12、第 2 段階の質問 1（FND-02）
     basis: confirmed
   - id: TC-08
-    statement: ふだんは手元の機械で開発する。サーバーを動かすのはデモと開発のときだけで、常時は動かさない
+    statement: ふだんは手元の機械で開発する。サーバーを動かすのは、デモの回、確かめの短い間（TC-07）と開発のときだけで、常時は動かさない。デモの期間は、毎日の処理のジョブが動く（TC-07）
     kind: platform
-    source: 利用者の入力（2026-11-02。ローカルだけで完結）、第 1 段階の質問 1・4
+    source: 利用者の入力（2026-11-02。ローカルだけで完結）、第 1 段階の質問 1・4、第 2 段階の質問 1（FND-02）
     basis: confirmed
   - id: TC-09
     statement: スマートフォンのブラウザの Web アプリだけで、ネイティブアプリは使わない。対象は iOS の Safari だけ。裏に回ると通知と現在地の更新が止まる制約を受け入れ、ドライバーは受付中に前面に開いておく
@@ -98,6 +100,12 @@ project_constraints:
     statement: ログと監視の基盤は自前の最小構成（構造化ログを保存し、集計のスクリプトで数え、チャットなどに知らせる）
     source: context.yaml の運用の事実（2026-11-01 の回答）
     basis: stated
+  - id: PC-05
+    kind: other
+    statement: 規模。デモは全体で 1〜2 回で終わる。参加者は 2 人（乗客 1 人とドライバー 1 人）。乗車はデモ 1 回で 2〜3 回（全体で 2〜6 回）。1 回のデモは 1〜2 日で、1 日に N_session_hours（3 時間）のデモの回が一つ（デモの回は全体で 1〜4 回、3〜12 時間）。乗客とドライバーが同時に動くので iPhone が 2 台要り、2 台ともそろう
+    source: 第 2 段階の質問 7 の回答（2026-11-03。FND-03）、context.yaml の運用の事実（N_session_hours）、第 1 段階の質問 11・14
+    basis: inferred
+    basis_note: デモの数、参加者、乗車の数、デモの日数は第 2 段階の質問 7 の回答（入力）。1 日に 3 時間の回が一つは質問 11、iPhone が 2 台そろうことは質問 14 で確認済み。「1 回の乗車は 2〜3 回」をデモ 1 回の乗車の数と読んだのは推定（質問 15 は回答なし）
 teams:
   - id: TEAM-01
     name: 開発者本人

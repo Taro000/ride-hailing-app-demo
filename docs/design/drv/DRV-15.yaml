@@ -1,7 +1,7 @@
 id: DRV-15
 title: 変更を自動のテストで確かめてから出す
 status: draft
-version: 1
+version: 2
 basis: inferred
 basis_note: シナリオは QR-43 と NFR-08・27 ほかのゲートから（入力）。配備を止めるゲートにすることは品質チェーン第 4 段階の質問 2、道具を足してよいことは質問 3、CI の場所は質問 9 で確認済み。難しさと順位は推定で要合意
 needs_agreement: true
@@ -28,7 +28,7 @@ priority:
 primary: false
 conflicts:
   - with: DRV-26
-    note: CI のゲート 21 件を一人で作って回す（品質チェーンへの課題 2）
+    note: CI のゲート 21 件を一人で作って回す。量は受け入れた（質問 13）
 placeholders:
   - name: T_match_wait
     meaning: 手配から何分許諾されなければ乗客に知らせるか
@@ -41,3 +41,7 @@ placeholders:
     from: FR-07
 changelog:
   - {version: 1, date: 2026-11-02, change: 作成, reason: 第 1 段階の下書き（質問 1〜10 の回答を反映）}
+  - version: 2
+    date: 2026-11-03
+    change: DRV-26 との競合を、量を受け入れた（質問 13）と書いた
+    reason: 第 1 段階の再実行（質問 13 の回答）

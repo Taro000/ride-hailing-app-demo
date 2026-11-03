@@ -1,20 +1,20 @@
 id: DRV-07
 title: iOS の Safari で主要な流れが動く
 status: draft
-version: 1
+version: 2
 basis: inferred
-basis_note: シナリオは QR-42・NFR-20・NFR-21 から（入力）。対象を iOS の Safari だけにしたことは質問 10、iPhone の実機があることは質問 7 で確認済み。難しさと順位は推定で要合意
+basis_note: シナリオは QR-42・NFR-20・NFR-21 から（入力）。対象を iOS の Safari だけにしたことは質問 10、iPhone の実機があることは質問 7、参加者 2 人分の 2 台がそろうことは質問 14 で確認済み。難しさと順位は推定で要合意
 needs_agreement: true
 approver_candidates: [プロダクトオーナー, 開発の責任者]
 kind: quality
 statement: 乗客とドライバーの Web アプリは、iOS の Safari で、位置情報の取得、音での知らせ、前面と裏の切り替え、画面の点灯を含めて主要な流れが動く
-sources: [QR-42, NFR-20, NFR-21, TC-09, PC-03]
+sources: [QR-42, NFR-20, NFR-21, TC-09, PC-03, PC-05]
 concern_of: [USR-01, USR-02]
 scenario:
   source: iPhone の Safari を使う乗客とドライバー
   stimulus: 主要な流れを使う（位置情報の取得、音での知らせ、前面と裏の切り替え、画面の点灯）
   artifact: 乗客とドライバーの Web アプリ（FR-02、FR-06、FR-10、FR-17、FR-18、FR-21、FR-24、FR-52）
-  environment: iPhone の実機。対象は iOS の Safari だけ（質問 10）
+  environment: iPhone の実機。参加者 2 人が同時に使うので 2 台で、2 台ともそろう（PC-05、質問 14）。対象は iOS の Safari だけ（質問 10）
   response: 位置情報、音、前面と裏の切り替え、画面の点灯を含めて主要な流れが動く。機能に対応していないときはその旨を示す（FR-52）
   measure: リリースの前に CUJ-01〜09 の主要な流れが iOS の Safari で通る（NFR-20 を Safari だけに読み替え。品質チェーンへの課題 3）。1 時間に 10 件以上のエラーか、対象外のブラウザの利用を知らせる（NFR-21）
 negotiable: null
@@ -23,7 +23,7 @@ priority:
   business: high
   business_reason: QR-42 が重視（入口は開発方針）
   difficulty: medium
-  difficulty_reason: iOS の Safari の制限（音の再生の条件、画面の点灯、位置の許可）に合わせる手間。iPhone の実機はある
+  difficulty_reason: iOS の Safari の制限（音の再生の条件、画面の点灯、位置の許可）に合わせる手間。iPhone の実機は参加者 2 人分の 2 台がそろう（質問 14）
   rank: 7
 primary: true
 conflicts:
@@ -32,3 +32,7 @@ conflicts:
 placeholders: []
 changelog:
   - {version: 1, date: 2026-11-02, change: 作成, reason: 第 1 段階の下書き（質問 1〜10 の回答を反映）}
+  - version: 2
+    date: 2026-11-03
+    change: 環境と難しさの理由に、参加者 2 人分の iPhone 2 台がそろうことを書いた
+    reason: FND-03 を受け入れた（第 1 段階の再実行。質問 14）
