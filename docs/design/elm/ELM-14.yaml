@@ -1,14 +1,14 @@
 id: ELM-14
 title: Cloud Monitoring
 status: draft
-version: 2
+version: 3
 basis: inferred
 basis_note: 提案
 needs_agreement: false
 approver_candidates: []
 kind: external-system
 name: Cloud Monitoring
-responsibility: Cloud Run のサービスの標準の指標とジョブの実行の結果を見て、アプリが止まったとき（デモの回の間）と、毎日の処理のジョブが失敗したとき（デモの期間の間）に、チャットへ知らせる規則を二つ持つと想定する
+responsibility: Cloud Run のサービスの標準の指標とジョブの実行の結果を見て、サーバーが数えられないもの（アプリが止まったとき、アプリに届く前に入口が返した 5xx と 429。デモの回の間）と、毎日の処理のジョブが失敗したとき（デモの期間の間）に、チャットへ知らせる規則を二つ持つと想定する。SLO のアラートはサーバーが数える（DEC-35）
 functions: []
 drivers:
 - DRV-01
@@ -18,6 +18,7 @@ drivers:
 decisions:
 - DEC-17
 - DEC-27
+- DEC-35
 team: null
 technology: Cloud Monitoring
 runs_on: null
@@ -32,3 +33,7 @@ changelog:
   date: '2026-11-03'
   change: 毎日の処理のジョブの失敗を見る二つ目の規則を足し、DRV-04・27 と DEC-27（規則の開け閉め）を加えた
   reason: FND-06（第 2 段階のレビュー）を受け入れた。質問 14 の回答
+- version: 3
+  date: '2026-11-03'
+  change: 一つ目の規則の役目を、サーバーが数えられないもの（アプリが止まったとき、入口が返した 5xx と 429）にし、DEC-35 を加えた
+  reason: DEC-17 の負債を返し、DEC-35 を作り直した（第 1 段階の質問 13、第 2 段階の質問 18。第 2 段階の再実行、2 回目）

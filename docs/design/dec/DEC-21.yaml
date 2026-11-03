@@ -1,9 +1,9 @@
 id: DEC-21
 title: 上限を重ねて、乱用で予算を超えず、同時の要求の枠を使い切られないようにする
 status: draft
-version: 2
+version: 3
 basis: inferred
-basis_note: 規模は質問 7 で確認済み。上限の値は提案（質問 15 は回答なし）
+basis_note: 規模は PC-05（入力）。上限の値は提案（質問 15 は回答なし）
 needs_agreement: true
 approver_candidates:
 - プロダクトオーナー
@@ -86,3 +86,7 @@ changelog:
   date: '2026-11-03'
   change: SSE の流れの本数の上限とアカウントの作成の回数の制限を足し、最大 2 インスタンスの案と比べ、DRV-02 を対象に加えた。残る危険（多くの IP からの攻撃）を書いた
   reason: FND-08（第 2 段階のレビュー）を受け入れた
+- version: 3
+  date: '2026-11-03'
+  change: 規模の出どころを、第 2 段階の質問 7 から PC-05 にした
+  reason: 第 1 段階が FND-03 を受け入れ、PC-05 を足した（第 2 段階の再実行、2 回目）

@@ -1,14 +1,14 @@
 id: ELM-04
 title: サーバー
 status: draft
-version: 2
+version: 3
 basis: inferred
 basis_note: 提案
 needs_agreement: false
 approver_candidates: []
 kind: component
 name: サーバー
-responsibility: API（認証と役割、配車の状態遷移、料金と到着予定、お金の操作、位置、評価、設定、苦情、管理）、SSE の配信（状態の履歴の追いかけ）、時刻の見回り、知らせ、Web アプリの静的なファイルの配布、構造化ログ。SSE 以外の経路と Turso の呼び出しの上限（DEC-33）、流れの本数の上限（DEC-21）、座標の表を読む相手の確かめ（位置のモジュール。DEC-15）
+responsibility: API（認証と役割、配車の状態遷移、料金と到着予定、お金の操作、位置、評価、設定、苦情、管理）、SSE の配信（状態の履歴の追いかけ）、時刻の見回り、知らせ、Web アプリの静的なファイルの配布、構造化ログ。SSE 以外の経路と Turso の呼び出しの上限（DEC-33）、流れの本数の上限（DEC-21）、座標の表を読む相手の確かめ（位置のモジュール。DEC-15）。SLO のアラートの毎分の評価（SLI-01 の 1 分ごとの数、SLI-03 の毎分の確かめ。DEC-35）
 functions:
 - FR-01
 - FR-02
@@ -111,6 +111,7 @@ decisions:
 - DEC-32
 - DEC-33
 - DEC-34
+- DEC-35
 - DEC-37
 team: TEAM-01
 technology: Node.js の上の Hono（TC-03、DEC-32）
@@ -131,3 +132,7 @@ changelog:
   date: '2026-11-03'
   change: 責務に経路と Turso の呼び出しの上限、流れの本数の上限、座標の表を読む相手の確かめを足し、DEC-33・34・37 を加えた
   reason: FND-07、08、12、13、05（第 2 段階のレビュー）を受け入れた
+- version: 3
+  date: '2026-11-03'
+  change: 責務に SLO のアラートの毎分の評価を足し、DEC-35 を加えた
+  reason: DEC-35 の作り直し（第 1 段階の質問 13、第 2 段階の質問 18。第 2 段階の再実行、2 回目）
