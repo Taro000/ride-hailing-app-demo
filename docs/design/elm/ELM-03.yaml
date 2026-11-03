@@ -1,14 +1,14 @@
 id: ELM-03
 title: 管理とエンジニアの画面
 status: draft
-version: 2
+version: 3
 basis: inferred
 basis_note: 提案
 needs_agreement: false
 approver_candidates: []
 kind: component
 name: 管理とエンジニアの画面
-responsibility: 運営・サポート担当の登録、停止と再開、苦情と対処、請求の記録、返金の画面。エンジニアの状態の履歴の検索と、各変化のトレース ID から Logs Explorer へのつなぎ
+responsibility: 運営・サポート担当の参加者のアカウントの作成（乗客、審査を通ったドライバーと車両）と設定の符号の出し直し、停止と再開、苦情と対処、請求の記録、返金の画面。エンジニアの状態の履歴の検索と、各変化のトレース ID から Logs Explorer へのつなぎ
 functions:
 - FR-01
 - FR-37
@@ -47,3 +47,7 @@ changelog:
   date: '2026-11-03'
   change: 形づくる決定に、返金の操作キー（DEC-12）と経路の上限の 503（DEC-33）を加えた
   reason: FND-04、07（第 2 段階のレビュー）を受け入れた
+- version: 3
+  date: '2026-11-03'
+  change: 責務の「登録」を、参加者のアカウントの作成（乗客、ドライバーと車両）と設定の符号の出し直しに直した
+  reason: 品質チェーンの再実行（FR-48 版 2。回答の設計 2-9）に追随した（第 2 段階の再実行、4 回目）
