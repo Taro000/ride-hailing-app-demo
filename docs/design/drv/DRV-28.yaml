@@ -1,22 +1,22 @@
 id: DRV-28
 title: 一つのトレース ID で原因まで追える
 status: draft
-version: 2
+version: 3
 basis: inferred
 basis_note: 求めは QR-23・24・34、NFR-32・33・38 と PC-04 から（入力）。T_log_retention 28 日は第 4 段階の仮の値。難しさと順位は推定で要合意
 needs_agreement: true
 approver_candidates: [プロダクトオーナー, 開発の責任者]
 kind: observability
 statement: 一つのトレース ID で、ブラウザ、サーバー、外部の呼び出しの記録をたどり、通知から原因まで行ける
-sources: [QR-23, QR-24, QR-34, NFR-32, NFR-33, NFR-38, FR-36, FR-37, FR-38, FR-40, PC-04]
+sources: [QR-23, QR-24, QR-34, NFR-32, NFR-33, NFR-38, FR-17, FR-36, FR-37, FR-38, FR-40, PC-04]
 concern_of: [USR-03]
 scenario:
   source: 通知を受けたエンジニア（USR-03）
   stimulus: サーバーのエラー、外部の呼び出しの失敗、ブラウザのエラーが起きる
   artifact: 通知（FR-36）、トレース ID（FR-37）、ブラウザのエラーの記録（FR-38）、ログの検索（FR-40）
   environment: デモの回は Cloud Run、ふだんは手元。ログと監視は自前の最小構成（PC-04）。個人情報は伏せる（DRV-32）
-  response: 種類、時刻、件数、トレース ID の例を添えて知らせる。一つのトレース ID で、ブラウザ、サーバー、外部の呼び出しのログを時刻順にたどれる。T_log_retention の間、ログと履歴を取り出せる
-  measure: 試験用のエラーの通知が 5 分以内に届く（NFR-33）。NFR-27 の実行でトレース ID のないログ 0 件（NFR-32）。28 日前のログと履歴を探せる（NFR-38）。背景は T_rca 30 分（QIU-19）
+  response: 種類、時刻、件数、トレース ID の例を添えて知らせる。一つのトレース ID で、ブラウザ、サーバー、外部の呼び出しのログを時刻順にたどれる。T_log_retention の間、ログ、状態の履歴、現在地の受信の記録を取り出せる
+  measure: 試験用のエラーの通知が 5 分以内に届く（NFR-33）。NFR-27 の実行でトレース ID のないログ 0 件（NFR-32）。28 日前のログ、状態の履歴、現在地の受信の記録を探せる（NFR-38）。背景は T_rca 30 分（QIU-19）
 negotiable: null
 derived_from: []
 priority:
@@ -46,3 +46,7 @@ changelog:
     date: 2026-11-03
     change: DRV-26 との競合を、量を受け入れた（質問 13）と書いた
     reason: 第 1 段階の再実行（質問 13 の回答）
+  - version: 3
+    date: 2026-11-03
+    change: 取り出せる記録と探せる記録に、現在地の受信の記録を足した
+    reason: 品質チェーンの再実行（FR-17 版 2、QR-34 版 2、NFR-38）に追随した（第 1 段階の再実行、3 回目）
