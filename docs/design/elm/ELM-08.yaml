@@ -1,14 +1,14 @@
 id: ELM-08
 title: ログの置き場所（Cloud Logging）
 status: draft
-version: 1
+version: 2
 basis: inferred
 basis_note: 提案
 needs_agreement: false
 approver_candidates: []
 kind: data-store
 name: ログの置き場所（Cloud Logging）
-responsibility: 入口の要求のログ（Cloud Run が書く）とアプリの構造化ログ。保持は既定の 30 日
+responsibility: 入口の要求のログ（Cloud Run が書く。URL をそのまま残すので、URL に個人情報を入れない。DEC-16）とアプリの構造化ログ（ELM-04 と ELM-05 が書く）。保持は既定の 30 日
 functions: []
 drivers:
 - DRV-21
@@ -28,3 +28,7 @@ changelog:
   date: '2026-11-03'
   change: 作成
   reason: 第 2 段階の下書き（質問 1〜12 の回答を反映）
+- version: 2
+  date: '2026-11-03'
+  change: 入口のログが URL をそのまま残すことと、ELM-05 もアプリのログを書くことを責務に書いた
+  reason: FND-13、17（第 2 段階のレビュー）を受け入れた

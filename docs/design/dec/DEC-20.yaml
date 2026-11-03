@@ -1,9 +1,9 @@
 id: DEC-20
 title: 認証はサーバーの中のライブラリ、管理とエンジニアはパスキーも
 status: draft
-version: 1
+version: 2
 basis: inferred
-basis_note: パスキーの範囲は質問 4 で確認済み。外部の認証サービスを使わないことと、ログインの失敗の上限は推定（質問 11 は回答なし）
+basis_note: パスキーの範囲は質問 4 で確認済み。外部の認証サービスを使わないことと、ログインの失敗の上限は推定（質問 11 は回答なし）。URL が作り直しで変わらないことは Cloud Run の文書で確かめた
 needs_agreement: true
 approver_candidates:
 - 開発の責任者
@@ -39,13 +39,16 @@ costs:
 sensitive_points:
 - ログインの失敗の上限と一時の停止の長さ
 - 状態を変える要求での送り元の確かめ
+- サービスの名前とプロジェクトを変えないこと（パスキーとクッキーが URL に結び付く）
 trade_offs:
 - with: DRV-26
   note: パスキーの部分を作る
 assumptions:
 - ライブラリの候補は Better Auth（第 4 段階で決める）
+- パスキーの RP ID とクッキーは、サービスの決まった形の URL の名前に結び付く。作り直しても名前、プロジェクト、地域が同じなら変わらない（DEC-06、Cloud Run の文書）。名前かプロジェクトを変えると、登録したパスキーは使えなくなる
 depends_on:
 - DEC-08
+- DEC-06
 parameters:
 - name: ログインの失敗の上限
   value: 同じアカウントで 5 回続けて失敗すると 15 分止める
@@ -59,3 +62,7 @@ changelog:
   date: '2026-11-03'
   change: 作成
   reason: 第 2 段階の下書き（質問 1〜12 の回答を反映）
+- version: 2
+  date: '2026-11-03'
+  change: パスキーとクッキーが作り直しても変わらない URL に頼ることを前提と応答を左右する点に書き、DEC-06 に依存させた
+  reason: FND-17（第 2 段階のレビュー）を受け入れた

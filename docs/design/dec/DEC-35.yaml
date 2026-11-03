@@ -1,0 +1,51 @@
+id: DEC-35
+title: SLO の速い条件のアラートを先送りする
+status: draft
+version: 1
+basis: inferred
+basis_note: 規模は質問 7 で確認済み。先送りは推定。前回は DEC-17 の中に書いていたものを分けた（FND-17）
+needs_agreement: true
+approver_candidates:
+- プロダクトオーナー
+stage: architecture
+question: NFR-01〜03 の SLO の速い条件のアラート（長い窓と短い窓のページ）を今つくるか
+addresses:
+- DRV-27
+- DRV-01
+- DRV-02
+- DRV-03
+options:
+- name: 先送りする。測るための記録と毎日の集計（DEC-16、DEC-05）は作り、アラートの規則は作らない
+  effect: 規則の費用と作る手間がない。あとから足しても記録の形は変わらない
+  cost: SLO を速く割っても知らせない
+- name: NFR-01〜03 のとおり、長い窓と短い窓のアラートを今つくる
+  effect: 品質チェーンの要求どおり
+  cost: 参加者 2 人、乗車は 1 回 2〜3 回（質問 7）では、窓の中の出来事が N_alert_min（10 件）に届かず知らせが出ないか、1 件の失敗で出て何も見分けない。規則の数だけ費用（C_monitoring_alert）
+chosen: 先送りする。測るための記録と毎日の集計（DEC-16、DEC-05）は作り、アラートの規則は作らない
+rationale: 案 2 は作っても、この規模では応答が良くならない。主な要求の応答はこの決定に頼っていない（作っても知らせが出ない）。記録と集計は作るので、品質チェーンが第 1 段階の課題 2（この段の課題 4）に答えてから足しても、保存した記録と公開したインタフェースは変わらない。先送りの条件を満たす
+rejected:
+- option: NFR-01〜03 のとおり、長い窓と短い窓のアラートを今つくる
+  reason: この規模では知らせが出ないか何も見分けず、DRV-26 で負ける
+gains:
+- 規則の費用と手間を、応答を生む所に回せる
+costs:
+- SLO を速く割っても知らせない
+sensitive_points: []
+trade_offs:
+- with: DRV-27
+  note: 測る記録はあるが、速い知らせはない
+assumptions:
+- 品質チェーンが第 1 段階の課題 2（この段の課題 4）に答えるまで、SLO の形は変わりうる
+depends_on:
+- DEC-16
+- DEC-17
+parameters: []
+debt: null
+deferred: true
+revisit_when: 品質チェーンが第 1 段階の課題 2（この段の課題 4）に答えたとき
+as_is: new
+changelog:
+- version: 1
+  date: '2026-11-03'
+  change: 作成（DEC-17 の先送りの部分を分けた）
+  reason: FND-17（第 2 段階のレビュー）を受け入れた（第 2 段階の再実行）

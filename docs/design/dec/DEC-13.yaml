@@ -1,7 +1,7 @@
 id: DEC-13
 title: 毎日の処理が Stripe の一覧を取り出して突き合わせる（Webhook なし）
 status: draft
-version: 1
+version: 2
 basis: inferred
 basis_note: 提案
 needs_agreement: false
@@ -23,7 +23,7 @@ options:
   effect: 集計を任せられる
   cost: 有料の機能
 chosen: 毎日の処理（DEC-05）が前日分の押さえ・確定・返金を Stripe の一覧の API で取り出し（依頼の ID をメタデータに入れておく）、依頼ごとに自分の記録と比べ、結果を追記する。結果が分からない操作もここで確かめる
-rationale: TC-08（DRV-18）でサーバーは常時動かないので、出来事を受ける作りより取り出す作りが合う。受ける入口を増やさない（DRV-29）。DRV-26 の費用を増やさない
+rationale: TC-08（DRV-18）でサーバーは常時動かないので、出来事を受ける作りより取り出す作りが合う。受ける入口を増やさない（DRV-29）。DRV-26 の費用を増やさない。結果が分からない操作は、取り出して照らしてから送る（DEC-12）
 rejected:
 - option: Webhook でサーバーが Stripe の出来事を受け、写しを持ち続ける
   reason: サーバーが常に動かず（TC-08）、入口が増える
@@ -36,9 +36,10 @@ costs:
 - 一覧の取り出しと比べ方を作る手間
 sensitive_points:
 - 押さえ直し（DEC-11）で押さえが複数ある乗車の比べ方
+- 確かめ中を片付けるときは、取り出して照らしてから送る（DEC-12）
 trade_offs: []
 assumptions:
-- 押さえ、確定、返金に依頼の ID をメタデータとして付け、一覧から依頼ごとに集められる
+- 押さえ、確定、返金に、依頼の ID と、お金の操作の ID（押さえの何番目か、返金の要求の ID）をメタデータとして付け、一覧から依頼ごとに集められる（DEC-12）
 depends_on:
 - DEC-05
 - DEC-10
@@ -52,3 +53,7 @@ changelog:
   date: '2026-11-03'
   change: 作成
   reason: 第 2 段階の下書き（質問 1〜12 の回答を反映）
+- version: 2
+  date: '2026-11-03'
+  change: メタデータにお金の操作の ID（返金の要求の ID など）を加え、確かめ中の片付け方を DEC-12 に合わせた
+  reason: FND-04（第 2 段階のレビュー）を受け入れた

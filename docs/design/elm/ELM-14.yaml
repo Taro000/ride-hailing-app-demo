@@ -1,20 +1,23 @@
 id: ELM-14
 title: Cloud Monitoring
 status: draft
-version: 1
+version: 2
 basis: inferred
 basis_note: 提案
 needs_agreement: false
 approver_candidates: []
 kind: external-system
 name: Cloud Monitoring
-responsibility: Cloud Run の標準の指標を見て、アプリが止まったときにチャットへ知らせる規則を一つ持つと想定する
+responsibility: Cloud Run のサービスの標準の指標とジョブの実行の結果を見て、アプリが止まったとき（デモの回の間）と、毎日の処理のジョブが失敗したとき（デモの期間の間）に、チャットへ知らせる規則を二つ持つと想定する
 functions: []
 drivers:
 - DRV-01
+- DRV-04
+- DRV-27
 - DRV-28
 decisions:
 - DEC-17
+- DEC-27
 team: null
 technology: Cloud Monitoring
 runs_on: null
@@ -25,3 +28,7 @@ changelog:
   date: '2026-11-03'
   change: 作成
   reason: 第 2 段階の下書き（質問 1〜12 の回答を反映）
+- version: 2
+  date: '2026-11-03'
+  change: 毎日の処理のジョブの失敗を見る二つ目の規則を足し、DRV-04・27 と DEC-27（規則の開け閉め）を加えた
+  reason: FND-06（第 2 段階のレビュー）を受け入れた。質問 14 の回答

@@ -1,0 +1,70 @@
+id: DEC-33
+title: SSE 以外の経路と Turso の呼び出しに、サーバーの中で上限を置く
+status: draft
+version: 1
+basis: inferred
+basis_note: Cloud Run の要求のタイムアウトがサービスに一つであること、Hono のタイムアウトのミドルウェアが流れに使えないこと、libSQL のクライアントの timeout が手元のファイルにだけ効くことは文書から。案と値は提案（質問 15 は回答なし）
+needs_agreement: true
+approver_candidates:
+- 開発の責任者
+stage: architecture
+question: 一つのサービスの要求のタイムアウト（SSE のための 3,600 秒）のもとで、SSE 以外の要求と Turso の呼び出しが長く待たされないようにするにはどうするか
+addresses:
+- DRV-01
+- DRV-11
+- DRV-27
+- DRV-02
+- DRV-04
+options:
+- name: サーバーの中に上限を置く。SSE 以外の経路は T_route を過ぎたら 503 と決まった符号を返し（Hono のタイムアウトのミドルウェア。SSE の経路には付けない）、Turso の呼び出しは libSQL のクライアントに渡す fetch に中止のタイマーを付けて 1 回 T_db で切る。経路を切っても進めていたお金の操作は止めず、結果は操作キーに残す
+  effect: 待たされた要求は T_route で失敗として返り、SLI-01 が数える。Turso が遅くても乗客は 60 分待たない
+  cost: 経路ごとの上限を保ち、SSE の経路を外す決まりが要る
+- name: SSE を別の Cloud Run のサービスに分け、API のサービスの要求のタイムアウトを短くする
+  effect: Cloud Run の入口が短い要求を切る
+  cost: 負荷分散がない（DEC-21）ので別の入口になり、クッキーの認証と同じ入口（DEC-23）が崩れる。回ごとに作って消すサービスが二つになる（DEC-06）
+- name: 今のまま（Stripe と地図の呼び出しにだけ上限）
+  effect: 手間がない
+  cost: Turso が遅いと要求は最大 60 分待ち、60 分の内に答えれば SLI-01 は良いに数える
+chosen: サーバーの中に上限を置く。SSE 以外の経路は T_route を過ぎたら 503 と決まった符号を返し（Hono のタイムアウトのミドルウェア。SSE の経路には付けない）、Turso の呼び出しは libSQL のクライアントに渡す fetch に中止のタイマーを付けて 1 回 T_db で切る。経路を切っても進めていたお金の操作は止めず、結果は操作キーに残す
+rationale: DRV-01 の応答（入口の待ち時間の上限で切られずに応える）と SLI-01 の OK（5xx でも 429 でもなく、切られなかった要求）は、待たされた要求を失敗に数えて初めて意味を持つ。Turso へは公開のインターネットをまたぐ（脅威のモデルの F14）。案 2 は DRV-26 と DEC-23（同じ入口、クッキー、CORS なし）を崩す。案 3 は DRV-01 と DRV-27 を満たさない（FND-07）
+rejected:
+- option: SSE を別の Cloud Run のサービスに分け、API のサービスの要求のタイムアウトを短くする
+  reason: DRV-26 を満たさず、DEC-23 の同じ入口とクッキーの認証が崩れる
+- option: 今のまま（Stripe と地図の呼び出しにだけ上限）
+  reason: DRV-01 と DRV-27 を満たさない
+gains:
+- 待たされた要求が T_route で失敗として返り、SLI-01 が数える
+- Turso が遅いときも、要求と書き込みが積み上がらない
+costs:
+- 経路ごとの上限を保つ手間
+- 切った後も動いているお金の操作を、操作キーで扱う
+sensitive_points:
+- T_route（最も遅い正常な経路より上で、待たせすぎない値）
+- T_db（ふだんの遅い呼び出しを切らない値）
+trade_offs:
+- with: DRV-04
+  note: 切られた手配の確定と返金は、乗客が同じキーで送り直すと最初の結果を受ける
+assumptions:
+- Hono のタイムアウトのミドルウェアは流れに使えない（Hono の文書）
+- libSQL の TypeScript のクライアントは fetch を差し替えられ、timeout の設定は手元のファイルにだけ効く（libSQL の文書）
+depends_on:
+- DEC-01
+- DEC-03
+- DEC-08
+- DEC-12
+parameters:
+- name: T_route（SSE 以外の経路の上限）
+  value: 10 秒
+  basis: 最も遅い正常な経路（手配の確定と返金の 2.7 秒。計算）の 3.7 倍
+- name: T_db（Turso の呼び出しの上限）
+  value: 1 回 2 秒
+  basis: データベースの仮の見込み 0.1 秒の 20 倍。手配の確定の二つのトランザクションが T_db で止まっても 6.5 秒で、T_route より先に切れる（計算）
+debt: null
+deferred: false
+revisit_when: null
+as_is: new
+changelog:
+- version: 1
+  date: '2026-11-03'
+  change: 作成
+  reason: FND-07（第 2 段階のレビュー）を受け入れた（第 2 段階の再実行）
