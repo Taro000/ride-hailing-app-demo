@@ -1,0 +1,51 @@
+id: DEC-66
+title: 管理とエンジニアの画面のアクセシビリティの確かめ方
+status: draft
+version: 1
+basis: confirmed
+basis_note: ELM-03 の質問 3 で確認済み
+needs_agreement: false
+approver_candidates: []
+stage: detailed-design
+question: 管理とエンジニアの画面のアクセシビリティをどこまで確かめるか
+addresses:
+- IFC-28
+- IFC-29
+- FND-79
+options:
+- name: WCAG 2.2 AA を目標にし、axe の自動の確かめを CI のゲートにする。人の確かめはしない
+  effect: 多くの違反を自動で捕まえ、IFC-28・29 に合う
+  cost: 自動で捕まえられない違反は残る
+- name: AA を求めない
+  effect: 確かめの手間がない
+  cost: IFC-28・29 と合わない
+- name: 人の確かめもする
+  effect: 自動で捕まえられない違反も見つかる
+  cost: QR-48 と NFR-22・23 の範囲を品質チェーンで広げる手間
+chosen: WCAG 2.2 AA を目標にし、axe の自動の確かめを CI のゲートにする。人の確かめはしない
+rationale: IFC-28・29 が AA を求め、部品（DEC-56）があれば自動の確かめは小さな手間で通せる。品質チェーン（QR-48、NFR-22・23）の範囲は乗客とドライバーの画面なので、人の確かめは足さない。ELM-03 の質問 3 で確認済み
+rejected:
+- option: AA を求めない
+  reason: IFC-28・29 と合わない
+- option: 人の確かめもする
+  reason: 品質チェーンの範囲を広げる手間が、二次利用者の画面には見合わない
+gains:
+- 自動の確かめで多くの違反を捕まえる
+costs:
+- 自動で捕まえられない違反は残る
+sensitive_points: []
+trade_offs: []
+assumptions: []
+depends_on:
+- DEC-56
+- DEC-24
+parameters: []
+debt: 
+deferred: false
+revisit_when: 
+as_is: new
+changelog:
+- version: 1
+  date: '2026-11-08'
+  change: 作成
+  reason: 第 4 段階（ELM-03）の下書き。質問 1〜4 の回答を反映（質問 5 は回答なし）

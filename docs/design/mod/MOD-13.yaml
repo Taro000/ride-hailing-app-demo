@@ -1,0 +1,64 @@
+id: MOD-13
+title: 状態の履歴の検索
+status: draft
+version: 1
+basis: inferred
+basis_note: 条件と誤り（FR-40、IFC-07）と DEC-19 の負債は入力。送る前の判断表、時間の範囲の両端、エラーの種類の選択肢、二つの並びの続け方は推定（前提の質問 5 は回答なし。FND-80 の答えで変わりうる）
+needs_agreement: false
+approver_candidates: []
+component: ELM-03
+name: 状態の履歴の検索
+responsibility: 条件に合う状態の履歴とブラウザのエラーを時刻順に示し、Logs Explorer へつなぐ
+visibility: public
+interface:
+- operation: 'search(d: HistorySearchDraft) -> {rows: List<SearchRow>, nextCursor: Cursor}'
+  pre: 送る前の判断表で「送る」。ID はパターンに合う
+  post: 日本時間の分を jstMinuteToInstant で UTC にし（from は start、to は end）、POST /api/v1/engineer/history-search を kind read で送る（条件は本文。DEC-16）。items と clientErrors を時刻の順に一つの並びにする（同じ時刻なら状態の変化を先に）。条件は画面のメモリにだけ持ち、URL に入れない
+  errors:
+  - 'ConditionRequired: 400 SEARCH_CONDITION_REQUIRED'
+  - 'RangeTooWide: 400 RANGE_TOO_WIDE'
+  - 'Invalid: 400 INVALID_REQUEST'
+  - '共通: 答えがない（WS-API の送り直しを尽くした）、403、429。401 は MOD-02 がログインし直させる'
+- operation: 'more(cursor: Cursor) -> {rows: List<SearchRow>, nextCursor: Cursor}'
+  pre: 前の結果の nextCursor
+  post: 同じ条件で次を読み、並びに足して並べ直す（FND-80 の答えで変わりうる）
+  errors:
+  - search と同じ
+- operation: HistorySearchScreen -> 画面
+  pre: engineer
+  post: 条件のフォームと結果の表。行から Logs Explorer（新しいタブ、rel noopener noreferrer）、依頼の位置（MOD-14）、同じトレース ID での検索へ移る。空なら「条件に合う記録はありません」（FR-40 AC4）
+  errors: []
+invariants: []
+depends_on:
+- MOD-03
+functions:
+- FR-40
+realizes:
+- IFC-07 POST /api/v1/engineer/history-search
+- IFC-29 状態の履歴の検索
+drivers:
+- DRV-28
+- DRV-21
+decisions:
+- DEC-16
+- DEC-19
+- DEC-40
+behaviour: '報告書の節: MOD-13 状態の履歴の検索（4-detailed-design/ELM-03.md）'
+verification:
+- checks: 送る前の判断表 6 行
+  how: 単体テスト
+- checks: 日本時間の換算（2026-11-03T00:00 の start は 2026-11-02T15:00:00.000Z、end は 2026-11-02T15:00:59.999Z）
+  how: 単体テスト（月と年の境目を含む）
+- checks: 二つの並びを時刻の順に一つにする
+  how: 単体テスト（同じ時刻、片方が空）
+- checks: FR-40 AC1〜4
+  how: MSW の部品のテスト（各条件、空の文、RANGE_TOO_WIDE の文、リンクの属性）
+- checks: CUJ-10 の通し（依頼 ID で探し、行のリンクが Logs Explorer の URL）
+  how: Playwright
+parameters: []
+as_is: new
+changelog:
+- version: 1
+  date: '2026-11-08'
+  change: 作成
+  reason: 第 4 段階（ELM-03）の下書き。質問 1〜4 の回答を反映（質問 5 は回答なし）

@@ -1,0 +1,54 @@
+id: MOD-05
+title: 記録した位置の表示
+status: draft
+version: 1
+basis: inferred
+basis_note: 示すもの（FR-45 AC3・4）と地図が出ないときの扱い（IFC-16）は入力。表を主にし地図を補いにすることは推定
+needs_agreement: false
+approver_candidates: []
+component: ELM-03
+name: 記録した位置の表示
+responsibility: 依頼の記録した位置を表と地図で示す
+visibility: internal
+interface:
+- operation: 'RecordedPositionsView(positions: RecordedPositions, mapsKey: Text?) -> 画面の部品'
+  pre: 座標が範囲の中
+  post: 四つの操作の表（緯度と経度は小数点以下 6 桁）、受信の記録の表（空なら「位置の受信の記録はありません（保存期間を過ぎたか、受信がありませんでした）」。FR-45 AC4）、WS-MAP の地図を示す。座標は画面と WS-MAP にだけ渡し、記録やログに渡さない
+  errors:
+  - 地図が出ないとき（鍵がない、読み込めない、gm_authFailure）は「地図を表示できません。表で確かめてください」を示し、表はいつも示す（IFC-16）
+- operation: 'fromEngineer(r: RidePositions) -> RecordedPositions'
+  pre: なし
+  post: 位置（changeType と position）を OpPosition に、受信を Receipt にする
+  errors: []
+invariants: []
+depends_on: []
+functions:
+- FR-45
+- FR-40
+realizes:
+- IFC-16 Maps JavaScript API の読み込み（WS-MAP を通す）
+- IFC-16 地図、マーカー（経路の線は示さない）
+drivers:
+- DRV-21
+- DRV-32
+decisions:
+- DEC-15
+- DEC-24
+- DEC-56
+behaviour: '報告書の節: MOD-05 記録した位置の表示（4-detailed-design/ELM-03.md）'
+verification:
+- checks: FR-45 AC4（受信が空のときの文）
+  how: 部品のテスト
+- checks: 地図が出ないときも表がある（IFC-16）
+  how: WS-MAP の偽物が onFailure を呼ぶ部品のテスト
+- checks: fromEngineer
+  how: 単体テスト
+- checks: アクセシビリティ（表の見出し、地図の領域の名前）
+  how: axe
+parameters: []
+as_is: new
+changelog:
+- version: 1
+  date: '2026-11-08'
+  change: 作成
+  reason: 第 4 段階（ELM-03）の下書き。質問 1〜4 の回答を反映（質問 5 は回答なし）

@@ -1,0 +1,23 @@
+id: FND-82
+title: 役割のアカウントのパスキーやパスワードを失ったときの戻し方がない
+status: open
+version: 1
+basis: inferred
+basis_note: DEC-20・43、IFC-01・06・12 の操作の一覧は入力。起きることと直し方の案は推定
+needs_agreement: false
+approver_candidates: []
+raised_by: high-level-design-to-detailed-design
+raised_in: 4-detailed-design/ELM-03.md
+to: architecture-drivers-to-architecture
+targets:
+- DEC-20
+- ELM-22
+severity: minor
+evidence: DEC-20 と DEC-43 は役割のアカウントにパスワードとパスキーを求め、最初のアカウントは役割のアカウントが一つもないときだけ作れる（IFC-01 の staff-bootstrap）。担当のパスワードの変更、パスキーの追加や取り消し、役割のアカウントの作り直しの操作はなく（IFC-01・06）、手元の保守の手順（ELM-22、IFC-12）にもない。担当が一人（TEAM-01）で役割のアカウントが一つなので、そのパスキーを失うと（PC の買い替えなど）管理とエンジニアの画面に入れず、デモの間なら返金（CUJ-16）と苦情への対処（CUJ-14）ができない。戻すには Turso の CLI で表を直接直すしかなく、その手順も決まっていない
+suggestion: '戻し方を決める。例: ELM-22 に、役割のアカウントのパスキーを消して作り直せるようにする手順を足す。ログインした担当が二つ目のパスキーを登録できるようにする（第 3 段階の IFC-01 も追随する）。または危険として受け入れ、DEC-20 の失うものと要合意に書く'
+resolution: 
+changelog:
+- version: 1
+  date: '2026-11-08'
+  change: 出した
+  reason: 第 4 段階（ELM-03）

@@ -1,0 +1,58 @@
+id: MOD-08
+title: 配車の停止と再開
+status: draft
+version: 1
+basis: inferred
+basis_note: 停止と再開（FR-47、IFC-06）は入力。ダイアログの文と確かめは推定（前提の質問 5 は回答なし）
+needs_agreement: false
+approver_candidates: []
+component: ELM-03
+name: 配車の停止と再開
+responsibility: ドライバーの配車を理由とともに止め、また始められるようにする
+visibility: internal
+interface:
+- operation: 'suspend(id: DriverId, reason: Text, run: OperationRun) -> DriverView'
+  pre: 理由は 1〜1000 文字。確かめのダイアログで「はい」
+  post: POST /api/v1/admin/drivers/{id}/suspend を run で送る。suspended が真になり、受付は止まる（FR-47 AC1）。もう停止中でも 200
+  errors:
+  - 'Invalid: 400'
+  - 'NotFound: 404'
+  - MOD-20 の結果（結果が分からない、ログイン待ち、待ち、止まった、KeyReused）
+- operation: 'resume(id: DriverId, reason: Text, run: OperationRun) -> DriverView'
+  pre: 同上
+  post: POST /api/v1/admin/drivers/{id}/resume を run で送る。suspended が偽になる（FR-47 AC3）
+  errors:
+  - 'Invalid: 400'
+  - 'NotFound: 404'
+  - MOD-20 の結果（結果が分からない、ログイン待ち、待ち、止まった、KeyReused）
+- operation: 'SuspensionControl(driver: DriverView, onChanged) -> 画面の部品'
+  pre: operator
+  post: 停止中かどうかで、示すボタンとダイアログの文を決める（判断表）
+  errors: []
+invariants: []
+depends_on:
+- MOD-03
+- MOD-20
+functions:
+- FR-47
+realizes:
+- IFC-06 POST /api/v1/admin/drivers/{driverId}/suspend
+- IFC-06 POST /api/v1/admin/drivers/{driverId}/resume
+drivers:
+- DRV-29
+decisions:
+- DEC-31
+- DEC-48
+behaviour: '報告書の節: MOD-08 配車の停止と再開（4-detailed-design/ELM-03.md）'
+verification:
+- checks: ボタンの判断表 2 行、理由が要る（FR-47 AC4）
+  how: 部品のテスト
+- checks: FR-47 AC1・AC3
+  how: MSW の部品のテスト（応答で停止中の表示が替わる）
+parameters: []
+as_is: new
+changelog:
+- version: 1
+  date: '2026-11-08'
+  change: 作成
+  reason: 第 4 段階（ELM-03）の下書き。質問 1〜4 の回答を反映（質問 5 は回答なし）

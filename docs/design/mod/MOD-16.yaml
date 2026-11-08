@@ -1,0 +1,54 @@
+id: MOD-16
+title: ドライバーの顔写真
+status: draft
+version: 1
+basis: inferred
+basis_note: 写真の操作（IFC-06）は入力。blob で読むこと、取り置きの形、N_photo_cache は推定
+needs_agreement: true
+approver_candidates:
+- 開発の責任者
+component: ELM-03
+name: ドライバーの顔写真
+responsibility: ドライバーの顔写真を読み込み、画面の間で使い回す
+visibility: internal
+interface:
+- operation: 'photoUrl(id: DriverId) -> ObjectUrl | Unavailable'
+  pre: id がパターンに合う
+  post: 取り置きにあればそれを返す。なければ GET /api/v1/admin/drivers/{id}/photo を WS-API で responseType blob で読み（トレース ID の見出しが付く）、URL.createObjectURL で作った URL を取り置いて返す。同じドライバーを同時に求めたら一つの読み込みを待つ
+  errors:
+  - 'NotFound: 404（「写真はありません」）'
+  - そのほかは「写真を読み込めませんでした」と読み直しの操作
+- operation: DriverPhoto(driverId, name) -> 画面の部品
+  pre: なし
+  post: 代わりの文「（名前）の顔写真」を付けた画像
+  errors: []
+invariants:
+- 取り置く URL は N_photo_cache 個まで。超えたら最も前に使ったものを URL.revokeObjectURL で捨てる
+- ページを読み込み直すとすべて消え、保存領域に書かない
+depends_on: []
+functions:
+- FR-45
+- FR-48
+realizes:
+- IFC-06 GET /api/v1/admin/drivers/{driverId}/photo
+drivers:
+- DRV-21
+decisions:
+- DEC-57
+- DEC-65
+behaviour: '報告書の節: MOD-16 ドライバーの顔写真（4-detailed-design/ELM-03.md）'
+verification:
+- checks: 51 枚目で最も古いものを捨て、revoke を呼ぶ
+  how: 単体テスト
+- checks: 404 の代わりの文
+  how: 部品のテスト
+parameters:
+- name: N_photo_cache
+  value: 50 個
+  basis: 提案。苦情とドライバーの画面の行き来に足りる。300 KiB として 14.6 MiB（計算）
+as_is: new
+changelog:
+- version: 1
+  date: '2026-11-08'
+  change: 作成
+  reason: 第 4 段階（ELM-03）の下書き。質問 1〜4 の回答を反映（質問 5 は回答なし）

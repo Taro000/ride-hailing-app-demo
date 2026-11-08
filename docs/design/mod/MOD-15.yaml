@@ -1,0 +1,48 @@
+id: MOD-15
+title: テスト用の印
+status: draft
+version: 1
+basis: inferred
+basis_note: 操作（FR-01 AC6、IFC-07）は入力。今の印を読めないので明示して送ることは推定（FND-81）
+needs_agreement: false
+approver_candidates: []
+component: ELM-03
+name: テスト用の印
+responsibility: アカウントのテスト用の印を付け外しする
+visibility: public
+interface:
+- operation: 'setTestAccount(id: AccountId, value: Bool, run: OperationRun) -> Account'
+  pre: id がパターンに合う。付けるか外すかを担当が選んだ
+  post: 'PATCH /api/v1/engineer/accounts/{id} を {testAccount: value} で run で送る。印が value になり、後の記録に写る（FR-01 AC6）'
+  errors:
+  - 'NotFound: 404'
+  - 'Invalid: 400'
+  - MOD-20 の結果（結果が分からない、ログイン待ち、待ち、止まった、KeyReused）
+- operation: TestAccountScreen -> 画面
+  pre: engineer
+  post: アカウントの ID の入力と「テスト用にする」「テスト用を外す」のボタン。結果に今の印と役割を示す
+  errors: []
+invariants: []
+depends_on:
+- MOD-03
+- MOD-20
+functions:
+- FR-01
+realizes:
+- IFC-07 PATCH /api/v1/engineer/accounts/{accountId}
+- IFC-29 テスト用の印
+drivers:
+- DRV-28
+decisions:
+- DEC-48
+behaviour: '報告書の節: MOD-15 テスト用の印（4-detailed-design/ELM-03.md）'
+verification:
+- checks: FR-01 AC6（付けると印が真、外すと偽）
+  how: MSW の部品のテスト
+parameters: []
+as_is: new
+changelog:
+- version: 1
+  date: '2026-11-08'
+  change: 作成
+  reason: 第 4 段階（ELM-03）の下書き。質問 1〜4 の回答を反映（質問 5 は回答なし）

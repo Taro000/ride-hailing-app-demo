@@ -1,0 +1,54 @@
+id: MOD-06
+title: 対処の記録
+status: draft
+version: 1
+basis: inferred
+basis_note: 対処と理由（FR-46）、停止（FR-47）、IFC-06 の決まりは入力。停止の確かめのダイアログは推定（前提の質問 5 は回答なし）
+needs_agreement: false
+approver_candidates: []
+component: ELM-03
+name: 対処の記録
+responsibility: 苦情への対処と理由を記録する
+visibility: public
+interface:
+- operation: 'recordAction(id: ComplaintId, d: ActionDraft, run: OperationRun) -> ComplaintDetail'
+  pre: d.action がある。理由は 1〜1000 文字（contracts の ActionRequest）。suspend なら確かめのダイアログで「はい」
+  post: POST /api/v1/admin/complaints/{id}/actions を run で送る。サーバーは対処を足して苦情を対処済みにし（FR-46 AC1）、suspend ならドライバーを停止する（FR-47 AC1）。201 の詳細を onRecorded で返す
+  errors:
+  - 'Invalid: 400 INVALID_REQUEST（「対処の内容と理由を入れてください」。FR-46 AC2）'
+  - 'NotFound: 404'
+  - MOD-20 の結果（結果が分からない、ログイン待ち、待ち、止まった、KeyReused）
+- operation: ActionForm(complaintId, status, onRecorded) -> 画面の部品
+  pre: operator
+  post: 対処済みの苦情では見出しを「対処を変える（前の記録は残ります）」にする（FR-46 AC3）
+  errors: []
+invariants: []
+depends_on:
+- MOD-03
+- MOD-20
+functions:
+- FR-46
+- FR-47
+realizes:
+- IFC-06 POST /api/v1/admin/complaints/{complaintId}/actions
+- IFC-28 対処の記録
+drivers:
+- DRV-29
+decisions:
+- DEC-31
+- DEC-48
+behaviour: '報告書の節: MOD-06 対処の記録（4-detailed-design/ELM-03.md）'
+verification:
+- checks: FR-46 AC1〜3
+  how: MSW の部品のテスト（201 で onRecorded、400 の文、対処済みの見出し）
+- checks: 対処と確かめのダイアログの判断表 3 行
+  how: 単体テスト
+- checks: FR-47 AC1（対処の停止）
+  how: Playwright（CUJ-14 の通し）
+parameters: []
+as_is: new
+changelog:
+- version: 1
+  date: '2026-11-08'
+  change: 作成
+  reason: 第 4 段階（ELM-03）の下書き。質問 1〜4 の回答を反映（質問 5 は回答なし）

@@ -1,0 +1,23 @@
+id: FND-79
+title: IFC-28・29 は WCAG 2.2 AA の出どころを DRV-24 とするが、DRV-24・QR-48・NFR-22・23 の範囲は乗客とドライバーの画面だけ
+status: open
+version: 1
+basis: inferred
+basis_note: 根拠に引いた項目の文は入力。直し方の案は推定
+needs_agreement: false
+approver_candidates: []
+raised_by: high-level-design-to-detailed-design
+raised_in: 4-detailed-design/ELM-03.md
+to: architecture-to-high-level-design
+targets:
+- IFC-28
+- IFC-29
+severity: minor
+evidence: IFC-28・29 の format は「WCAG 2.2 AA（DRV-24）」。DRV-24 の statement は「乗客とドライバーの Web アプリの画面は、WCAG 2.2 レベル AA を満たす」で、QR-48 も同じ範囲。NFR-22（自動の確かめ）と NFR-23（人の確かめ）も対象は乗客とドライバーの画面。ELM-03 の drivers にも DRV-24 はない。第 4 段階は IFC のとおり AA を目標にし、自動の確かめだけを行うと決めた（DEC-66、ELM-03 の質問 3）
+suggestion: IFC-28・29 の format の出どころを DRV-24 から外し、「AA を目標にし、自動の確かめだけ（第 4 段階の DEC-66）」のように書く。人の確かめも求めるなら、品質チェーンへの課題（QR-48 の範囲を広げる）にする
+resolution: 
+changelog:
+- version: 1
+  date: '2026-11-08'
+  change: 出した
+  reason: 第 4 段階（ELM-03）

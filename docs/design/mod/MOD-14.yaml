@@ -1,0 +1,48 @@
+id: MOD-14
+title: 依頼の位置の調べ
+status: draft
+version: 1
+basis: inferred
+basis_note: 操作（IFC-07、DEC-15）は入力。画面の作りは推定
+needs_agreement: false
+approver_candidates: []
+component: ELM-03
+name: 依頼の位置の調べ
+responsibility: エンジニアに依頼の位置の記録と受信の記録を示す
+visibility: public
+interface:
+- operation: 'openRidePositions(rideId: RideId) -> RecordedPositions'
+  pre: rideId がパターンに合う
+  post: GET /api/v1/engineer/rides/{rideId}/positions を開くたびに読み、MOD-05 の fromEngineer で変えて示す
+  errors:
+  - 'NotFound: 404'
+  - '共通: 答えがない（WS-API の送り直しを尽くした）、403、429。401 は MOD-02 がログインし直させる'
+- operation: RidePositionsScreen(rideId) -> 画面
+  pre: engineer
+  post: 依頼 ID の入力と MOD-05
+  errors: []
+invariants: []
+depends_on:
+- MOD-03
+- MOD-05
+functions:
+- FR-40
+realizes:
+- IFC-07 GET /api/v1/engineer/rides/{rideId}/positions
+- IFC-29 依頼の位置
+drivers:
+- DRV-21
+- DRV-28
+decisions:
+- DEC-15
+behaviour: '報告書の節: MOD-14 依頼の位置の調べ（4-detailed-design/ELM-03.md）'
+verification:
+- checks: 位置と受信を示す、404 の文
+  how: MSW の部品のテスト
+parameters: []
+as_is: new
+changelog:
+- version: 1
+  date: '2026-11-08'
+  change: 作成
+  reason: 第 4 段階（ELM-03）の下書き。質問 1〜4 の回答を反映（質問 5 は回答なし）

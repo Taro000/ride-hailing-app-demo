@@ -1,0 +1,59 @@
+id: DEC-62
+title: 設定の符号の示し方
+status: draft
+version: 1
+basis: confirmed
+basis_note: ELM-03 の質問 4 で確認済み
+needs_agreement: true
+approver_candidates:
+- 開発の責任者
+- プロダクトオーナー
+stage: detailed-design
+question: 設定の符号を作ったときと出し直したときにどう示すか
+addresses:
+- IFC-06
+- IFC-28
+- DRV-29
+- FND-54
+options:
+- name: 閉じるまで示すダイアログ、写す操作あり、どこにも残さない。null なら新しいキーで出し直す
+  effect: 担当が本人に渡すまで消えず、書き写しの誤りがない
+  cost: クリップボードに符号が残る
+- name: 閉じるまで示し、写す操作はない
+  effect: クリップボードに残らない
+  cost: 手で書き写して誤る
+- name: 数分で自動で閉じる
+  effect: 開いたままの画面から盗み見られる時間が短い
+  cost: 担当が本人に渡す前に消えうる
+chosen: 閉じるまで示すダイアログ、写す操作あり、どこにも残さない。null なら新しいキーで出し直す
+rationale: 符号は一度だけ示す（IFC-06、DEC-48）。担当が本人に渡すまで消えず、手で書き写す誤りを避ける。符号は保存領域、URL、記録に残さない。ELM-03 の質問 4 で確認済み
+rejected:
+- option: 閉じるまで示し、写す操作はない
+  reason: 手で書き写して誤る
+- option: 数分で自動で閉じる
+  reason: 渡す前に消えうる
+gains:
+- 書き写しの誤りがない
+- 符号がシステムのどこにも残らない
+costs:
+- 写した符号が担当の端末のクリップボードに残る
+sensitive_points:
+- 符号の期限 24 時間（DEC-43）
+trade_offs:
+- with: DRV-29
+  note: クリップボードに残った符号は、担当の端末のほかのアプリから読めうる（渡す手段は範囲外。FND-54）
+assumptions:
+- 担当の端末は担当だけが使う
+depends_on:
+- DEC-43
+- DEC-48
+parameters: []
+debt: 
+deferred: false
+revisit_when: 
+as_is: new
+changelog:
+- version: 1
+  date: '2026-11-08'
+  change: 作成
+  reason: 第 4 段階（ELM-03）の下書き。質問 1〜4 の回答を反映（質問 5 は回答なし）

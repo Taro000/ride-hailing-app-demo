@@ -1,0 +1,98 @@
+id: MOD-07
+title: ドライバーと車両の登録
+status: draft
+version: 1
+basis: inferred
+basis_note: 登録と変更の欄と誤り（FR-48、IFC-06）は入力。写真を描き直して送ること（DEC-63）、D_photo_max_px と質は推定（前提の質問 5 は回答なし）
+needs_agreement: true
+approver_candidates:
+- 開発の責任者
+component: ELM-03
+name: ドライバーと車両の登録
+responsibility: ドライバーと車両の登録の内容を作り、示し、直す
+visibility: public
+interface:
+- operation: 'listDrivers(cursor: Cursor) -> Page<DriverView>'
+  pre: なし
+  post: GET /api/v1/admin/drivers を kind read で読む
+  errors:
+  - '共通: 答えがない（WS-API の送り直しを尽くした）、403、429。401 は MOD-02 がログインし直させる'
+- operation: 'getDriver(id: DriverId) -> DriverView'
+  pre: id がパターンに合う
+  post: GET /api/v1/admin/drivers/{id} を開くたびに読む
+  errors:
+  - 'NotFound: 404'
+  - '共通: 答えがない（WS-API の送り直しを尽くした）、403、429。401 は MOD-02 がログインし直させる'
+- operation: 'preparePhoto(f: File) -> PhotoFile'
+  pre: 担当が選んだファイル
+  post: 種類が image/jpeg か image/png で 5 MB 以下なら、長い辺を D_photo_max_px 以下にした JPEG（質 0.85）に描き直して返す。描き直しで付帯情報（撮った位置を含む）が落ちる
+  errors:
+  - 'PhotoTypeInvalid: 「JPEG か PNG の写真を選んでください」'
+  - 'PhotoTooLarge: 「5 MB 以下の写真を選んでください」'
+  - 'PhotoUnreadable: 「写真を読み込めませんでした」'
+- operation: 'registerDriver(d: DriverDraft, run: OperationRun) -> DriverCreated'
+  pre: d が contracts の DriverRegistration の検査に通り、写真が用意できている
+  post: POST /api/v1/admin/drivers を run で送る。ドライバー、車両、アカウントができる（FR-48 AC2）。結果を MOD-09 の show に渡し、アカウントの ID も示す
+  errors:
+  - 'Invalid: 400（欄ごと。FR-48 AC3）'
+  - 'PlateTaken: 409 PLATE_ALREADY_REGISTERED（ナンバーの欄。AC5）'
+  - 'EmailTaken: 409 EMAIL_ALREADY_REGISTERED（メールアドレスの欄。AC4）'
+  - 'PhotoTooLarge: 413 PHOTO_TOO_LARGE'
+  - 'PhotoInvalid: 422 PHOTO_INVALID'
+  - MOD-20 の結果（結果が分からない、ログイン待ち、待ち、止まった、KeyReused）
+- operation: 'changeVehicle(id: DriverId, v: VehiclePatch, run: OperationRun) -> DriverView'
+  pre: 一つ以上の欄を変えた。各欄が contracts の DriverPatch の検査に通る
+  post: PATCH /api/v1/admin/drivers/{id} を run で送る。次の依頼から乗客に示す（FR-48 AC7。画面に添える）
+  errors:
+  - 'PlateTaken: 409'
+  - 'Invalid: 400'
+  - 'NotFound: 404'
+  - MOD-20 の結果（結果が分からない、ログイン待ち、待ち、止まった、KeyReused）
+- operation: DriverListScreen、DriverRegisterScreen、DriverDetailScreen(driverId) -> 画面
+  pre: operator
+  post: 報告書の「画面」の節のとおり。詳細は MOD-08、MOD-09、MOD-16 を埋め込む
+  errors:
+  - '共通: 答えがない（WS-API の送り直しを尽くした）、403、429。401 は MOD-02 がログインし直させる'
+invariants:
+- 写真のデータは送る前のメモリにだけ持ち、送ったら捨てる
+depends_on:
+- MOD-03
+- MOD-08
+- MOD-09
+- MOD-16
+- MOD-20
+functions:
+- FR-48
+realizes:
+- IFC-06 GET /api/v1/admin/drivers
+- IFC-06 POST /api/v1/admin/drivers
+- IFC-06 GET /api/v1/admin/drivers/{driverId}
+- IFC-06 PATCH /api/v1/admin/drivers/{driverId}
+- IFC-28 ドライバー（停止と再開は MOD-08、符号は MOD-09）
+drivers:
+- DRV-21
+- DRV-29
+decisions:
+- DEC-48
+- DEC-63
+behaviour: '報告書の節: MOD-07 ドライバーと車両の登録（4-detailed-design/ELM-03.md）'
+verification:
+- checks: 写真の用意（種類、5 MB、縮める、付帯情報が落ちる）
+  how: 位置の付帯情報を持つ JPEG を入れ、出力に付帯情報がなく長い辺が 1600 px 以下になる単体テスト
+- checks: FR-48 AC2〜5・7
+  how: MSW の部品のテスト（欄の誤りの当て方、409 の欄、変更の後の文）
+- checks: 登録で符号が一度だけ出る（FR-48 AC2）
+  how: Playwright（MOD-09 と通し）
+parameters:
+- name: D_photo_max_px
+  value: 1600 px
+  basis: 提案。乗客の画面の写真より大きく、送る量を 1 MiB 以下にする（1600 × 1200 で base64 0.46〜0.92 MiB、3 Mbps で 1.3〜2.6 秒。計算）。5 MB のままでは 3 Mbps で 18.6 秒かかり、ブラウザの 15 秒を超える（計算）
+- name: 写真の JPEG の質
+  value: '0.85'
+  basis: 提案。顔が見分けられ、量が小さい
+as_is: new
+changelog:
+- version: 1
+  date: '2026-11-08'
+  change: 作成
+  reason: 第 4 段階（ELM-03）の下書き。質問 1〜4 の回答を反映（質問 5 は回答なし）

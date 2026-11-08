@@ -1,0 +1,49 @@
+id: DEC-63
+title: ドライバーの写真を縮めて送る
+status: draft
+version: 1
+basis: inferred
+basis_note: 送る量と時間は計算（作業用の derive_elm03.py）。描き直して送ることは推定（ELM-03 の前提の質問 5 は回答なし）
+needs_agreement: false
+approver_candidates: []
+stage: detailed-design
+question: ドライバーの顔写真をどう送るか
+addresses:
+- IFC-06
+- DEC-50
+- DRV-21
+options:
+- name: 送る前に長い辺 1600 px の JPEG に描き直す（付帯情報が落ちる）
+  effect: 送る量が 1 MiB 以下になり、撮った位置などの付帯情報がブラウザの外に出ない
+  cost: 描き直す処理。PNG の透明が失われる
+- name: そのまま送る
+  effect: 作りが簡単
+  cost: 遅い回線で 15 秒を超え、付帯情報がサーバーまで届く
+chosen: 送る前に長い辺 1600 px の JPEG に描き直す（付帯情報が落ちる）
+rationale: 5 MB の写真を base64 で送ると 6.67 MiB になり、3 Mbps では 18.6 秒でブラウザの 15 秒を超える（計算）。描き直すと 0.46〜0.92 MiB で 1.3〜2.6 秒（計算）。描き直しで撮った位置などの付帯情報がブラウザの外に出ない（DRV-21）。サーバーも付帯情報を除いて小さくする（IFC-06）ので、重ねの守りになる
+rejected:
+- option: そのまま送る
+  reason: 遅い回線でタイムアウトし、付帯情報がサーバーまで届く
+gains:
+- 送る量が 1 MiB 以下
+- 付帯情報が外に出ない
+costs:
+- 描き直す処理
+- PNG の透明が失われる（顔写真では問題ない）
+sensitive_points:
+- D_photo_max_px と質（MOD-07）
+trade_offs: []
+assumptions:
+- 乗客の画面に示す写真は 1600 px より小さい
+depends_on:
+- DEC-50
+parameters: []
+debt: 
+deferred: false
+revisit_when: 
+as_is: new
+changelog:
+- version: 1
+  date: '2026-11-08'
+  change: 作成
+  reason: 第 4 段階（ELM-03）の下書き。質問 1〜4 の回答を反映（質問 5 は回答なし）

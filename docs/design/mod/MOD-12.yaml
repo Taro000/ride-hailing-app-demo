@@ -1,0 +1,67 @@
+id: MOD-12
+title: 返金
+status: draft
+version: 1
+basis: inferred
+basis_note: 返金の決まり（FR-50、IFC-06、DEC-12・48）と原則 DRV-30 は入力。T_refund_poll、T_refund_poll_window、確かめの打ち切りの扱いは推定（前提の質問 5 は回答なし）。DRV-30 は ELM-03 の drivers にない（FND-83）
+needs_agreement: true
+approver_candidates:
+- 開発の責任者
+component: ELM-03
+name: 返金
+responsibility: 請求の一部か全部を一度だけ返金し、結果が定まるまで追う
+visibility: internal
+interface:
+- operation: 'RefundForm(rideId: RideId, charge, refresh: () -> Billing) -> 画面の部品'
+  pre: MOD-11 の判断表で入力を示す請求
+  post: 報告書の状態遷移図のとおり
+  errors: []
+- operation: 'refund(rideId: RideId, d: RefundDraft, run: OperationRun) -> RefundState'
+  pre: 額は 1 円以上で、請求の返金できる残り以下（画面の先の確かめ。決めるのはサーバー）。理由は 1〜1000 文字。確かめのダイアログで額と請求の種類を見て「はい」
+  post: POST /api/v1/admin/rides/{rideId}/refunds を run で送る（chargeId、amount、reason）。201 は返金した（FR-50 AC1）。202 は rfr_ を覚えて確かめ中にし、T_refund_poll ごとに refresh で読み直す
+  errors:
+  - 'ExceedsRemaining: 422 REFUND_EXCEEDS_REMAINING（remainingRefundable を示す。AC2）'
+  - 'Failed: 402 REFUND_FAILED（理由を示し、完了と示さない。やり直すときは新しい run。AC4）'
+  - 'InProgress、NotCharged: 409（読み直して今の状態を示す）'
+  - 'Invalid: 400'
+  - MOD-20 の結果（結果が分からない、ログイン待ち、待ち、止まった、KeyReused）。結果が分からないときは同じキーでだけ確かめる（AC4）
+invariants:
+- 一つの返金の要求は一つの run（一つのキー）
+- 結果が分からないか確かめ中の間は、同じ依頼の新しい返金を出させない
+- 失敗と分かった後のやり直しだけが新しい run になる（FR-50 AC4、DRV-30）
+depends_on:
+- MOD-03
+- MOD-20
+functions:
+- FR-50
+realizes:
+- IFC-06 POST /api/v1/admin/rides/{rideId}/refunds
+drivers:
+- DRV-29
+- DRV-30
+decisions:
+- DEC-12
+- DEC-48
+behaviour: '報告書の節: MOD-12 返金（4-detailed-design/ELM-03.md）'
+verification:
+- checks: 状態遷移図のすべての遷移
+  how: WS-API の偽物と偽の時計の単体テスト
+- checks: FR-50 AC2（残りを超える額と示す残り）
+  how: MSW の部品のテスト
+- checks: FR-50 AC3・AC4（答えがないときは同じキー、失敗の後は新しいキー、結果が分からない間は新しい返金を出せない）
+  how: 偽物が受けたキーを数える単体テスト。Playwright で Stripe の偽物の成功、断り（402）、無応答から 202 を経た成功を通す
+- checks: 二重に返金しない（NFR-08 の画面の側）
+  how: Playwright で応答を落として同じキーで確かめ、偽物の返金が一回だけのこと
+parameters:
+- name: T_refund_poll
+  value: 5 秒
+  basis: DEC-04 の P_sweep（見回り 5 秒）。それより速く読んでも結果は変わらない。1 分に 12 回で、回数の制限（そのほかの経路、1 分に 120 回）の 10%（計算）
+- name: T_refund_poll_window
+  value: 120 秒
+  basis: T_op_stale（30 秒）の 4 倍。処理中が確かめ中になり、見回りが何度か Stripe を照らす間。24 回（計算）
+as_is: new
+changelog:
+- version: 1
+  date: '2026-11-08'
+  change: 作成
+  reason: 第 4 段階（ELM-03）の下書き。質問 1〜4 の回答を反映（質問 5 は回答なし）

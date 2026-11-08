@@ -1,0 +1,64 @@
+id: MOD-03
+title: 画面の移り先
+status: draft
+version: 1
+basis: inferred
+basis_note: 版の読み直しは DEC-49、URL の決まりは DEC-16（入力）。読み直しの判断表、未保存の扱い、/backoffice/ の経路は推定（DEC-60。前提の質問 5 は回答なし）
+needs_agreement: false
+approver_candidates: []
+component: ELM-03
+name: 画面の移り先
+responsibility: 画面の移り先を、役割、版、未保存の入力に合わせて決める
+visibility: internal
+interface:
+- operation: 'path(screen: ScreenId, params) -> Text'
+  pre: params は ID のパターンに合う
+  post: "/backoffice/ の下の URL を返す。ID のほかの値（名前、連絡先、位置、検索の条件）を入れない（DEC-16）"
+  errors:
+  - 'InvalidParam: プログラムの誤り（テストで捕まえる）'
+- operation: 'RequireRole(session: SessionState, roles: Set<StaffRole>, children) -> 画面'
+  pre: なし
+  post: session が Active で roles のどれかがあれば children を示す。Anonymous ならログインの画面（戻り先の経路をメモリに持つ）。役割がなければ「この画面を使う権限がありません」
+  errors: []
+- operation: 'markUnsaved(id: Text, unsaved: Bool) -> Unit; hasUnsaved() -> Bool; hasBlocking() -> Bool'
+  pre: なし
+  post: 未保存の入力と、止める理由（送信中や結果が分からない run、表示中の設定の符号）を数える
+  errors: []
+- operation: confirmLeave() -> Bool
+  pre: なし
+  post: 未保存か止める理由があれば、移ってよいかを確かめる。ブラウザを閉じるときは beforeunload で確かめる
+  errors: []
+- operation: 'onVersionMismatch(serverVersion: Text) -> Unit; tryReload(trigger: navigation | banner) -> Unit'
+  pre: なし
+  post: 版の読み直しの判断表で、読み直すか待つかを決める
+  errors: []
+invariants: []
+depends_on: []
+functions:
+- FR-01
+realizes: []
+drivers:
+- DRV-21
+- DRV-25
+decisions:
+- DEC-16
+- DEC-49
+- DEC-58
+- DEC-60
+behaviour: '報告書の節: MOD-03 画面の移り先（4-detailed-design/ELM-03.md）'
+verification:
+- checks: 版の読み直しの判断表 7 行
+  how: 単体テスト
+- checks: URL に ID のほかを入れない（DEC-16）
+  how: 経路の表のすべての経路で、引数が …Id の名前で ID のパターンを持ち、問い合わせの文字を使わないことを確かめる単体テスト
+- checks: 役割の案内（operator だけ、engineer だけ、両方、なし）
+  how: 部品のテスト
+- checks: 離れるときの確かめ
+  how: 未保存と結果が分からない run で、確かめのダイアログと beforeunload が出る部品のテスト
+parameters: []
+as_is: new
+changelog:
+- version: 1
+  date: '2026-11-08'
+  change: 作成
+  reason: 第 4 段階（ELM-03）の下書き。質問 1〜4 の回答を反映（質問 5 は回答なし）

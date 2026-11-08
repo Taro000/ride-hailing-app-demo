@@ -1,0 +1,56 @@
+id: MOD-10
+title: 乗客のアカウント
+status: draft
+version: 1
+basis: inferred
+basis_note: 作成と一覧（FR-48 AC1・3・4、IFC-06）は入力。画面の並べ方は推定
+needs_agreement: false
+approver_candidates: []
+component: ELM-03
+name: 乗客のアカウント
+responsibility: 参加者の乗客のアカウントを作り、一覧で示す
+visibility: public
+interface:
+- operation: 'listPassengers(cursor: Cursor) -> Page<PassengerView>'
+  pre: なし
+  post: GET /api/v1/admin/passengers を kind read で読む。新しい順
+  errors:
+  - '共通: 答えがない（WS-API の送り直しを尽くした）、403、429。401 は MOD-02 がログインし直させる'
+- operation: 'createPassenger(d: PassengerDraft, run: OperationRun) -> PassengerCreated'
+  pre: d が contracts の PassengerRegistration の検査に通る
+  post: POST /api/v1/admin/passengers を run で送る。アカウントができ（FR-48 AC1）、結果を MOD-09 の show に渡す
+  errors:
+  - 'Invalid: 400（欄ごと。AC3）'
+  - 'EmailTaken: 409 EMAIL_ALREADY_REGISTERED（メールアドレスの欄に「このメールアドレスのアカウントはもうあります」。AC4）'
+  - MOD-20 の結果（結果が分からない、ログイン待ち、待ち、止まった、KeyReused）
+- operation: PassengerAccountsScreen -> 画面
+  pre: operator
+  post: 一覧（名前、メールアドレス、設定待ち）、作成のフォーム、各行の符号の出し直し（MOD-09）
+  errors:
+  - '共通: 答えがない（WS-API の送り直しを尽くした）、403、429。401 は MOD-02 がログインし直させる'
+invariants: []
+depends_on:
+- MOD-03
+- MOD-09
+- MOD-20
+functions:
+- FR-48
+realizes:
+- IFC-06 GET /api/v1/admin/passengers
+- IFC-06 POST /api/v1/admin/passengers
+- IFC-28 乗客のアカウント（符号は MOD-09）
+drivers:
+- DRV-29
+decisions:
+- DEC-48
+behaviour: '報告書の節: MOD-10 乗客のアカウント（4-detailed-design/ELM-03.md）'
+verification:
+- checks: FR-48 AC1・3・4
+  how: MSW の部品のテスト
+parameters: []
+as_is: new
+changelog:
+- version: 1
+  date: '2026-11-08'
+  change: 作成
+  reason: 第 4 段階（ELM-03）の下書き。質問 1〜4 の回答を反映（質問 5 は回答なし）
