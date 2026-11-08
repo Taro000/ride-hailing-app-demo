@@ -7,6 +7,6 @@ statement: T_noshow_wait を 5 分とする。
 why_unsure: 入力に数値はない。5 分は、迎車が着いたことを知らされた乗客が乗る場所まで来られる長さとして置いた最初の値。
 breadth: medium
 severity: low
-rating_note: FR-26 と QR-06 が依存する。第 2 段階と第 3 段階が次の実行で書く値で、変えるのは容易
+rating_note: FR-26 が依存し、第 3 段階が値を書くと QR-06 も依存する。変えるのは容易
 answer: null
 answered_in: null

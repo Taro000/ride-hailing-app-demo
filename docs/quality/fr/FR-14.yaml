@@ -1,8 +1,8 @@
 id: FR-14
 title: 乗り終えた乗客に移動時間を信じられたかを問う
-status: active
-basis: inferred
-basis_note: QIU-05 の測定量は乗客への問いで、入力にデータの出どころがないため加えた（推定）。新規であることは質問 4 で確認済み
+status: retired
+basis: confirmed
+basis_note: "QIU-05 は乗客に尋ねず、手配時に示した目的地への到着予定時刻と降車した時刻の記録から数える（第 4 段階の決めたこと #21、第 1 段階の QIU-05）ため、廃止した。手配時に示した到着予定時刻は FR-45 が記録する"
 premises: []
 statement: システムは、乗車が終わった乗客に、手配時に示された移動時間を信じて手配できたかを一つだけ問い、回答を記録する。
 origin: quality-in-use

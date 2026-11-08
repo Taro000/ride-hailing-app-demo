@@ -1,0 +1,20 @@
+id: FR-53
+title: 依頼の状態の変化を相手の画面に示した時刻を記録する
+status: active
+basis: assumed
+basis_note: FRP-11 を受け入れたもの（第 3 段階の QR-06 を、相手の画面に示されるまでで数えるため、第 4 段階の SLI-07）。今期作ることは QAS-54 による暫定の決定。どう記録しどう集めるかは設計で決める。受け入れ基準は推定
+premises: [QAS-54]
+statement: システムは、依頼、許諾、取り消し、迎車の到着を相手の画面に示した時刻を、その依頼と相手に結び付けて記録する。
+origin: proposal
+cuj: null
+cuj_step: null
+traces_to: [QIU-01, QIU-03, QIU-08, QIU-09, QIU-15, QIU-16]
+proposal: FRP-11
+existing: false
+extends: null
+interface: []
+acceptance_criteria:
+  - 乗客の依頼と取り消しがドライバーの画面と一覧に、ドライバーの許諾と取り消しが乗客の画面と通知に、迎車の到着が乗客の画面と通知に示されると、システムは示した時刻を、その依頼と示した相手に結び付けて記録する。
+  - 相手の端末がつながっていないため示せなかったとき、システムは示せなかったことを記録し、後で示したときはその時刻を記録する。
+quality_hints:
+  - QR-06 - 依頼、許諾、取り消し、迎車の到着が相手にすぐ示される

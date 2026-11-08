@@ -1,6 +1,6 @@
 id: FRP-03
 title: 担当者の操作を、行った担当者とともに記録する
-status: proposed
+status: accepted
 basis: inferred
 basis_note: QR-44 からの推定。訂正したことの記録は FR-41、FR-43 にあるが、誰が行ったかはどの FR にもない。第 2 段階の報告の未解決の点が見込んでいた提案
 premises: []
@@ -11,4 +11,4 @@ reason: 返金、アカウントの作成と訂正、ドライバーと車両の
 suggested_statement: システムは、担当者による返金、アカウントの作成と訂正、ドライバーと車両の登録と訂正、ドライバーの停止と再開を、行った担当者、時刻、内容とともに記録する。
 affects: [NFR-32, NFR-43]
 placeholders: []
-resolution: null
+resolution: "受け入れ。FR-50 として今期作る。QR-44 は第 3 段階の決めたこと #15 で重視に決まっている。"

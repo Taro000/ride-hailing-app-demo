@@ -2,8 +2,8 @@ id: FR-28
 title: 到着を確認する
 status: active
 basis: inferred
-basis_note: 機能は CUJ-08 の手順（入力）。受け入れ基準は推定。新規であることは質問 4 で確認済み
-premises: []
+basis_note: "機能は CUJ-08 の手順（入力）。受け入れ基準は推定。新規であることは質問 4 で確認済み。D_dropoff_gap の値（30 m）は第 4 段階の決めたこと #14（QAS-45 への訂正）、T_alighting の値（30 秒）は決めたこと #15（QAS-46 への訂正）"
+premises: [QAS-45, QAS-46]
 statement: システムは、ドライバーが降りる場所への到着を確認できるようにし、到着を確認すると乗車を終えて決済に進む。
 origin: cuj-step
 cuj: CUJ-08
@@ -17,5 +17,5 @@ acceptance_criteria:
   - 乗車中にドライバーが到着を確認すると、システムは乗車を終え、到着を確認した場所と時刻を記録し、決済に進む。
   - 乗車が始まっていない依頼でドライバーが到着を確認しようとすると、システムは受け付けない。
 quality_hints:
-  - 有効性 (QIU-11) - 乗客が決めた降りる場所から D_dropoff_gap 以内で乗車を終える
-  - 効率性 (QIU-12) - 降りる場所に着いてから T_alighting 以内に降車を終えられる
+  - 有効性 (QIU-11) - 乗客が決めた降りる場所から D_dropoff_gap（30 m）以内で乗車を終える
+  - 効率性 (QIU-12) - 降りる場所に着いてから T_alighting（30 秒）以内に降車を終えられる

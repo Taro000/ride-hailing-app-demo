@@ -1,6 +1,6 @@
 id: FRP-01
 title: 本人であることを確かめて使い始める
-status: proposed
+status: accepted
 basis: inferred
 basis_note: QR-10 からの推定。第 2 段階の報告の未解決の点が見込んでいた提案。どう確かめるかは設計で決める
 premises: []
@@ -11,4 +11,4 @@ reason: 乗客、ドライバー、担当者、エンジニアがアカウント
 suggested_statement: システムは、乗客、ドライバー、運営・サポートの担当者、エンジニアが、そのアカウントの本人であることを確かめてから、そのアカウントで機能を使わせる。
 affects: [NFR-27]
 placeholders: []
-resolution: null
+resolution: "受け入れ。FR-48 として今期作る。QR-10 は第 3 段階の決めたこと #18 で重視に決まっている。"

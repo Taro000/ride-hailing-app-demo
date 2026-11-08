@@ -1,8 +1,8 @@
 id: FRP-04
 title: 停止したドライバーには、停止の前に届いていた依頼も許諾させない
-status: proposed
+status: accepted
 basis: inferred
-basis_note: QR-49 からの推定。QAS-08 は #19 で覆り、QR-49 は QIU-33 と QIU-27 にたどる。FR-44 の受け入れ基準は停止した時から新しい依頼を示さないとするが、停止の前に一覧に届いていた依頼の扱いを決めておらず、QR-49 が禁じる許諾を通しうる
+basis_note: "QR-49 からの推定。QAS-08 は #19 で覆り、QR-49 は QIU-33 と QIU-27 にたどる。FR-44 の受け入れ基準は停止した時から新しい依頼を示さないとするが、停止の前に一覧に届いていた依頼の扱いを決めておらず、QR-49 が禁じる許諾を通しうる"
 premises: [QAS-08]
 proposed_by: functional-requirements-to-product-quality
 origin: [QR-49]
@@ -11,4 +11,4 @@ reason: 停止の直前に一覧に届いていた依頼を、停止されたド
 suggested_statement: システムは、担当者がドライバーを停止すると、停止の前にそのドライバーの一覧に届いていた依頼も一覧から除き、許諾させない。
 affects: [NFR-35, NFR-36]
 placeholders: []
-resolution: null
+resolution: "受け入れ。FR-44（新規）をその場で変え、停止の前に一覧に届いていた依頼も除いて許諾させないようにした。QR-49 は第 3 段階の決めたこと #15 で重視に決まっている。"
