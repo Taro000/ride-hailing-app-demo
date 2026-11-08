@@ -19,6 +19,12 @@
       "skillPath": "skills/design-review/SKILL.md",
       "computedHash": "8d4d9006d80a2a4c2b8b89907bb0af1b206972ff25dc0b43c65ae3b26ba9fbb1"
     },
+    "design-summary-html": {
+      "source": "Taro000/quality-summary-html",
+      "sourceType": "github",
+      "skillPath": "skills/design-summary-html/SKILL.md",
+      "computedHash": "c2f4255f260cb6f159403c2642ed4bac149e4e75b704095f9089a47273b361b8"
+    },
     "high-level-design-to-detailed-design": {
       "source": "Taro000/req-to-design",
       "sourceType": "github",
