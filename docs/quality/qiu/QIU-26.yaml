@@ -1,9 +1,9 @@
 id: QIU-26
 title: エンジニアが既存の機能を壊さずに利用技術のバージョンアップに対応できる
 status: active
-basis: inferred
-basis_note: CUJ とニーズ（既存のシステムを壊さない）は入力。測定量と利用状況は推定
-premises: []
+basis: assumed
+basis_note: CUJ とニーズ（既存のシステムを壊さない）は入力。測定量と利用状況は推定。測定量はプロダクトの外のエンジニアの記録で数える（第 2 段階の質問 5）。N_regression_days の値（14 日）は第 4 段階が提案した仮の値で、QAS-49 による仮定
+premises: [QAS-49]
 user: USR-03
 cuj: CUJ-13
 outcomes: []
@@ -19,7 +19,7 @@ characteristic: effectiveness
 statement: 利用技術のバージョンアップに対応するエンジニアは、既存の機能を以前どおりに動かしたまま、バージョンアップを公開できる。
 failure_scenario: 利用技術のバージョンアップの後で到着の確認や決済が以前と違う動きをし、乗客とドライバーが乗降のたびに困る。
 measure:
-  numerator: 公開から N_regression_days 以内に、既存の機能が以前どおりに動かなくなる不具合を起こさなかったバージョンアップ
+  numerator: 公開から N_regression_days（14 日）以内に、既存の機能が以前どおりに動かなくなる不具合を起こさなかったバージョンアップ
   denominator: 公開したバージョンアップ
   narrowed_to: 稼働中のシステムに公開したバージョンアップ
   denominator_needed_only: 公開まで進んだバージョンアップだけを数える

@@ -1,27 +1,27 @@
 id: QIU-04
-title: 乗客が手配時に確認した料金を超えて請求されない
+title: 乗客が確認した料金を超えて請求されない
 status: active
 basis: inferred
-basis_note: ニーズ（出来るだけ安く移動したい）と料金の確認は入力。確認した料金がそのまま支払う額になることは質問 1 で確認済み（CON-01）。測定量と利用状況は推定
-premises: [CON-01]
+basis_note: ニーズ（出来るだけ安く移動したい）と料金の確認は入力。乗客が確認した料金がそのまま支払う額になることは質問 1 で、乗車中に降りる場所を変えて承認した料金に更新されることは第 2 段階の質問 7 で確認済み（CON-01）。決済をする降車（乗客）の CUJ に置くことは第 3 段階の決めたこと #4 で確認済み。降車の CUJ はどの中間成果も直接は生まないため、中間成果は挙げない（推定）。測定量と利用状況は推定
+premises: [CON-01, CON-03, CON-05]
 user: USR-01
-cuj: CUJ-01
-outcomes: [OUT-01]
+cuj: CUJ-03
+outcomes: []
 need: 出来るだけ安く目的地に移動したい
 context_of_use:
-  device: スマートフォン
+  device: スマートフォン（対応する端末、CON-05）
   network: 問わない
   user_type: 登録した乗客
-  task: 配車の手配
-  environment: null
+  task: 目的地での降車と決済
+  environment: 車内
   other: null
 characteristic: freedom from risk > economic risk mitigation
-statement: スマートフォンで配車を手配した乗客は、手配時に確認した料金を超える額や、同じ乗車への二重の額を請求されない。
-failure_scenario: 降りた後に、手配時に確かめた料金より高い額や二重の額が請求され、乗客は問い合わせて返金を求め、サービスを使わなくなる。
+statement: 目的地で降りる乗客は、確認した料金（CON-01 の確定額）を超える額や、同じ乗車への二重の額を請求されない。
+failure_scenario: 降りた後に、手配時や降りる場所を変えたときに確かめた料金より高い額や二重の額が請求され、乗客は問い合わせて返金を求め、サービスを使わなくなる。
 measure:
-  numerator: 手配時に確認した料金を超える額を請求された乗車（二重の請求を含む）
+  numerator: 乗客が確認した料金（CON-01 の確定額）を超える額を請求された乗車（二重の請求を含む）
   denominator: 決済された乗車
-  narrowed_to: スマートフォンで依頼した登録した乗客。試験用のアカウントを除く
+  narrowed_to: スマートフォンで依頼した登録した乗客。試験用のアカウントを除く。乗車中に降りる場所を変えた乗車は、乗客が承認した新しい料金と比べる
   denominator_needed_only: 決済まで進んだ乗車だけを数える
   contribution: 請求額は料金の計算と決済というプロダクトの振る舞いで決まる
   observable: true

@@ -2,14 +2,14 @@ id: QIU-09
 title: 乗客が手間をかけずに手配した車を確かめて乗れる
 status: active
 basis: inferred
-basis_note: ニーズ（乗降の手間を省きたい）は入力。手間を時間で測ることと利用状況は推定
-premises: []
+basis_note: ニーズ（乗降の手間を省きたい）は入力。手間を時間で測ることと利用状況は推定。T_boarding の値（1 分）は第 4 段階の決めたこと #13 で確認済み（QAS-44）
+premises: [CON-05, QAS-44]
 user: USR-01
 cuj: CUJ-02
 outcomes: [OUT-02]
 need: 乗降の手間を省きたい（正しい車かの確認）
 context_of_use:
-  device: スマートフォン
+  device: スマートフォン（対応する端末、CON-05）
   network: 問わない
   user_type: 登録した乗客
   task: 手配した車への乗車
@@ -19,7 +19,7 @@ characteristic: efficiency
 statement: 乗る場所で待つ乗客は、手配した車かどうかを手間をかけずに確かめ、車が着いてから短い時間で乗れる。
 failure_scenario: 似た車が何台も止まる駅前で、乗客が手配した車を確かめるのに手間取り、待ちきれなくなったドライバーが配車を取り消して、乗客は乗れない。
 measure:
-  numerator: 迎車が乗車場所に到着してから T_boarding 以内に乗車が始まった依頼
+  numerator: 迎車が乗車場所に到着してから T_boarding（1 分）以内に乗車が始まった依頼
   denominator: 乗車が始まった依頼
   narrowed_to: スマートフォンで依頼した登録した乗客。試験用のアカウントを除く
   denominator_needed_only: 乗車が始まった依頼だけを数える

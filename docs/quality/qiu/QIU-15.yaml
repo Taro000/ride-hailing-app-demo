@@ -3,13 +3,13 @@ title: ドライバーが許諾した依頼で取り消しにならずに乗車�
 status: active
 basis: inferred
 basis_note: CUJ の手順とニーズは入力。中間成果は質問 5、式は事業が全体で数える式（質問 6）。式を利用状況に絞り込むことと利用状況は推定
-premises: []
+premises: [CON-05]
 user: USR-02
 cuj: CUJ-06
 outcomes: [OUT-02]
 need: 出来るだけ多く・高い依頼を受けたい
 context_of_use:
-  device: 携帯端末
+  device: スマートフォン（対応する端末、CON-05）
   network: 問わない
   user_type: 登録したドライバー
   task: 配車依頼の受付

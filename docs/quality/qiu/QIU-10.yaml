@@ -3,13 +3,13 @@ title: 乗客が手配した車以外に乗らない
 status: active
 basis: inferred
 basis_note: CUJ の手順（手配した車かどうかを確認する）は入力。別の車に乗ることを健康・安全の問題として扱うことは推定
-premises: []
+premises: [CON-05]
 user: USR-01
 cuj: CUJ-02
 outcomes: [OUT-02]
 need: 手配した車に乗りたい。変なドライバーに当たりたくない
 context_of_use:
-  device: スマートフォン
+  device: スマートフォン（対応する端末、CON-05）
   network: 問わない
   user_type: 登録した乗客
   task: 手配した車への乗車

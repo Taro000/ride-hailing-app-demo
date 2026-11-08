@@ -1,8 +1,8 @@
 id: QIU-07
 title: 乗客が危険な運転や加害をするドライバーに当たらない
-status: active
-basis: inferred
-basis_note: 「変なドライバーに当たりたくない」は入力。乗車中の危険を健康・安全の問題として扱うことは推定
+status: retired
+basis: confirmed
+basis_note: 乗車中の危険（危険な運転や犯罪）は当てはまる CUJ がないため利用時の品質要求の対象にしないと、第 3 段階の #19（第 2 段階の QAS-08 への訂正）で決まり、廃止した。ドライバーの振る舞いは、閾値を設定した乗客の満足（QIU-06）と苦情への対応（QIU-27）で扱う
 premises: []
 user: USR-01
 cuj: CUJ-01

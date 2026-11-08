@@ -2,8 +2,8 @@ id: QIU-23
 title: エンジニアが個人の情報を必要以上に見ずに原因を特定できる
 status: active
 basis: inferred
-basis_note: ニーズ（ログ・データの確認、原因の特定）は入力。乗客やドライバーの個人の情報を必要以上に見ないことは推定
-premises: []
+basis_note: ニーズ（ログ・データの確認、原因の特定）は入力。乗客やドライバーの個人の情報を必要以上に見ないことは推定。参加者が実在の人で位置情報も本物であることと、個人の情報の扱いに関する法令に従うことは第 3 段階の質問 1 で確認済み（CON-06）。必要以上に見たかは、誰がどの依頼の個人の情報をどんな理由で見たかの記録（第 2 段階の FR-35）から判断する（推定）
+premises: [CON-06]
 user: USR-03
 cuj: CUJ-10
 outcomes: []
@@ -24,7 +24,7 @@ measure:
   narrowed_to: 稼働中のシステムで起きた障害の調査
   denominator_needed_only: 実際に行われた調査だけを数える
   contribution: 調査でどの情報が見えるかにプロダクトが効く
-  observable: false
+  observable: true
   compared_with: null
   scale: ratio
 kpi: null

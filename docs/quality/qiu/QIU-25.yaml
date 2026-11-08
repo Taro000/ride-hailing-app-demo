@@ -1,9 +1,9 @@
 id: QIU-25
 title: エンジニアがほかの機能を壊さずに既存の機能を修正できる
 status: active
-basis: inferred
-basis_note: CUJ とニーズ（既存のシステムを壊さない）は入力。測定量と利用状況は推定
-premises: []
+basis: assumed
+basis_note: CUJ とニーズ（既存のシステムを壊さない）は入力。測定量と利用状況は推定。測定量はプロダクトの外のエンジニアの記録で数える（第 2 段階の質問 5）。N_regression_days の値（14 日）は第 4 段階が提案した仮の値で、QAS-49 による仮定
+premises: [QAS-49]
 user: USR-03
 cuj: CUJ-12
 outcomes: []
@@ -19,7 +19,7 @@ characteristic: effectiveness
 statement: 既存の機能を修正するエンジニアは、修正した機能以外を以前どおりに動かしたまま、修正を公開できる。
 failure_scenario: 決済の不具合を直したら評価の記録が止まり、乗客の評価がドライバーに反映されなくなる。
 measure:
-  numerator: 公開から N_regression_days 以内に、ほかの既存の機能が以前どおりに動かなくなる不具合を起こさなかった修正
+  numerator: 公開から N_regression_days（14 日）以内に、ほかの既存の機能が以前どおりに動かなくなる不具合を起こさなかった修正
   denominator: 公開した修正
   narrowed_to: 稼働中のシステムに公開した修正
   denominator_needed_only: 公開まで進んだ修正だけを数える

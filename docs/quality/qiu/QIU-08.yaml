@@ -3,13 +3,13 @@ title: 乗客が乗る場所で手配した車と合流して乗れる
 status: active
 basis: inferred
 basis_note: CUJ の手順とニーズは入力。中間成果は質問 5、式は事業が全体で数える式（質問 6）。式を利用状況に絞り込むことと利用状況は推定
-premises: []
+premises: [CON-05]
 user: USR-01
 cuj: CUJ-02
 outcomes: [OUT-02]
 need: 手配した車に乗りたい。正しい車かの確認の手間を省きたい
 context_of_use:
-  device: スマートフォン
+  device: スマートフォン（対応する端末、CON-05）
   network: 問わない
   user_type: 登録した乗客
   task: 手配した車への乗車

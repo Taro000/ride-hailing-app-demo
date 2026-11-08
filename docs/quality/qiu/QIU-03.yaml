@@ -1,25 +1,25 @@
 id: QIU-03
 title: 乗客が手配してから長く待たずに乗れる
 status: active
-basis: inferred
-basis_note: ニーズ（出来るだけ早く移動したい）は入力。早さを迎えまでの待ち時間で測ることと利用状況は推定
-premises: []
+basis: assumed
+basis_note: ニーズ（出来るだけ早く移動したい）は入力。乗車（乗客）の CUJ に置くことは第 3 段階の決めたこと #8 で確認済み。T_pickup_wait の値（10 分）は第 4 段階が提案した仮の値で、QAS-41 による仮定。早さを迎えまでの待ち時間で測ることと利用状況は推定
+premises: [CON-05, QAS-41]
 user: USR-01
-cuj: CUJ-01
+cuj: CUJ-02
 outcomes: [OUT-02]
 need: 出来るだけ早く目的地に移動したい
 context_of_use:
-  device: スマートフォン
+  device: スマートフォン（対応する端末、CON-05）
   network: 問わない
   user_type: 登録した乗客
-  task: 配車の手配
+  task: 迎えの車を待っての乗車
   environment: null
   other: null
 characteristic: efficiency
 statement: スマートフォンで配車を手配した乗客は、依頼を出してから長く待たずに、乗る場所で迎えの車に会える。
 failure_scenario: 配車は確定したが車がなかなか来ず、乗客は約束の時間に遅れる、または待ちきれずに取り消してほかの手段で移動する。
 measure:
-  numerator: 依頼を出してから T_pickup_wait 以内に迎車が乗車場所に到着した配車依頼
+  numerator: 依頼を出してから T_pickup_wait（10 分）以内に迎車が乗車場所に到着した配車依頼
   denominator: 迎車が乗車場所に到着した配車依頼
   narrowed_to: スマートフォンで依頼した登録した乗客。試験用のアカウントを除く
   denominator_needed_only: 迎車が乗車場所に到着したものだけを数え、到着しなかった依頼は QIU-01 で数える

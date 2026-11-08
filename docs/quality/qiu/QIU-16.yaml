@@ -1,15 +1,15 @@
 id: QIU-16
 title: ドライバーが手間をかけずに短い時間で依頼を受けられる
 status: active
-basis: inferred
-basis_note: ニーズ（配車受付までの手間を省きたい）は入力。手間を時間で測ることと利用状況は推定
-premises: []
+basis: assumed
+basis_note: ニーズ（配車受付までの手間を省きたい）は入力。手間を時間で測ることと利用状況は推定。T_accept の値（30 秒）は第 4 段階が提案した仮の値で、QAS-47 による仮定
+premises: [CON-05, QAS-47]
 user: USR-02
 cuj: CUJ-06
 outcomes: [OUT-01]
 need: 配車受付までの手間を省きたい（乗客の検索・交渉）
 context_of_use:
-  device: 携帯端末
+  device: スマートフォン（対応する端末、CON-05）
   network: 問わない
   user_type: 登録したドライバー
   task: 配車依頼の受付
@@ -19,7 +19,7 @@ characteristic: efficiency
 statement: 配車依頼を受け付けるドライバーは、乗客を探したり料金を交渉したりせずに、依頼を選んでから短い時間で許諾を終えられる。
 failure_scenario: 依頼の金額や乗る場所を確かめるのに手間取り、許諾が遅れる間に乗客が待ちきれずに依頼を取り消し、ドライバーは自分で乗客を探すやり方に戻る。
 measure:
-  numerator: 依頼を選んでから T_accept 以内に許諾を終えた依頼
+  numerator: 依頼を選んでから T_accept（30 秒）以内に許諾を終えた依頼
   denominator: ドライバーが許諾した依頼
   narrowed_to: 登録したドライバー。試験用のアカウントを除く
   denominator_needed_only: 許諾まで進んだ依頼だけを数える

@@ -2,7 +2,7 @@ id: QIU-21
 title: エンジニアが障害の原因を特定できる
 status: active
 basis: inferred
-basis_note: CUJ の手順とニーズは入力。測定量と利用状況は推定
+basis_note: CUJ の手順とニーズは入力。測定量と利用状況は推定。測定量はプロダクトの外のエンジニアの記録で数える（第 2 段階の質問 5）
 premises: []
 user: USR-03
 cuj: CUJ-10

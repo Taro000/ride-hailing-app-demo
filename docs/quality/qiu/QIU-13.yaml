@@ -3,13 +3,13 @@ title: 乗客が乗ったドライバーを評価できる
 status: active
 basis: inferred
 basis_note: CUJ の手順は入力。評価が閾値によるマッチに使われ、変なドライバーを避けるニーズにつながることと測定量は推定
-premises: []
+premises: [CON-05]
 user: USR-01
 cuj: CUJ-04
 outcomes: []
 need: 変なドライバーや汚い車に当たりたくない（評価は閾値によるマッチに使われる）
 context_of_use:
-  device: スマートフォン
+  device: スマートフォン（対応する端末、CON-05）
   network: 問わない
   user_type: 登録した乗客
   task: 乗ったドライバーの評価

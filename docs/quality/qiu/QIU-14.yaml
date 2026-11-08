@@ -3,13 +3,13 @@ title: 閾値を設定した乗客が閾値以上のドライバーとだけマ�
 status: active
 basis: inferred
 basis_note: CUJ の手順とニーズは入力。測定量と利用状況は推定
-premises: []
+premises: [CON-05]
 user: USR-01
 cuj: CUJ-05
 outcomes: [OUT-02]
 need: 変なドライバーや汚い車に当たりたくない
 context_of_use:
-  device: スマートフォン
+  device: スマートフォン（対応する端末、CON-05）
   network: 問わない
   user_type: マッチするドライバーの評価の閾値を設定した登録した乗客
   task: 閾値を設定したうえでの配車の手配

@@ -2,14 +2,14 @@ id: QIU-02
 title: 乗客が手間をかけずに配車を手配できる
 status: active
 basis: inferred
-basis_note: ニーズ（手軽に配車したい）は入力。手間を時間で測ることと利用状況は推定
-premises: []
+basis_note: ニーズ（手軽に配車したい）は入力。T_request_entry の値（30 秒）は第 4 段階の決めたこと #12 で確認済み（QAS-40）。手間を時間で測ることと利用状況は推定
+premises: [CON-05, QAS-40]
 user: USR-01
 cuj: CUJ-01
 outcomes: [OUT-01]
 need: 手軽に配車したい
 context_of_use:
-  device: スマートフォン
+  device: スマートフォン（対応する端末、CON-05）
   network: 問わない
   user_type: 登録した乗客
   task: 配車の手配
@@ -19,7 +19,7 @@ characteristic: efficiency
 statement: スマートフォンで配車を手配する乗客は、乗る場所・降りる場所を決めてから依頼を出すまでを、手間をかけずに短い時間で終えられる。
 failure_scenario: 屋外で乗る場所や降りる場所を入れるのに手間取り、乗客は途中でやめて流しのタクシーを拾う。
 measure:
-  numerator: 乗る場所を決め始めてから T_request_entry 以内に出された配車依頼
+  numerator: 乗る場所を決め始めてから T_request_entry（30 秒）以内に出された配車依頼
   denominator: 出された配車依頼
   narrowed_to: スマートフォンで依頼した登録した乗客。試験用のアカウントを除く
   denominator_needed_only: 依頼を出し終えた手配だけを数える

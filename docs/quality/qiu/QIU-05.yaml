@@ -1,32 +1,32 @@
 id: QIU-05
-title: 乗客が示された移動時間を信じて手配できる
+title: 乗客が示された到着予定時刻を信じて手配できる
 status: active
 basis: inferred
-basis_note: 移動時間の確認とニーズは入力。乗客に問う測定量と利用状況は推定
-premises: []
+basis_note: 移動時間の確認とニーズは入力。「示された移動時間」が、手配のときに示す目的地への到着予定時刻（ドライバーが見つかるまでの時間と迎車の時間を含む）を指すことは第 3 段階の決めたこと #8 で、乗客に尋ねずに記録から数えること（5 分以内に降車した乗車の割合）は第 4 段階の決めたこと #21 で確認済み（QAS-42）。信用性として扱うこと、分母と利用状況は推定
+premises: [CON-05, EXT-02, QAS-42]
 user: USR-01
 cuj: CUJ-01
 outcomes: [OUT-01]
 need: 出来るだけ早く目的地に移動したい。手配する前に移動時間を確かめて決めたい
 context_of_use:
-  device: スマートフォン
+  device: スマートフォン（対応する端末、CON-05）
   network: 問わない
   user_type: 登録した乗客
   task: 配車の手配
   environment: null
   other: null
 characteristic: satisfaction > trust
-statement: スマートフォンで配車を手配する乗客は、手配時に示された移動時間を信じて、手配するかどうかを決められる。
-failure_scenario: 示された移動時間より大幅に遅れて着くことが重なり、乗客は時間に間に合わせたい移動ではこのサービスを使わなくなる。
+statement: スマートフォンで配車を手配する乗客は、手配時に示された目的地への到着予定時刻（ドライバーが見つかるまでの時間と迎車の時間を含む）を信じて、手配するかどうかを決められる。
+failure_scenario: 示された到着予定時刻より大幅に遅れて着くことが重なり、乗客は時間に間に合わせたい移動ではこのサービスを使わなくなる。
 measure:
-  numerator: 乗り終えた乗客に示された移動時間を信じて手配できたかを問い、N_eta_trust_level 以上と答えた回答
-  denominator: その問いへの回答
-  narrowed_to: スマートフォンで依頼した登録した乗客。試験用のアカウントを除く
-  denominator_needed_only: 乗り終えた乗客の回答だけを数える
-  contribution: 示す移動時間と実際の差にはプロダクトが効くが、道路の混み具合の影響も受ける
-  observable: false
+  numerator: 降車した時刻が、手配時に示した目的地への到着予定時刻から 5 分以内だった乗車（5 分は第 4 段階の決めたこと #21）
+  denominator: 降車まで終えた乗車
+  narrowed_to: スマートフォンで依頼した登録した乗客。試験用のアカウントを除く。乗車中に降りる場所を変えた乗車は、手配時の到着予定時刻と比べられないため除く
+  denominator_needed_only: 降車まで終えた乗車だけを数え、取り消された依頼や乗車に至らなかった依頼は含めない（QIU-01、QIU-08 で数える）
+  contribution: 示す到着予定時刻の見込みと、ドライバーが見つかるまで・迎車にかかる時間にプロダクトが効くが、道路の混み具合と、道と移動時間の見込みのもとになるデータ（EXT-02）にも左右される
+  observable: true
   compared_with: null
-  scale: ordinal
+  scale: ratio
 kpi: null
 target: null
 target_status: undecided

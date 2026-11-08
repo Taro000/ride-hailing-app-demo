@@ -1,29 +1,29 @@
 id: QIU-06
-title: 乗客が変なドライバーや汚い車に当たらない
+title: 閾値を設定した乗客が変なドライバーや汚い車に当たらない
 status: active
 basis: assumed
-basis_note: ニーズは入力。乗客の評価で測ることは推定。評価に車の状態も含むことは QAS-02 による仮定
-premises: [QAS-02]
+basis_note: ニーズは入力。閾値を設定した乗客の満足としてマッチするドライバーの閾値の設定の CUJ に置くことは第 3 段階の決めたこと #4 で確認済み。乗客の評価で測ることと、中間成果を CUJ-05 と同じ OUT-02 とすることは推定。評価に車の状態も含むことは QAS-02 による仮定。N_ride_rating_ok の値（評価の上位 2 段階）は第 4 段階が提案した仮の値で、QAS-43 による仮定
+premises: [QAS-02, CON-05, QAS-43]
 user: USR-01
-cuj: CUJ-01
-outcomes: [OUT-01]
+cuj: CUJ-05
+outcomes: [OUT-02]
 need: 変なドライバーや汚い車に当たりたくない
 context_of_use:
-  device: スマートフォン
+  device: スマートフォン（対応する端末、CON-05）
   network: 問わない
-  user_type: 登録した乗客
-  task: 配車の手配
+  user_type: マッチするドライバーの評価の閾値を設定した登録した乗客
+  task: 閾値を設定したうえでの配車の手配と乗車
   environment: null
   other: null
 characteristic: satisfaction > usefulness
-statement: スマートフォンで配車を手配した乗客は、変なドライバーや汚い車に当たらず、乗ってよかったと感じる。
-failure_scenario: 態度の悪いドライバーや汚れた車に当たり、乗客は次からほかのサービスを選ぶ。
+statement: 評価の閾値を設定して配車を手配した乗客は、変なドライバーや汚い車に当たらず、乗ってよかったと感じる。
+failure_scenario: 閾値を設定したのに態度の悪いドライバーや汚れた車に当たり、乗客は次からほかのサービスを選ぶ。
 measure:
-  numerator: 乗客がドライバーに N_ride_rating_ok 以上の評価を付けた乗車
+  numerator: 乗客がドライバーに N_ride_rating_ok（評価の上位 2 段階）以上の評価を付けた乗車
   denominator: 乗客が評価を付けた乗車
-  narrowed_to: スマートフォンで依頼した登録した乗客。試験用のアカウントを除く
+  narrowed_to: 閾値を設定した登録した乗客がスマートフォンで依頼した乗車。試験用のアカウントを除く
   denominator_needed_only: 評価を付けた乗車だけを数える
-  contribution: どのドライバーとマッチさせるか（乗客の閾値を含む）が効くが、ドライバーの振る舞いと車の手入れはプロダクトの外で決まる
+  contribution: どのドライバーとマッチさせるか（乗客の閾値）が効くが、ドライバーの振る舞いと車の手入れはプロダクトの外で決まる
   observable: true
   compared_with: null
   scale: ordinal

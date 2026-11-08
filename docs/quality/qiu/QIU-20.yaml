@@ -3,13 +3,13 @@ title: ドライバーが設定した条件に合う依頼だけを受け取れ�
 status: active
 basis: inferred
 basis_note: CUJ の手順と条件の中身（金額・現在地から乗車場所までの距離）は入力。測定量と利用状況は推定
-premises: []
+premises: [CON-05]
 user: USR-02
 cuj: CUJ-09
 outcomes: [OUT-01]
 need: 出来るだけ高い依頼を受けたい。配車受付までの手間を省きたい
 context_of_use:
-  device: 携帯端末
+  device: スマートフォン（対応する端末、CON-05）
   network: 問わない
   user_type: 依頼を受ける条件を設定した登録したドライバー
   task: 条件を設定したうえでの配車依頼の受付

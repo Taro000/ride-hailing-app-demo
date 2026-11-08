@@ -28,6 +28,10 @@ constraints:
     statement: 参加者は実在の人で、システムが扱う位置情報も本物である。個人の情報の扱いに関する法令に従う
     source: 第 3 段階の質問 1 の回答
     basis: confirmed
+  - id: CON-07
+    statement: ドライバーと車両の審査の結果（審査の日付と、審査の記録を探す手がかりを含む）と免許の期限は、このシステムに記録しない。審査を通ったかどうかはシステムの外の記録にだけある
+    source: 第 3 段階の質問 1 の回答（旅客運送の法令を模す開発方針）と質問 5 の回答
+    basis: confirmed
 external_systems:
   - id: EXT-01
     role: 外部の決済サービス（テスト環境で、乗客の支払いと返金を処理する）
@@ -102,10 +106,10 @@ users:
   - id: USR-03
     name: エンジニア
     category: secondary-maintenance
-    data_role: consumer
+    data_role: both
     considered: true
     exclusion_reason: null
-    basis: stated
+    basis: confirmed
   - id: USR-04
     name: 運営・サポートの担当者
     category: secondary-operation

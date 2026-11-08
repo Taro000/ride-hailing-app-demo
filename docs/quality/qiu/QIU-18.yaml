@@ -2,14 +2,14 @@ id: QIU-18
 title: ドライバーが依頼主本人を乗せて運転を始める
 status: active
 basis: inferred
-basis_note: CUJ の手順（依頼主かどうかを確認する、運転を始める）は入力。ニーズは手順からの推定。測定量と利用状況も推定
-premises: []
+basis_note: CUJ の手順（依頼主かどうかを確認する、運転を始める）は入力。ニーズは手順からの推定。測定量と利用状況も推定。依頼主本人を乗せたかは、乗車を始める前の確かめの記録（第 2 段階の FR-12）から数える（推定）
+premises: [CON-05]
 user: USR-02
 cuj: CUJ-07
 outcomes: [OUT-02]
 need: 依頼主かどうかを確かめて、依頼主を乗せたい
 context_of_use:
-  device: 携帯端末
+  device: スマートフォン（対応する端末、CON-05）
   network: 問わない
   user_type: 登録したドライバー
   task: 依頼主の乗車
@@ -24,7 +24,7 @@ measure:
   narrowed_to: 登録したドライバー。試験用のアカウントを除く
   denominator_needed_only: 運転を始めた乗車だけを数える
   contribution: 依頼主かどうかを確かめる手がかりにプロダクトが効く
-  observable: false
+  observable: true
   compared_with: null
   scale: ratio
 kpi: null
