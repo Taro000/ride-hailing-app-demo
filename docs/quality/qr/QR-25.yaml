@@ -2,7 +2,7 @@ id: QR-25
 title: 付けた評価が欠けずに記録され、ドライバーの評価に加わる
 status: retired
 basis: confirmed
-basis_note: #14 で、評価が欠けずに記録されることは品質要求にしないと決まったため廃止した（QAS-10 への訂正）
+basis_note: 決めたこと 14 で、評価が欠けずに記録されることは品質要求にしないと決まったため廃止した（QAS-10 への訂正）
 premises: [QAS-10]
 model: data
 layer: data-inherent

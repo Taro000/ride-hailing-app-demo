@@ -2,13 +2,13 @@ id: QR-13
 title: 確定額、評価、依頼の状態は、許された操作のほかでは変わらない
 status: active
 basis: inferred
-basis_note: 失敗のシナリオと点は推定。誰がどの機能を使えるかの区別は FRP-02 で提案した
+basis_note: 失敗のシナリオと点は推定。誰がどの機能を使えるかの区別は FR-49（FRP-02 を第 2 段階が受け入れたもの）
 premises: [CON-01]
 model: product
 layer: external
 characteristic: security > integrity
 statement: 確定額、ドライバーの評価、依頼の状態は、それを決める機能を使うことを許された人の操作によってだけ変わり、乗客やドライバーが端末からシステムへ送る値を書き換えても変わらない。
-applies_to: [FR-04, FR-05, FR-15, FR-21, FR-29, FR-47]
+applies_to: [FR-04, FR-05, FR-15, FR-21, FR-29, FR-47, FR-49]
 traces_to: [QIU-04, QIU-06, QIU-14]
 entry_point: null
 stakeholders: [USR-01, USR-02]

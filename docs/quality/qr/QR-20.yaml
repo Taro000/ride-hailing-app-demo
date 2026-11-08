@@ -2,8 +2,8 @@ id: QR-20
 title: 登録した車とドライバーの内容が実際の車とドライバーに一致する
 status: active
 basis: inferred
-basis_note: 失敗のシナリオと点は推定。内容は担当者が入れる（FR-43）。登録で入れる項目は名前、顔写真、連絡先、車種、色、ナンバーだけ（質問 5）。FR-43 は登録の前に内容を示して確かめさせるため、誤りは年に一度程度とみた。扱い（最低限守る線）は、CUJ-02 の上限（質問 4）のため。CUJ-02 の組は質問 9 で決まった
-premises: []
+basis_note: 失敗のシナリオと点は推定。内容は担当者が入れる（FR-43）。登録で入れる項目は名前、顔写真、連絡先、車種、色、ナンバーだけで、審査の結果は記録しない（質問 5、CON-07、FR-43）。FR-43 は登録の前に内容を示して確かめさせるため、誤りは全体で一度あるかどうかとみた。デモの参加者は顔の分かる乗客 1 人とドライバー 1 人（OPF-03、第 4 段階の決めたこと 20）で、登録の誤りで別の車に乗ることは起きにくく、影響は迎車を見つけるのに手間取ることとみた。扱い（最低限守る線）は、CUJ-02 の上限（質問 4）のため。CUJ-02 の組は質問 9 で決まった
+premises: [CON-07, OPF-03]
 model: data
 layer: data-inherent
 characteristic: accuracy
@@ -12,8 +12,8 @@ applies_to: [FR-09, FR-43]
 traces_to: [QIU-09, QIU-10, QIU-31]
 entry_point: null
 stakeholders: [USR-01, USR-02, USR-04]
-failure_scenario: 担当者が車の色を誤って登録し、乗客は示された色の車を探して、近くに止まった同じ色の別の車に乗る。
-score: {impact: 5, likelihood: 2}
+failure_scenario: 担当者が車の色を誤って登録し、乗客は示された色の車を探して、着いている迎車を見つけられずに待ち続ける。
+score: {impact: 3, likelihood: 2}
 handling: minimum-line
 handling_reason: null
 implies_internal: []

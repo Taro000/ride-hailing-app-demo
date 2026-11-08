@@ -2,8 +2,8 @@ id: QR-03
 title: 一つの依頼の状態と割り当てたドライバーは一つに定まる
 status: active
 basis: inferred
-basis_note: 失敗のシナリオと点は推定。許諾と取り消しが重なる場面は FR-07、FR-21、FR-23 の受け入れ基準にあり、量の事実がないデモ（CON-02）では重なりはまれとみた。扱い（重視）は質問 2 で確認済み（CUJ-01 の組）
-premises: [CON-02]
+basis_note: 失敗のシナリオと点は推定。許諾と取り消しが重なる場面は FR-07、FR-21、FR-23 の受け入れ基準にあり、乗客 1 人とドライバー 1 人で配車は全体で数回のデモ（CON-02、OPF-02、OPF-03）では、重なりはまれとみた。ドライバーが 1 人のため二人のドライバーが同じ依頼を許諾する重なりはデモでは起きず、乗客の取り消しとドライバーの許諾の重なりが残る。扱い（重視）は質問 2 で確認済み（CUJ-01 の組）
+premises: [CON-02, OPF-02, OPF-03]
 model: data
 layer: data-inherent
 characteristic: consistency

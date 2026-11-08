@@ -1,18 +1,18 @@
 id: QR-07
 title: 手配の操作に、乗客を待たせない速さで応える
 status: active
-basis: inferred
-basis_note: 失敗のシナリオと点は推定。量の事実がないデモ（CON-02）で、応答の遅さが手配をやめさせる場面は年に一度程度とみた。乗客の作業の時間 T_request_entry は QIU-02 に残し、ここではシステムの応答の時間を扱う
-premises: [CON-02]
+basis: assumed
+basis_note: 失敗のシナリオと点は推定。デモの回のときだけ使われ、配車は全体で数回（CON-02、OPF-01、OPF-02）のため、応答の遅さが手配をやめさせる場面は全体で一度あるかどうかとみた。T_quote_response の値（3 秒）は第 4 段階が提案した仮の値で、QAS-27 による仮定。乗客の作業の時間 T_request_entry は QIU-02 に残し、ここではシステムの応答の時間を扱う
+premises: [CON-02, OPF-01, OPF-02, QAS-27]
 model: product
 layer: external
 characteristic: performance efficiency > time behaviour
-statement: システムは、乗客が場所を入れたときの候補、乗る場所と降りる場所が決まったときの移動時間と料金、依頼の受け付けを、操作から T_quote_response 以内に示す。
+statement: システムは、乗客が場所を入れたときの候補、乗る場所と降りる場所が決まったときの到着予定時刻と料金、依頼の受け付けを、操作から T_quote_response（3 秒）以内に示す。
 applies_to: [FR-01, FR-02, FR-03, FR-04]
 traces_to: [QIU-02]
 entry_point: null
 stakeholders: [USR-01]
-failure_scenario: 屋外で乗る場所と降りる場所を決めても移動時間と料金がなかなか示されず、乗客は手配をやめて流しのタクシーを拾う。
+failure_scenario: 屋外で乗る場所と降りる場所を決めても到着予定時刻と料金がなかなか示されず、乗客は手配をやめて流しのタクシーを拾う。
 score: {impact: 3, likelihood: 2}
 handling: minimum-line
 handling_reason: null
@@ -20,4 +20,4 @@ implies_internal: []
 conflicts: []
 stated_numbers: []
 placeholders:
-  - {name: T_quote_response, meaning: "乗客が場所を入れる、場所を決める、依頼するといった手配の操作から、システムが候補、移動時間と料金、受け付けたことを示すまでの時間", from: QR-07}
+  - {name: T_quote_response, meaning: "乗客が場所を入れる、場所を決める、依頼するといった手配の操作から、システムが候補、到着予定時刻と料金、受け付けたことを示すまでの時間", from: QR-07}

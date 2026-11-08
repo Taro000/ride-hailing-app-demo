@@ -2,13 +2,13 @@ id: QR-17
 title: システムが止まっても、確定した依頼と決済・返金の結果は失われない
 status: active
 basis: inferred
-basis_note: 失敗のシナリオと点は推定。止まった後に再開するまでの速さは QR-01 の可用性に含め、ここでは失われないことを扱う。どう残すかは設計で決める
+basis_note: 失敗のシナリオと点は推定。止まった後に再開するまでの速さは QR-01 の可用性に含め、ここでは失われないことを扱う。どう残すかは設計で決める。依頼のときの押さえとキャンセル料・不在の料金の請求（FR-54、第 2 段階の質問 8）の結果も失われてはならないものに加えた
 premises: [EXT-01]
 model: data
 layer: data-system-dependent
 characteristic: recoverability
-statement: システムが止まっても、それまでに確定した依頼、乗車中の乗車と確定額、EXT-01 から受けた決済と返金の結果は失われず、再開すると止まる前の状態から続けられる。
-applies_to: [FR-04, FR-21, FR-27, FR-29, FR-39, FR-45, FR-47]
+statement: システムが止まっても、それまでに確定した依頼、乗車中の乗車と確定額、EXT-01 から受けた押さえ、決済、キャンセル料と不在の料金の請求、返金の結果は失われず、再開すると止まる前の状態から続けられる。
+applies_to: [FR-04, FR-21, FR-27, FR-29, FR-39, FR-45, FR-47, FR-54]
 traces_to: [QIU-01, QIU-04, QIU-19, QIU-28]
 entry_point: null
 stakeholders: [USR-01, USR-02, USR-04, EXT-01]

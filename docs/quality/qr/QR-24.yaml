@@ -1,13 +1,13 @@
 id: QR-24
 title: 到着を確認してから決済の結果を示すまで、乗客を待たせない
 status: active
-basis: inferred
-basis_note: 失敗のシナリオと点は推定。決済の処理は EXT-01 が行う（CON-03）。EXT-01 のテスト環境の応答の速さは入力になく、設計が確かめる。乗客の作業の時間 T_alighting は QIU-12 に残す
-premises: [CON-03, EXT-01]
+basis: assumed
+basis_note: 失敗のシナリオと点は推定。決済の処理は EXT-01 が行う（CON-03）。EXT-01 のテスト環境の応答の速さは入力になく、設計が確かめる。乗客の作業の時間 T_alighting は QIU-12 に残す。T_payment_response の値（10 秒）は第 4 段階が提案した仮の値で、QAS-33 による仮定
+premises: [CON-03, EXT-01, QAS-33]
 model: product
 layer: external
 characteristic: performance efficiency > time behaviour
-statement: システムは、ドライバーが到着を確認して決済を行ってから、済んだか済まなかったか、または済んだかどうか分からないことを、T_payment_response 以内にドライバーと乗客に示す。
+statement: システムは、ドライバーが到着を確認して決済を行ってから、済んだか済まなかったか、または済んだかどうか分からないことを、T_payment_response（10 秒）以内にドライバーと乗客に示す。
 applies_to: [FR-28, FR-29, FR-31]
 traces_to: [QIU-12, QIU-19]
 entry_point: null
@@ -18,7 +18,7 @@ handling: minimum-line
 handling_reason: null
 implies_internal: []
 conflicts:
-  - {with: QR-04, note: "EXT-01 が答えないときに一度だけ請求することを確かめる間も、T_payment_response のうちに済んだかどうか分からないことを示し、乗客を待たせない。結果が分かってから示し直す（FR-29）"}
+  - {with: QR-04, note: "EXT-01 が答えないときに一度だけ請求することを確かめる間も、T_payment_response（10 秒）のうちに済んだかどうか分からないことを示し、乗客を待たせない。結果が分かってから示し直す（FR-29）"}
 stated_numbers: []
 placeholders:
   - {name: T_payment_response, meaning: "ドライバーが決済を行ってから、結果（済んだ、済まなかった、分からない）がドライバーと乗客に示されるまでの時間", from: QR-24}

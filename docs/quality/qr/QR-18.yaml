@@ -2,8 +2,8 @@ id: QR-18
 title: 乗車を始めるのは、同じ依頼の相手であることが確かめられたときだけ
 status: active
 basis: inferred
-basis_note: 確かめの手がかりを乗客がドライバーに伝え、一致したときだけ乗車を始めることは第 2 段階の質問 2 で確認済み（FR-12）。失敗のシナリオと点は推定。手がかりの作り方は設計への申し送り（第 2 段階の DIN-02）で、ここでは選ばない。扱い（最低限守る線）は、CUJ-02 の上限（質問 4）のため。CUJ-02 の組は質問 9 で決まった
-premises: []
+basis_note: 確かめの手がかりを乗客がドライバーに伝え、一致したときだけ乗車を始めることは第 2 段階の質問 2 で確認済み（FR-12）。失敗のシナリオは推定。デモの参加者は顔の分かる乗客 1 人とドライバー 1 人で、装う人はいない（OPF-03、第 4 段階の決めたこと 20）ため、起こりやすさを 1 とした。手がかりの作り方は設計への申し送り（第 2 段階の DIN-02）で、ここでは選ばない。扱い（最低限守る線）は点による
+premises: [OPF-03]
 model: product
 layer: external
 characteristic: security > authenticity
@@ -13,7 +13,7 @@ traces_to: [QIU-10, QIU-18]
 entry_point: null
 stakeholders: [USR-01, USR-02]
 failure_scenario: 駅前で別の車のドライバーが当て推量で入れた手がかりが一致してしまい、乗客の画面が乗車中に変わって、乗客は手配していない車に乗る。
-score: {impact: 5, likelihood: 2}
+score: {impact: 5, likelihood: 1}
 handling: minimum-line
 handling_reason: null
 implies_internal: [QR-55]

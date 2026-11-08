@@ -2,19 +2,19 @@ id: QR-45
 title: 返金は、認めた乗車の支払った乗客に、認めた額を一度だけ、支払われた額まで行う
 status: active
 basis: inferred
-basis_note: 返金が EXT-01 のテスト環境を通ることは CON-03。失敗のシナリオと点は推定。EXT-01 が答えなかった返金のやり直し（FR-39, FR-40）と、一つの乗車への二つ目の返金が誤りの起きやすい場面とみた。扱い（重視）は質問 2 と質問 4 で確認済み（CUJ-15 の組。どの QR もたどるすべての CUJ で数え、上限を超えた CUJ では点の低いものを外す）
-premises: [CON-03, EXT-01]
+basis_note: 返金が EXT-01 のテスト環境を通ることは CON-03。失敗のシナリオと点は推定。EXT-01 が答えなかった返金のやり直し（FR-39, FR-40）と、一つの乗車への二つ目の返金が誤りの起きやすい場面とみた。キャンセル料か不在の料金（CON-08）を請求した依頼への返金も、第 2 段階の質問 8 の回答で同じに扱う（FR-39、FR-40）。扱い（最低限守る線）は質問 22 で確認済み（返金の正しさは最低限守る線とする事業の決め）
+premises: [CON-03, CON-08, EXT-01]
 model: product
 layer: external
 characteristic: functional suitability > functional correctness
-statement: システムは、担当者が認めた返金を、その乗車の支払いをした乗客に、認めた額で一度だけ行い、一つの乗車への返金の合計をその乗車に支払われた額までに限る。
+statement: システムは、担当者が認めた返金を、その乗車、またはキャンセル料か不在の料金を請求したその依頼の支払いをした乗客に、認めた額で一度だけ行い、一つの乗車や依頼への返金の合計をそれに支払われた額までに限る。
 applies_to: [FR-39, FR-40]
 traces_to: [QIU-29, QIU-28]
 entry_point: null
 stakeholders: [USR-04, USR-01, EXT-01]
 failure_scenario: EXT-01 が答えなかった返金を担当者がやり直し、EXT-01 では一度目も済んでいたため二重に返金される。
 score: {impact: 5, likelihood: 3}
-handling: emphasized
+handling: minimum-line
 handling_reason: null
 implies_internal: [QR-50]
 conflicts: []

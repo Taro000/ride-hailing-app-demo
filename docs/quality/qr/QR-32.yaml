@@ -1,8 +1,8 @@
 id: QR-32
 title: 設定した条件に合う依頼だけがドライバーに届く
 status: active
-basis: assumed
-basis_note: 条件の中身（金額、現在地から乗車場所までの距離）は入力。失敗のシナリオと点は推定。距離は道のりか直線かが入力になく、FR-19 の距離の意味に従う（未解決の点）。扱い（重視）は QAS-14 による暫定の決定
+basis: inferred
+basis_note: 条件の中身（金額、現在地から乗車場所までの距離）は入力。失敗のシナリオと点は推定。距離は道のりか直線かが入力になく、FR-19 の距離の意味に従う（未解決の点）。扱い（重視）は質問 22 で確認済み（CUJ-09 の組、QAS-14）
 premises: [QAS-14]
 model: product
 layer: external

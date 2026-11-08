@@ -2,13 +2,13 @@ id: QR-37
 title: 障害を調べるのに要る記録が、調べる間は取り出せる
 status: active
 basis: inferred
-basis_note: 失敗のシナリオと点は推定。記録をどれだけ残すかは入力になく、名前を付けた値にした
-premises: []
+basis_note: 失敗のシナリオと点は推定。N_trace_retention_days の値（28 日）は第 4 段階の決めたこと 18（QAS-38 への訂正。デモは 1 回が 1〜2 日で、苦情はデモの期間の中で扱う）。端末で起きたエラーの記録（FR-52、FRP-09 を第 2 段階が受け入れたもの）も、依頼の経過とともにたどる記録に加えた
+premises: [QAS-38]
 model: data
 layer: data-system-dependent
 characteristic: availability
-statement: 依頼の経過をたどるのに要る記録（FR-34）は、その依頼から N_trace_retention_days の間、エンジニアが取り出せる。
-applies_to: [FR-34]
+statement: 依頼の経過をたどるのに要る記録（FR-34、FR-52）は、その依頼から N_trace_retention_days（28 日）の間、エンジニアが取り出せる。
+applies_to: [FR-34, FR-52]
 traces_to: [QIU-21]
 entry_point: null
 stakeholders: [USR-03]

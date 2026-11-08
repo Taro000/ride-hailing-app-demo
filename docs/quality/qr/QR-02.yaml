@@ -1,9 +1,9 @@
 id: QR-02
 title: 端末との通信が途切れても、進んでいる配車が失われない
 status: active
-basis: inferred
-basis_note: 失敗のシナリオと点は推定。QIU-01 の利用状況（通信は問わない）と、乗客とドライバーが屋外や走る車の中でスマートフォンを使うことから、通信の途切れは毎週起きるとみた。扱い（最低限守る線）は質問 4 で確認済み（CUJ-01 の QIU にたどり、CUJ-01 の組の外に置く）
-premises: []
+basis: assumed
+basis_note: 失敗のシナリオと点は推定。QIU-01 の利用状況（通信は問わない）と、乗客とドライバーが屋外や走る車の中でスマートフォンを使うことから、通信の途切れはデモの回（OPF-01）ごとに起きうるとみた。扱い（最低限守る線）は質問 4 で確認済み（CUJ-01 の QIU にたどり、CUJ-01 の組の外に置く）。競合の T_dispatch_propagation の値（5 秒）は第 4 段階が提案した仮の値で、QAS-25 による仮定
+premises: [OPF-01, QAS-25]
 model: product
 layer: external
 characteristic: reliability > fault tolerance
@@ -18,6 +18,7 @@ handling: minimum-line
 handling_reason: null
 implies_internal: [QR-51]
 conflicts:
-  - {with: QR-06, note: "途切れた操作を確かめ直すことで相手に示すまでの時間が延びうる。途切れていないときは T_dispatch_propagation 以内に示し、途切れたときは失わないことを先にする"}
+  - {with: QR-06, note: "途切れた操作を確かめ直すことで相手に示すまでの時間が延びうる。途切れていないときは T_dispatch_propagation（5 秒）以内に示し、途切れたときは失わないことを先にする"}
 stated_numbers: []
-placeholders: []
+placeholders:
+  - {name: T_dispatch_propagation, meaning: "乗客やドライバーの依頼、許諾、取り消しの操作、または迎車が乗車場所に実際に着いたときから、相手の画面、一覧、通知にそれが示されるまでの時間", from: QR-06}

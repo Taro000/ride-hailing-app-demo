@@ -2,7 +2,7 @@ id: QR-26
 title: ドライバーの評価が新しい評価をすぐ反映する
 status: retired
 basis: confirmed
-basis_note: #14 で、新しい評価を評価の値に反映することは閾値による絞り込みの正しさ（QR-16）に含めると決まったため、QR-16 にまとめて廃止した（QAS-10 への訂正）
+basis_note: 決めたこと 14 で、新しい評価を評価の値に反映することは閾値による絞り込みの正しさ（QR-16）に含めると決まったため、QR-16 にまとめて廃止した（QAS-10 への訂正）
 premises: [QAS-10]
 model: data
 layer: data-inherent
