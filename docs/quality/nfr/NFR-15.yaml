@@ -1,0 +1,21 @@
+id: NFR-15
+title: スマートフォンとブラウザの更新に合わせた試験のゲート
+status: active
+basis: inferred
+basis_note: 最低限守る線のため、もっとも軽いゲートにした（推定）
+premises: [CON-05]
+from: [QR-14]
+kind: gate
+cuj: CUJ-01
+statement: 対応するスマートフォンとブラウザ（CON-05）の更新が出るたびと、各リリースの前に、配車の手配から決済までの受け入れの試験を、更新後の版で行う。
+conditions:
+  workload: null
+  users: 乗客とドライバー
+  transactions: 配車の手配から決済まで
+slo: null
+gate:
+  where: release-check
+  check: 更新後のスマートフォンとブラウザでの、配車の手配から決済までの受け入れの試験
+  threshold: すべての試験が通ること。通らなければ、利用者が更新する前に直す
+audit: null
+monitor: null

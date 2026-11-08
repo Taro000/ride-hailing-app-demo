@@ -1,0 +1,21 @@
+id: NFR-40
+title: 変えなかった機能を公開の前に確かめる自動の試験のゲート
+status: active
+basis: inferred
+basis_note: 試験の範囲は QR-52 と QR-38 が挙げる機能からの推定
+premises: []
+from: [QR-52, QR-38]
+kind: gate
+cuj: CUJ-11
+statement: 機能の追加、修正、利用技術のバージョンアップを公開する前に、配車の手配から決済、返金、評価、変えた振る舞いを止める機能までの自動の試験がすべて通り、変更が受け持つ部分のほかに及んでいないことを、部分の間の依存の決まりの検査で確かめる。
+conditions:
+  workload: null
+  users: null
+  transactions: QR-38 と QR-52 が挙げる機能
+slo: null
+gate:
+  where: CI
+  check: 挙げた機能の自動の試験と、部分の間の依存の決まりの検査
+  threshold: すべての試験と検査が通ること。通らない変更は公開しない
+audit: null
+monitor: null

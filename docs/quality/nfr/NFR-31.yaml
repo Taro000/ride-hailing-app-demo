@@ -1,0 +1,21 @@
+id: NFR-31
+title: ドライバーに示す場所と乗客が決めた場所の一致の受け入れの試験
+status: active
+basis: inferred
+basis_note: 最低限守る線で、公開の前に確かめられるためゲートにした（推定）
+premises: []
+from: [QR-23]
+kind: gate
+cuj: CUJ-07
+statement: リリースの前に、ドライバーに示す乗車場所と降りる場所が乗客が決めた場所と同じであり、乗車中に乗客が新しい降りる場所を承認すると承認した場所になることを、受け入れの試験で確かめる。
+conditions:
+  workload: null
+  users: 乗客、ドライバー
+  transactions: 依頼、乗車中の降りる場所の変更
+slo: null
+gate:
+  where: release-check
+  check: 乗客が決めた場所と承認した場所を、ドライバーの迎車と乗車中の画面と突き合わせる受け入れの試験
+  threshold: すべての試験が通ること
+audit: null
+monitor: null

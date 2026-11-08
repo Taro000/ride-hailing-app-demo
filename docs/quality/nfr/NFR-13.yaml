@@ -1,0 +1,21 @@
+id: NFR-13
+title: 同じ名前の場所の取り違えを防ぐ受け入れの試験
+status: active
+basis: inferred
+basis_note: 製品の性質で、公開の前に確かめられるためゲートにした（推定）
+premises: [EXT-02]
+from: [QR-09]
+kind: gate
+cuj: CUJ-01
+statement: リリースの前に、同じ名前や似た名前の場所を入れたとき、候補が所在地などで区別して示され、選んだ場所の位置が依頼の前と、乗車中に降りる場所を変えて承認する前に示されることを、受け入れの試験で確かめる。
+conditions:
+  workload: null
+  users: 乗客
+  transactions: 場所の名前と住所で乗る場所と降りる場所を決めること、乗車中に降りる場所を変えること
+slo: null
+gate:
+  where: release-check
+  check: 同じ名前と似た名前の候補を含む場所の組で、候補の区別と選んだ場所の位置の表示を確かめる受け入れの試験
+  threshold: すべての試験が通ること
+audit: null
+monitor: null

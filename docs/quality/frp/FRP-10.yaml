@@ -9,6 +9,6 @@ origin: [QR-19]
 changes: FR-24
 reason: QR-19 は迎車中のドライバーに示す乗客の現在地が遅れないことを求めるが、FR-24 はそれを示さない。
 suggested_statement: システムは、ドライバーが依頼を許諾してから乗車が始まるまで、乗客が決めた乗車場所に加えて、乗客の現在地をドライバーに示す。
-affects: []
+affects: [NFR-19, SLI-10]
 placeholders: []
 resolution: null

@@ -1,0 +1,21 @@
+id: NFR-16
+title: 止まってから再開する回復の訓練
+status: active
+basis: assumed
+basis_note: 訓練の中身は QR-17 からの推定。デモの前ごとという頻度は暫定の決定（QAS-28）
+premises: [OPF-01, EXT-01, QAS-28]
+from: [QR-17]
+kind: audit
+cuj: CUJ-08
+statement: 保存するデータの形を変えるリリースのたびと、各デモの前（OPF-01）に、依頼と乗車と決済の途中でシステムを止めて再開する訓練を行い、確定した依頼、乗車中の乗車と確定額、EXT-01 から受けた決済と返金の結果が一つも失われず、止まる前の状態から続けられることを確かめる。
+conditions:
+  workload: null
+  users: null
+  transactions: 確定した依頼、乗車中の乗車、決済と返金
+slo: null
+gate: null
+audit:
+  mechanism: 回復の訓練（試験の環境で、進んでいる依頼と乗車と決済の途中で止めて再開する）
+  criterion: 確定した依頼、乗車中の乗車と確定額、決済と返金の結果がどれも失われず、止まる前の状態から続けられること
+  cadence_or_deadline: 保存するデータの形を変えるリリースのたびと、各デモの前
+monitor: null

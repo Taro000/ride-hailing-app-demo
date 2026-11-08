@@ -1,0 +1,21 @@
+id: NFR-17
+title: 手配の操作への応えの速さの監視
+status: active
+basis: assumed
+basis_note: しきい値 3 秒（T_quote_response）は暫定の決定（QAS-27）。依頼の量（OPF-02、OPF-03）では 1 時間の割合が数件で決まってしまうため、遅れた応えを一件ごとに知らせる。可用性の SLO（NFR-01）が失敗を数えるため、ここではシステムが応えた操作だけを数える
+premises: [OPF-01, OPF-02, OPF-03, QAS-27]
+from: [QR-07]
+kind: monitor
+cuj: CUJ-01
+statement: デモの回の間、乗客が場所を入れたときの候補、移動時間と料金、依頼の受け付けのうち、操作から 3 秒（T_quote_response）を超えて応えたものを、一件ごとにエンジニアに知らせる。
+conditions:
+  workload: デモの回の間（OPF-01）。参加者と依頼の量は OPF-02 と OPF-03
+  users: 登録した乗客。試験用のアカウントを除く
+  transactions: 場所の候補、移動時間と料金、配車の依頼
+slo: null
+gate: null
+audit: null
+monitor:
+  signal: システムの境界で、乗客の操作（場所の候補、移動時間と料金、依頼）を受けてから応えるまでの時間が 3 秒を超えたもの
+  threshold: 一件でもあれば知らせる
+  notifies: エンジニア

@@ -9,6 +9,6 @@ origin: [QR-41]
 changes: null
 reason: 障害の原因の特定と苦情の確かめに、乗客とドライバーの端末で起きたエラーの記録が要るが、それを記録する機能がどの FR にもない。
 suggested_statement: システムは、乗客とドライバーの端末で起きたエラーを、どの依頼のどの画面で起きたかとともに記録し、エンジニアが依頼の経過と合わせてたどれるようにする。
-affects: []
+affects: [NFR-37]
 placeholders: []
 resolution: null

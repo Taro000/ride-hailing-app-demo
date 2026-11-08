@@ -1,0 +1,21 @@
+id: NFR-33
+title: 少ない操作で評価を送れることの受け入れの試験
+status: active
+basis: assumed
+basis_note: 操作の回数は公開の前に数えられるためゲートにした（推定）。N_rating_operations の 3 回は暫定の決定（QAS-35）
+premises: [QAS-35]
+from: [QR-68]
+kind: gate
+cuj: CUJ-04
+statement: 評価の画面を変えるリリースの前に、乗車が終わった画面から乗ったドライバーの評価を送り終えるまでの乗客の操作が 3 回（N_rating_operations）以内であることを、受け入れの試験で確かめる。
+conditions:
+  workload: null
+  users: 乗り終えた乗客
+  transactions: ドライバーの評価
+slo: null
+gate:
+  where: release-check
+  check: 乗車が終わった画面から評価を送り終えるまでの操作の回数を数える受け入れの試験
+  threshold: 3 回以内
+audit: null
+monitor: null

@@ -1,0 +1,31 @@
+id: NFR-19
+title: 車とドライバーの現在地の新しさの SLO
+status: active
+basis: inferred
+basis_note: しきい値 30 秒（T_vehicle_location_lag）、目標値 95%、1 分ごとの確かめは決めたこと #17 の訂正で、しきい値と目標値はどちらも利用者が仮とした。SLO として置くことと方針は質問 9 の回答。迎車中のドライバーに示す乗客の現在地は FRP-10 を待つ。アラートの予算の消費は、使う時間がウィンドウの 3〜12 時間（OPF-01）に集まるものとして計算した。どの規則も予算を使い切った後に鳴るため、悪いイベントのたびのチケットを加えた
+premises: [OPF-01, OPF-02, OPF-03, QAS-29]
+from: [QR-19]
+kind: slo
+cuj: CUJ-02
+statement: 直近 28 日で、受付をしている、迎車中、乗車中のドライバーについての確かめの 95% で、システムが持つ位置が端末で測ってから 30 秒（T_vehicle_location_lag）以内である。
+conditions:
+  workload: デモの回の間（OPF-01）。参加者と依頼の量は OPF-02 と OPF-03
+  users: 登録したドライバーと、その依頼の乗客。試験用のアカウントを除く
+  transactions: 受付、迎車、乗車。CUJ-06、CUJ-07、CUJ-09 で使う現在地も含む
+slo:
+  sli: SLI-10
+  target: 95%
+  target_status: provisional
+  target_rationale: 入力の数値も基準となる値もなく、機能はまだない。30 秒と 95% は利用者が訂正で示した仮の値（決めたこと #17）で、最初のデモの値から見直す。端末の通信の途切れが混ざるため、目標は控えめにした。KPI と KGI からは導いていない
+  window: 直近 28 日
+  error_budget: 確かめの 5% まで、位置が 30 秒より古くてよい
+  error_budget_volume: 許される古い確かめは、ウィンドウの確かめの数 × 5% 件。確かめは使う時間 3〜12 時間（OPF-01）のうちドライバー（OPF-03）が受付、迎車、乗車をしている分で、最大 180〜720 回のため、最大 9〜36 回
+  policy: EBP-01
+  alerts:
+    - {notify: page, long_window: 1h, short_window: 5m, burn_rate: 14.4, budget_spent_at_alert: 120〜480%, condition: 長いウィンドウの有効なイベントが 20 件以上のときだけ}
+    - {notify: page, long_window: 6h, short_window: 30m, burn_rate: 6, budget_spent_at_alert: 150〜600%, condition: 長いウィンドウの有効なイベントが 20 件以上のときだけ}
+    - {notify: ticket, long_window: 3d, short_window: 6h, burn_rate: 1, budget_spent_at_alert: 50〜100%, condition: null}
+    - {notify: ticket, long_window: null, short_window: null, burn_rate: null, budget_spent_at_alert: 1 件で 100% 以上, condition: ウィンドウに許される失敗が 1 件に満たない間は、悪いイベントのたびに（EBP-01 の最後の規則）}
+gate: null
+audit: null
+monitor: null

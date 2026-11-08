@@ -280,4 +280,16 @@ cujs:
     basis: confirmed
     basis_note: 質問 2 の回答。手順は決まっていないため空けた
 hints: []
-operational_facts: []
+operational_facts:
+  - id: OPF-01
+    fact: サービスはデモの回のときだけ使われる。デモは全体で 1〜2 回で、1 回のデモは 1〜2 日、1 日に 3 時間の回が一つ（全体で 1〜4 回、3〜12 時間）
+    source: 第 4 段階の質問 1 の回答
+    basis: confirmed
+  - id: OPF-02
+    fact: 配車（乗車）の数は、デモ 1 回で 2〜3 回（全体で 2〜6 回）。混む時間の依頼の数は分からない
+    source: 第 4 段階の質問 1 の回答
+    basis: confirmed
+  - id: OPF-03
+    fact: デモの参加者は乗客 1 人とドライバー 1 人
+    source: 第 4 段階の質問 1 の回答
+    basis: confirmed

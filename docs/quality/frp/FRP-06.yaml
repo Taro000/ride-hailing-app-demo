@@ -9,6 +9,6 @@ origin: [QR-60]
 changes: FR-46
 reason: カードの情報がシステムのサーバー、ログ、データを通らないこと（CON-04）を、FR-46 の受け入れ基準が保てない。
 suggested_statement: 乗客が支払い方法を入れるとき、カードの情報は EXT-01 が直接受け取り、システムは EXT-01 が返した登録の結果だけを受け取って、登録できたかどうかを示す。
-affects: []
+affects: [NFR-47]
 placeholders: []
 resolution: null

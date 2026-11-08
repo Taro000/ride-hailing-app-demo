@@ -1,0 +1,31 @@
+id: NFR-07
+title: 依頼の状態の変化を相手に届ける速さの SLO
+status: active
+basis: assumed
+basis_note: 目標値 95% としきい値 5 秒（T_dispatch_propagation）は暫定の決定（QAS-25）。SLO として置くことと方針は質問 9 の回答。利用者の側で示した時刻を記録する機能（FRP-11）を待つ。アラートの予算の消費は、使う時間がウィンドウの 3〜12 時間（OPF-01）に集まるものとして計算した。どの規則も予算を使い切った後に鳴るため、悪いイベントのたびのチケットを加えた
+premises: [OPF-01, OPF-02, OPF-03, QAS-25]
+from: [QR-06]
+kind: slo
+cuj: CUJ-01
+statement: 直近 28 日で、依頼の状態の変化（依頼、許諾、取り消し、迎車の到着）の 95% を、システムが受けてから 5 秒（T_dispatch_propagation）以内に相手に向けて送る。
+conditions:
+  workload: デモの回の間（OPF-01）。参加者と依頼の量は OPF-02 と OPF-03
+  users: 登録した乗客とドライバー。試験用のアカウントを除く
+  transactions: 依頼、乗客とドライバーの取り消し、許諾、迎車の到着。CUJ-02 と CUJ-06 の相手に示すものも含む
+slo:
+  sli: SLI-07
+  target: 95%
+  target_status: provisional
+  target_rationale: 入力の数値も基準となる値もなく、機能はまだない。5 秒は、依頼を届けてから許諾し、許諾を乗客に知らせる流れで、相手が操作の結果を待っていると感じない長さとして置いた最初の値。95% は最初のデモで数えることを優先した控えめな値（QAS-25）。KPI と KGI からは導いていない
+  window: 直近 28 日
+  error_budget: 状態の変化と相手の組の 5% まで、5 秒を超えて送ってよい
+  error_budget_volume: 許される失敗はウィンドウの状態の変化と相手の組の数 × 5% 件。28 日に入るのは乗車 2〜6 回（OPF-01、OPF-02）で、有効なイベントが 20 件に届かない限り 1 件に満たない
+  policy: EBP-01
+  alerts:
+    - {notify: page, long_window: 1h, short_window: 5m, burn_rate: 14.4, budget_spent_at_alert: 120〜480%, condition: 長いウィンドウの有効なイベントが 20 件以上のときだけ}
+    - {notify: page, long_window: 6h, short_window: 30m, burn_rate: 6, budget_spent_at_alert: 150〜600%, condition: 長いウィンドウの有効なイベントが 20 件以上のときだけ}
+    - {notify: ticket, long_window: 3d, short_window: 6h, burn_rate: 1, budget_spent_at_alert: 50〜100%, condition: null}
+    - {notify: ticket, long_window: null, short_window: null, burn_rate: null, budget_spent_at_alert: 1 件で 100% 以上, condition: ウィンドウに許される失敗が 1 件に満たない間は、悪いイベントのたびに（EBP-01 の最後の規則）}
+gate: null
+audit: null
+monitor: null

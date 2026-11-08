@@ -1,0 +1,21 @@
+id: NFR-38
+title: 異常の知らせとたどりを確かめるリリース前の確認
+status: active
+basis: assumed
+basis_note: 異常を起こして確かめられるため、リリース前の確認にした（推定）。T_alert_delay の 5 分は暫定の決定（QAS-37）
+premises: [QAS-37]
+from: [QR-33, QR-53]
+kind: gate
+cuj: CUJ-10
+statement: リリースの前に、依頼から決済までの各機能と EXT-01、EXT-02 とのやり取りで異常やエラーを起こし、起きてから 5 分（T_alert_delay）以内に、どの機能で、いつ、何が起きたかがエンジニアに知らされ、知らされた異常からその依頼でシステムが行ったことを、依頼から決済まで欠けた段階なく、どの部分で起きたかが分かるようにたどれることを確かめる。新しい部分を加えたときは、その部分も確かめるまで公開しない。
+conditions:
+  workload: null
+  users: エンジニア
+  transactions: 依頼から決済までの機能と、EXT-01 と EXT-02 とのやり取り
+slo: null
+gate:
+  where: release-check
+  check: 機能ごとと外部のサービスとのやり取りごとに異常を起こし、知らせの時間と中身、依頼から決済までのたどりの欠けを確かめる
+  threshold: 起こしたすべての異常が 5 分以内に知らされ、たどりに欠けた段階がないこと
+audit: null
+monitor: null

@@ -1,0 +1,31 @@
+id: NFR-01
+title: 配車手配の可用性の SLO
+status: active
+basis: inferred
+basis_note: 失敗の数え方は QR-01 からの推定。目標値 99% は質問 6 の回答。SLO として置くことと方針は質問 9 の回答。アラートの予算の消費は、使う時間がウィンドウの 3〜12 時間（OPF-01）に集まるものとして計算した。どの規則も予算を使い切った後に鳴るため、悪いイベントのたびのチケットを加えた
+premises: [OPF-01, OPF-02, OPF-03]
+from: [QR-01]
+kind: slo
+cuj: CUJ-01
+statement: 直近 28 日で、CUJ-01 の乗客の有効な操作の 99% に、システムが失敗せずに応える。
+conditions:
+  workload: デモの回の間（OPF-01）。参加者と依頼の量は OPF-02 と OPF-03
+  users: 登録した乗客。試験用のアカウント（QR-47 が記録する区別）を除く
+  transactions: 乗客が配車手配の画面で行う操作（場所の候補を求める、現在地を乗る場所として求める、移動時間と料金を求める、配車を依頼する、依頼を取り消す）と、配車の確定の知らせ
+slo:
+  sli: SLI-01
+  target: 99%
+  target_status: confirmed
+  target_rationale: 入力の数値も基準となる値（負荷試験や本番の値）もなく、機能はまだない。最初のウィンドウで数えることを優先した控えめな値（質問 6 で確認）。KPI と KGI からは導いていない
+  window: 直近 28 日
+  error_budget: 有効な操作の 1% まで、システムが失敗してよい
+  error_budget_volume: 許される失敗はウィンドウの有効な操作の数 × 1% 件。28 日に入るのはデモ 1〜2 回分（OPF-01）で、乗車は 2〜6 回（OPF-02）のため、有効な操作が 100 件に届かない限り 1 件に満たない。全停止に換算すると、ウィンドウの使う時間 3〜12 時間（OPF-01）の 1% の 1.8〜7.2 分
+  policy: EBP-01
+  alerts:
+    - {notify: page, long_window: 1h, short_window: 5m, burn_rate: 14.4, budget_spent_at_alert: 120〜480%, condition: 長いウィンドウの有効なイベントが 20 件以上のときだけ}
+    - {notify: page, long_window: 6h, short_window: 30m, burn_rate: 6, budget_spent_at_alert: 150〜600%, condition: 長いウィンドウの有効なイベントが 20 件以上のときだけ}
+    - {notify: ticket, long_window: 3d, short_window: 6h, burn_rate: 1, budget_spent_at_alert: 50〜100%, condition: null}
+    - {notify: ticket, long_window: null, short_window: null, burn_rate: null, budget_spent_at_alert: 1 件で 100% 以上, condition: ウィンドウに許される失敗が 1 件に満たない間は、悪いイベントのたびに（EBP-01 の最後の規則）}
+gate: null
+audit: null
+monitor: null

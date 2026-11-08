@@ -1,0 +1,29 @@
+id: SLI-11
+title: 示す額と請求する額の確定額との一致
+status: active
+basis: inferred
+basis_note: 突き合わせる額は QR-04 と CON-01 からの推定。一度だけの請求は一件も認めないため、この SLI ではなく監視（NFR-24）が数える
+premises: [OPF-01, CON-01]
+function: GOOD ÷ VALID
+refs: [QR-04, NFR-23]
+reshaped: null
+target_entity: 一つの乗車の確定額（CON-01）と、乗客に示した料金、ドライバーに示した金額、EXT-01 に請求した額、乗客に示した支払った額（FR-03, FR-20, FR-29, FR-30, FR-31, FR-47）
+purpose: 示す額や請求する額が確定額と食い違うことがどれだけあるか
+unit_event: ドライバーが決済を行った一つの乗車
+vantage: data
+vantage_reason: 額の食い違いは、乗車ごとに記録した額どうしを突き合わせて初めて分かる。どの応えにも誤りとして現れないため、データで比べる
+existing_source: null
+elements:
+  VALID:
+    definition: ドライバーが決済を行った乗車
+    exclusions: 試験用のアカウントの乗車
+    unit: 乗車
+    counting_rule: 一つの乗車は、決済を何度行っても一つと数える。乗車は最初に決済を行った日に数える
+  GOOD:
+    definition: VALID のうち、乗客に示した料金、ドライバーに示した金額、EXT-01 に請求した額、乗客に示した支払った額（支払いが済んだときだけ）が、どれも確定額と等しいもの。乗車中に乗客が新しい料金を承認した乗車は、承認した料金を確定額とする
+    unit: 乗車
+    counting_rule: VALID と同じ
+scale: ratio
+applicability: 本番の環境で、デモの回の間（OPF-01）の、利用者の実際の乗車
+lifecycle: 本番で測る。デモの回ごとに値をまとめ、振り返りに使う
+blind_spots: 確定額そのものが運賃表どおりかは見えない（NFR-09 と NFR-48 が受け持つ）。EXT-01 が実際に処理した額との食い違いは SLI-12 が数える

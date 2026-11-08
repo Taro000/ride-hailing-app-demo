@@ -1,0 +1,21 @@
+id: NFR-21
+title: 乗車を始める判断と走っている間の判断を試すゲート
+status: active
+basis: inferred
+basis_note: 試験の中身は QR-55、QR-18、QR-28 からの推定。V_moving_lock の時速 5 km は質問 4 の回答
+premises: []
+from: [QR-55, QR-18, QR-28]
+kind: gate
+cuj: CUJ-07
+statement: 変更のたびに、確かめの手がかりで乗車を始めてよいかの判断（その依頼の手がかりと一致したときだけ始める、手がかりはその依頼にだけ合う）と、車の速さで依頼を選ぶ操作と許諾を受け付けるかの判断（V_moving_lock の時速 5 km 以上では受け付けず、下回れば受け付ける）を、実際の端末や車を使わずに、境目の値を含めて自動で試験する。
+conditions:
+  workload: null
+  users: null
+  transactions: 乗車の開始、依頼を選ぶ操作、許諾
+slo: null
+gate:
+  where: CI
+  check: 手がかりの一致と不一致、ほかの依頼の手がかり、時速 5 km のちょうど上と下の速さを含む判断の試験
+  threshold: すべての試験が通ること。通らない変更は公開しない
+audit: null
+monitor: null

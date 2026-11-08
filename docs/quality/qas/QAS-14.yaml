@@ -5,8 +5,8 @@ stage: 3
 kind: decision
 statement: CUJ-09 の重視の組を QR-19（ドライバーの現在地の最新性、質問 9）と QR-32（条件に合う依頼だけを届ける機能正確性）とする。ほかの候補は最低限守る線とする。
 why_unsure: QR-19 は質問 9 で重視になったが、QR-32 を重視にすることは点から下書きした。事業が重く見るかは入力にない。
-breadth: low
+breadth: medium
 severity: low
-rating_note: QR-32 の扱いが依存する。条件に合わない依頼が届いてもドライバーが断れば済み、害は手間にとどまる
+rating_note: QR-32 と、それをたどる第 4 段階の NFR-35 と NFR-36 が依存する。どちらも届ける先の規則をまとめて見る監視と試験で、重視でなくなっても残る
 answer: null
 answered_in: null

@@ -1,0 +1,21 @@
+id: NFR-10
+title: 依頼の状態と割り当ての食い違いの監視
+status: active
+basis: inferred
+basis_note: QR-03 は食い違いを一件も認めないため、エラーバジェットを持つ SLO ではなく、一件ごとに知らせる監視にした（推定）
+premises: []
+from: [QR-03]
+kind: monitor
+cuj: CUJ-01
+statement: 二人以上のドライバーが割り当てられた依頼と、状態の変化が食い違う依頼（取り消した後の許諾、一つの依頼への二度の許諾）を、見つけるたびにエンジニアに知らせる。
+conditions:
+  workload: null
+  users: 登録した乗客とドライバー。試験用のアカウントを含む（食い違いは試験用でも起きてはならない）
+  transactions: 依頼、許諾、乗客とドライバーの取り消し
+slo: null
+gate: null
+audit: null
+monitor:
+  signal: 依頼ごとの割り当てたドライバーの数と、状態の変化の並び
+  threshold: 一件でもあれば知らせる
+  notifies: エンジニア

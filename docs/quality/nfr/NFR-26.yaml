@@ -1,0 +1,31 @@
+id: NFR-26
+title: 決済の記録と決済サービスの処理の一致の SLO
+status: active
+basis: assumed
+basis_note: 目標値 99.5% と、結果を返さない決済を翌日の終わりに突き合わせることは暫定の決定（QAS-32）。SLO として置くことと方針は質問 9 の回答。アラートの予算の消費は、使う時間がウィンドウの 3〜12 時間（OPF-01）に集まるものとして計算した。どの規則も予算を使い切った後に鳴るため、悪いイベントのたびのチケットを加えた
+premises: [OPF-01, OPF-02, OPF-03, EXT-01, CON-03, QAS-32]
+from: [QR-30, QR-29]
+kind: slo
+cuj: CUJ-08
+statement: 直近 28 日で、決済の 99.5% で、システムが記録した額と結果が EXT-01 が実際に処理した額と結果に等しい。
+conditions:
+  workload: デモの回の間（OPF-01）。参加者と依頼の量は OPF-02 と OPF-03
+  users: 登録した乗客とドライバー。試験用のアカウントを除く
+  transactions: 乗車の決済（請求）。EXT-01 が受け付けなかったものと答えなかったものを含む
+slo:
+  sli: SLI-12
+  target: 99.5%
+  target_status: provisional
+  target_rationale: 入力の数値も基準となる値もなく、機能はまだない。記録の食い違いは返金や苦情の対応を誤らせるため可用性より高くしたが、実際のお金は動かず（CON-03）、最初のウィンドウで数えることを優先して 99.9% より緩めた（QAS-32）。KPI と KGI からは導いていない
+  window: 直近 28 日
+  error_budget: 決済の 0.5% まで、記録と EXT-01 の処理が食い違ってよい
+  error_budget_volume: 許される食い違いは、28 日に入る決済 2〜6 件（OPF-01、OPF-02）の 0.5% で 0.01〜0.03 件。1 件で予算を使い切る
+  policy: EBP-01
+  alerts:
+    - {notify: page, long_window: 1h, short_window: 5m, burn_rate: 14.4, budget_spent_at_alert: 120〜480%, condition: 長いウィンドウの有効なイベントが 20 件以上のときだけ}
+    - {notify: page, long_window: 6h, short_window: 30m, burn_rate: 6, budget_spent_at_alert: 150〜600%, condition: 長いウィンドウの有効なイベントが 20 件以上のときだけ}
+    - {notify: ticket, long_window: 3d, short_window: 6h, burn_rate: 1, budget_spent_at_alert: 50〜100%, condition: null}
+    - {notify: ticket, long_window: null, short_window: null, burn_rate: null, budget_spent_at_alert: 1 件で 100% 以上, condition: ウィンドウに許される失敗が 1 件に満たない間は、悪いイベントのたびに（EBP-01 の最後の規則）}
+gate: null
+audit: null
+monitor: null

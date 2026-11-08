@@ -1,0 +1,21 @@
+id: NFR-39
+title: 調査と照会に要る記録を取り出せる期間の監視
+status: active
+basis: inferred
+basis_note: N_trace_retention_days の 28 日は決めたこと #18 の訂正で、N_ride_record_days の 365 日は同じ訂正で訂正なしとされた。どちらも記録してから 3 年（QR-59）を超えない。監視にしたのは推定
+premises: [QAS-38]
+from: [QR-37, QR-42]
+kind: monitor
+cuj: CUJ-14
+statement: 依頼の経過をたどる記録（ログ、状態の履歴、現在地の受信の記録）が 28 日（N_trace_retention_days）前の依頼まで、乗車の記録が 365 日（N_ride_record_days）前の乗車まで取り出せることを毎日確かめ、取り出せなければエンジニアに知らせる。サービスを使い始めてからの日数がそれより短い間は、最初の依頼と乗車まで取り出せることを確かめる。
+conditions:
+  workload: null
+  users: エンジニア、運営・サポートの担当者、乗客
+  transactions: 依頼の経過をたどる記録（FR-34）、乗車の記録（FR-31, FR-38）
+slo: null
+gate: null
+audit: null
+monitor:
+  signal: 取り出せるもっとも古い依頼の経過の記録と乗車の記録の日付
+  threshold: 依頼の経過の記録が 28 日前まで、乗車の記録が 365 日前まで取り出せない
+  notifies: エンジニア

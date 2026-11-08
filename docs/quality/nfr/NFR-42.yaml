@@ -1,0 +1,21 @@
+id: NFR-42
+title: データを移す予行のリリース前の確認
+status: active
+basis: inferred
+basis_note: 最低限守る線で、データを移す前に予行できるためリリース前の確認にした（推定）
+premises: []
+from: [QR-40]
+kind: gate
+cuj: CUJ-13
+statement: 利用技術のバージョンアップに伴ってデータを移すリリースの前に、本番と同じ形のデータで移す予行を行い、アカウント、登録、依頼と乗車の記録、評価、決済と返金の記録が、件数も値も移す前と同じで、文字化けがないことを確かめる。
+conditions:
+  workload: null
+  users: エンジニア
+  transactions: データを移すバージョンアップ
+slo: null
+gate:
+  where: release-check
+  check: 移す前と後のデータの件数と値の突き合わせ
+  threshold: 件数と値の食い違いと文字化けが一つもないこと
+audit: null
+monitor: null

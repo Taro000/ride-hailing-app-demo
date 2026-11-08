@@ -9,6 +9,6 @@ origin: [QR-49]
 changes: FR-44
 reason: 停止の直前に一覧に届いていた依頼を、停止されたドライバーが許諾できると、停止した時から依頼が届かないこと（QIU-33）が成り立たない。
 suggested_statement: システムは、担当者がドライバーを停止すると、停止の前にそのドライバーの一覧に届いていた依頼も一覧から除き、許諾させない。
-affects: []
+affects: [NFR-35, NFR-36]
 placeholders: []
 resolution: null

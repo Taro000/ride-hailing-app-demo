@@ -1,0 +1,21 @@
+id: NFR-41
+title: 自動の配備と前の版への戻しを確かめるリリース前の確認
+status: active
+basis: assumed
+basis_note: 配備と戻しはリリースの前に試せるため、リリース前の確認にした（推定）。T_rollback の 30 分は暫定の決定（QAS-39）
+premises: [QAS-39]
+from: [QR-69, QR-39]
+kind: gate
+cuj: CUJ-13
+statement: リリースの前に、新しい版を決まった自動の手順だけで配備し、戻すと決めてから 30 分（T_rollback）以内に前の版に戻して、元の振る舞いに戻り、進んでいる依頼と乗車とそれまでの記録をそのまま使い続けられることを、試験の環境で確かめる。
+conditions:
+  workload: null
+  users: エンジニア
+  transactions: 新しい版の配備と、前の版への戻し。進んでいる依頼と乗車がある場面を含む
+slo: null
+gate:
+  where: release-check
+  check: 自動の手順だけでの配備と、進んでいる依頼と乗車がある場面での前の版への戻しの予行
+  threshold: 手作業なしで配備が終わり、30 分以内に戻せて、進んでいる依頼と乗車と記録が使い続けられること
+audit: null
+monitor: null

@@ -1,0 +1,21 @@
+id: NFR-18
+title: 試験用のアカウントの記録の区別の監視
+status: active
+basis: inferred
+basis_note: 試験用のアカウントの依頼が試験用として記録されているかは本番の記録で分かるため、監視にした（推定）
+premises: []
+from: [QR-47]
+kind: monitor
+cuj: CUJ-01
+statement: 試験用のアカウントによる依頼、乗車、評価、決済、苦情のうち、試験用であることが記録されていないものを、見つけるたびにエンジニアに知らせる。
+conditions:
+  workload: null
+  users: 試験用のアカウント
+  transactions: 依頼、乗車、評価、決済、苦情
+slo: null
+gate: null
+audit: null
+monitor:
+  signal: 試験用のアカウントによる記録のうち、試験用の区別がないもの
+  threshold: 一件でもあれば知らせる
+  notifies: エンジニア

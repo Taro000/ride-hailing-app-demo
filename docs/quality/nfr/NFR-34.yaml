@@ -1,0 +1,31 @@
+id: NFR-34
+title: 新しい評価をマッチに使う評価に反映する速さの SLO
+status: active
+basis: assumed
+basis_note: 目標値 99% としきい値 1 時間（T_rating_reflect）は暫定の決定（QAS-36）。SLO として置くことと方針は質問 9 の回答。アラートの予算の消費は、使う時間がウィンドウの 3〜12 時間（OPF-01）に集まるものとして計算した。どの規則も予算を使い切った後に鳴るため、悪いイベントのたびのチケットを加えた
+premises: [OPF-01, OPF-02, OPF-03, QAS-36]
+from: [QR-16]
+kind: slo
+cuj: CUJ-05
+statement: 直近 28 日で、乗客が送った評価の 99% を、受けてから 1 時間（T_rating_reflect）以内にマッチに使うドライバーの評価に反映する。
+conditions:
+  workload: デモの回の間（OPF-01）。参加者と依頼の量は OPF-02 と OPF-03
+  users: 登録した乗客。試験用のアカウントを除く
+  transactions: ドライバーの評価
+slo:
+  sli: SLI-13
+  target: 99%
+  target_status: provisional
+  target_rationale: 入力の数値も基準となる値もなく、機能はまだない。1 時間は、評価が付いてから次の依頼が届くまでに反映されていれば閾値による絞り込みが正しく働く長さとして置いた最初の値。99% は最初のデモで数えることを優先した控えめな値（QAS-36）。KPI と KGI からは導いていない
+  window: 直近 28 日
+  error_budget: 評価の 1% まで、反映が 1 時間を超えてよい
+  error_budget_volume: 許される遅れは、28 日に入る評価（乗車 2〜6 回、OPF-01、OPF-02 を超えない）の 1% で 0.06 件以下。1 件で予算を使い切る
+  policy: EBP-01
+  alerts:
+    - {notify: page, long_window: 1h, short_window: 5m, burn_rate: 14.4, budget_spent_at_alert: 120〜480%, condition: 長いウィンドウの有効なイベントが 20 件以上のときだけ}
+    - {notify: page, long_window: 6h, short_window: 30m, burn_rate: 6, budget_spent_at_alert: 150〜600%, condition: 長いウィンドウの有効なイベントが 20 件以上のときだけ}
+    - {notify: ticket, long_window: 3d, short_window: 6h, burn_rate: 1, budget_spent_at_alert: 50〜100%, condition: null}
+    - {notify: ticket, long_window: null, short_window: null, burn_rate: null, budget_spent_at_alert: 1 件で 100% 以上, condition: ウィンドウに許される失敗が 1 件に満たない間は、悪いイベントのたびに（EBP-01 の最後の規則）}
+gate: null
+audit: null
+monitor: null

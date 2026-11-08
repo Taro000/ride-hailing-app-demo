@@ -1,0 +1,31 @@
+id: NFR-08
+title: 降りる場所までの移動時間の見込みの当たりの SLO
+status: active
+basis: assumed
+basis_note: 目標値 90% としきい値 5 分（T_arrival_estimate_gap）は暫定の決定（QAS-26）。SLO として置くことと方針は質問 9 の回答。QIU-05 が依頼の前に示した到着予定時刻どおりに降りた割合を数える（決めたこと #21）ため、乗車を始めてからの移動の見込みに絞った（質問 22 の回答）。アラートの予算の消費は、使う時間がウィンドウの 3〜12 時間（OPF-01）に集まるものとして計算した。どの規則も予算を使い切った後に鳴るため、悪いイベントのたびのチケットを加えた
+premises: [OPF-01, OPF-02, OPF-03, EXT-02, QAS-26]
+from: [QR-08]
+kind: slo
+cuj: CUJ-01
+statement: 直近 28 日で、到着を確認した乗車の 90% が、乗車を始めた時刻に示した移動時間を足した時刻（降りる場所を変えた乗車は承認した到着予定の時刻）の前後 5 分（T_arrival_estimate_gap）以内に着く。
+conditions:
+  workload: デモの回の間（OPF-01）。参加者と依頼の量は OPF-02 と OPF-03
+  users: 登録した乗客。試験用のアカウントを除く
+  transactions: 依頼の前に移動時間の見込みを示した乗車。降りる場所を変えた乗車を含む
+slo:
+  sli: SLI-08
+  target: 90%
+  target_status: provisional
+  target_rationale: 入力の数値も基準となる値もない。移動時間の見込みは道の混み方と EXT-02 の見込みに左右されるため、目標は他の SLO より低い控えめな値にした。5 分は予定の外れの許容として置いた最初の値（QAS-26）で、QIU-05 が使う 5 分と同じ。KPI と KGI からは導いていない
+  window: 直近 28 日
+  error_budget: 到着を確認した乗車の 10% まで、見込みから 5 分を超えて外れてよい
+  error_budget_volume: 許される外れは、28 日に入る乗車 2〜6 回（OPF-01、OPF-02）の 10% で 0.2〜0.6 件。1 件で予算を使い切る
+  policy: EBP-01
+  alerts:
+    - {notify: page, long_window: 1h, short_window: 5m, burn_rate: 14.4, budget_spent_at_alert: 120〜480%, condition: 長いウィンドウの有効なイベントが 20 件以上のときだけ}
+    - {notify: page, long_window: 6h, short_window: 30m, burn_rate: 6, budget_spent_at_alert: 150〜600%, condition: 長いウィンドウの有効なイベントが 20 件以上のときだけ}
+    - {notify: ticket, long_window: 3d, short_window: 6h, burn_rate: 1, budget_spent_at_alert: 50〜100%, condition: null}
+    - {notify: ticket, long_window: null, short_window: null, burn_rate: null, budget_spent_at_alert: 1 件で 100% 以上, condition: ウィンドウに許される失敗が 1 件に満たない間は、悪いイベントのたびに（EBP-01 の最後の規則）}
+gate: null
+audit: null
+monitor: null

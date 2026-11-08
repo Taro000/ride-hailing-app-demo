@@ -1,0 +1,21 @@
+id: NFR-30
+title: 到着を確認した位置と降りる場所のずれの監視
+status: active
+basis: inferred
+basis_note: D_place_position_gap の 30 m は質問 3 の回答。乗車はデモ 1 回に数件（OPF-02）のため、割合ではなく一件ごとにチケットにする（推定）。ずれは位置の不正確さと、ドライバーが止まった場所の両方で起きる
+premises: [OPF-02, EXT-02]
+from: [QR-70]
+kind: monitor
+cuj: CUJ-03
+statement: 到着を確認した乗車のうち、到着を確認した位置が降りる場所の位置から 30 m（D_place_position_gap）以上離れたものを、一件ごとにエンジニアにチケットで知らせる。
+conditions:
+  workload: null
+  users: 登録した乗客とドライバー。試験用のアカウントを除く
+  transactions: 到着を確認した乗車。降りる場所を変えた乗車は変えた後の場所と比べる
+slo: null
+gate: null
+audit: null
+monitor:
+  signal: 乗車ごとの、到着を確認した位置と降りる場所の位置の距離
+  threshold: 30 m 以上離れた乗車が一件でもあればチケットにする
+  notifies: エンジニア（チケット）

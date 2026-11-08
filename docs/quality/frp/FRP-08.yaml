@@ -9,6 +9,6 @@ origin: [QR-08]
 changes: FR-03
 reason: QR-08 は手配のときに示す目的地への到着予定時刻どおりに着くことを求めるが、FR-03 はその時刻を示さない。
 suggested_statement: システムは、乗る場所と降りる場所が決まると、依頼する前に、ドライバーが見つかるまでの時間と迎車の時間を含めた目的地への到着予定時刻と、乗客が支払う料金を示す。
-affects: []
+affects: [NFR-09]
 placeholders: []
 resolution: null

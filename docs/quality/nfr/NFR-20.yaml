@@ -1,0 +1,21 @@
+id: NFR-20
+title: 乗る前の画面の分かりやすさの使いやすさの評価
+status: retired
+basis: confirmed
+basis_note: 決めたこと #20 の訂正で、乗る前の画面の使いやすさは品質要求にしないことになったため廃止した。QR-22 は第 3 段階が見直す
+premises: [QAS-30]
+from: [QR-22]
+kind: audit
+cuj: CUJ-02
+statement: 乗客の迎車中の画面を変えるリリースのたびに、乗客の役の参加者 5 人以上で使いやすさの評価を行い、全員が、まだ乗ってはいけないことと、ドライバーに伝える確かめの手がかりを画面から読み取り、乗車中に変わったことに気づくことを確かめる。
+conditions:
+  workload: null
+  users: 乗客の役の参加者（スマートフォンで、屋外で迎車を待つ場面）
+  transactions: 配車の確定から乗車中に変わるまで
+slo: null
+gate: null
+audit:
+  mechanism: 使いやすさの評価（参加者に迎車を待つ場面を演じてもらい、画面から読み取ったことを確かめる）
+  criterion: 参加者の全員が、まだ乗ってはいけないことと確かめの手がかりを読み取り、乗車中に変わったことに気づく
+  cadence_or_deadline: 乗客の迎車中の画面を変えるリリースのたび
+monitor: null

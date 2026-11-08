@@ -9,6 +9,6 @@ origin: [QR-44]
 changes: null
 reason: 返金、アカウントの作成と訂正、ドライバーと車両の登録と訂正、ドライバーの停止と再開を、どの担当者が行ったかを記録する機能がなく、誤った登録や返金を担当者までたどれない。
 suggested_statement: システムは、担当者による返金、アカウントの作成と訂正、ドライバーと車両の登録と訂正、ドライバーの停止と再開を、行った担当者、時刻、内容とともに記録する。
-affects: []
+affects: [NFR-32, NFR-43]
 placeholders: []
 resolution: null

@@ -1,0 +1,21 @@
+id: NFR-22
+title: 登録の訂正を乗客に示す手がかりに反映する受け入れの試験
+status: active
+basis: inferred
+basis_note: 登録した内容が実際の車とドライバーに一致することは担当者の手続きで守る（範囲外）。ソフトウェアは訂正が手がかりに反映されることを受け持つ（推定）。登録で入れる項目は FRP-07 を待つ
+premises: []
+from: [QR-20]
+kind: gate
+cuj: CUJ-02
+statement: リリースの前に、ドライバーの名前と顔写真、車種、色、車のナンバーを訂正すると、それからの依頼と進んでいる迎車で乗客に示す手がかりが訂正した内容になることを、受け入れの試験で確かめる。
+conditions:
+  workload: null
+  users: 運営・サポートの担当者、乗客
+  transactions: ドライバーと車両の登録の訂正、迎車中の手がかりの表示
+slo: null
+gate:
+  where: release-check
+  check: 登録を訂正した後に、新しい依頼と進んでいる迎車の両方で手がかりの表示を確かめる受け入れの試験
+  threshold: すべての試験が通ること
+audit: null
+monitor: null

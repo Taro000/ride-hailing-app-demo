@@ -1,0 +1,21 @@
+id: NFR-09
+title: 到着予定時刻と料金の決まりを地図のサービスを使わずに試すゲート
+status: active
+basis: inferred
+basis_note: 試験の中身は QR-67、QR-65、QR-61 からの推定。ドライバーが見つかるまでと迎車の時間を含めた到着予定時刻の決まりは FRP-08 を待つ
+premises: [EXT-02]
+from: [QR-67, QR-65, QR-61]
+kind: gate
+cuj: CUJ-01
+statement: 変更のたびに、目的地への到着予定時刻と料金を求める決まりを EXT-02 を使わずに自動で試験して、料金が模擬の運賃表に従って求めた額であることを確かめ、EXT-02 が失敗する場合と答えない場合に、移動時間と料金を示せないことを乗客に伝えて依頼させず、確定した依頼と進んでいる乗車が続くことを確かめる。
+conditions:
+  workload: null
+  users: null
+  transactions: 依頼の前に示す移動時間と料金、乗車中に降りる場所を変えるときの到着予定と料金
+slo: null
+gate:
+  where: CI
+  check: 到着予定時刻と料金を求める決まりの試験（EXT-02 の正常な応え、失敗、無応答を模したもの、運賃表の各区分の境目を含む）と、EXT-02 が失敗または無応答のときに依頼させず進んでいる乗車を続ける試験
+  threshold: すべての試験が通ること。通らない変更は公開しない
+audit: null
+monitor: null

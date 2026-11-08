@@ -1,0 +1,12 @@
+id: QAS-43
+title: N_ride_rating_ok の最初の値
+status: open
+stage: 4
+kind: decision
+statement: N_ride_rating_ok を、乗客がドライバーに付ける評価の上位 2 段階とする（5 段階の評価なら 4 以上）。
+why_unsure: 評価の段階はまだ決まっていない（第 2 段階の未解決の点）。尺度の分からない数ではなく、評価の意味で置いた。
+breadth: low
+severity: low
+rating_note: QIU-06 だけが依存する。評価の段階が決まったら見直す
+answer: null
+answered_in: null

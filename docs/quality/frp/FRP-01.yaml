@@ -9,6 +9,6 @@ origin: [QR-10]
 changes: null
 reason: 乗客、ドライバー、担当者、エンジニアがアカウントの本人であることを確かめる機能がどの FR にもなく、審査を通ったドライバーのアカウントを別の人が使って乗客を乗せることを防げない。
 suggested_statement: システムは、乗客、ドライバー、運営・サポートの担当者、エンジニアが、そのアカウントの本人であることを確かめてから、そのアカウントで機能を使わせる。
-affects: []
+affects: [NFR-27]
 placeholders: []
 resolution: null

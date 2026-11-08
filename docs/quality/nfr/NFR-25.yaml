@@ -1,0 +1,21 @@
+id: NFR-25
+title: 料金と返金の決まりを決済サービスを使わずに試すゲート
+status: active
+basis: inferred
+basis_note: 試験の中身は QR-50、QR-04、QR-29、QR-45 からの推定
+premises: [EXT-01]
+from: [QR-50, QR-04, QR-29, QR-45]
+kind: gate
+cuj: CUJ-08
+statement: 変更のたびに、確定額の決まりと更新、一度だけの請求、EXT-01 の結果の乗車と返金への結び付け、返金の額の上限と一度だけの返金を、EXT-01 を使わずに、EXT-01 が受け付けない場合と答えない場合も含めて自動で試験する。
+conditions:
+  workload: null
+  users: null
+  transactions: 決済、支払い方法の登録、返金
+slo: null
+gate:
+  where: CI
+  check: EXT-01 の済んだ、受け付けない（理由つき）、無応答、遅れて届く結果を模した試験で、確定額、請求の回数、結び付け、済んだかどうか分からないことの表示、返金の額と回数を確かめる
+  threshold: すべての試験が通ること。通らない変更は公開しない
+audit: null
+monitor: null

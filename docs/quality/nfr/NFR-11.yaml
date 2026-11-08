@@ -1,0 +1,21 @@
+id: NFR-11
+title: 通信の途切れと操作の重なりを再現する試験のゲート
+status: active
+basis: inferred
+basis_note: 試験の場面は QR-51、QR-02、QR-03 からの推定
+premises: []
+from: [QR-51, QR-02, QR-03]
+kind: gate
+cuj: CUJ-01
+statement: リリースの前に、依頼、許諾、取り消し、乗車の開始、到着の確認の途中で端末との通信が途切れてつながり直す場面と、許諾と取り消しがほぼ同時に起きる場面を試験で再現し、操作が失われも二重にもならず、つながり直した乗客とドライバーの画面が今の状態を示し、依頼に割り当てたドライバーが一人に定まることを確かめる。
+conditions:
+  workload: null
+  users: null
+  transactions: 依頼、許諾、乗客とドライバーの取り消し、乗車の開始、到着の確認
+slo: null
+gate:
+  where: release-check
+  check: 通信の途切れとつながり直し、許諾と取り消しの重なりを、操作ごとに何度でも同じように再現する試験
+  threshold: すべての場面で、操作の消失と二重がなく、画面が今の状態を示し、割り当てが一人に定まること
+audit: null
+monitor: null
