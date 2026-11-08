@@ -1,0 +1,32 @@
+id: QIU-20
+title: ドライバーが設定した条件に合う依頼だけを受け取れる
+status: active
+basis: inferred
+basis_note: CUJ の手順と条件の中身（金額・現在地から乗車場所までの距離）は入力。測定量と利用状況は推定
+premises: []
+user: USR-02
+cuj: CUJ-09
+outcomes: [OUT-01]
+need: 出来るだけ高い依頼を受けたい。配車受付までの手間を省きたい
+context_of_use:
+  device: 携帯端末
+  network: 問わない
+  user_type: 依頼を受ける条件を設定した登録したドライバー
+  task: 条件を設定したうえでの配車依頼の受付
+  environment: 車内
+  other: null
+characteristic: effectiveness
+statement: 依頼を受ける条件を設定したドライバーは、金額と現在地から乗車場所までの距離が条件に合う依頼だけを受け取れる。
+failure_scenario: 条件より安い依頼や乗車場所の遠い依頼ばかり届き、ドライバーは一件ずつ断る手間を取られ、受けたい依頼を見落とす。
+measure:
+  numerator: 金額と現在地から乗車場所までの距離がそのドライバーの条件に合っていた、そのドライバーに届いた依頼
+  denominator: 条件を設定したドライバーに届いた依頼
+  narrowed_to: 条件を設定した登録したドライバー。試験用のアカウントを除く
+  denominator_needed_only: 条件を設定したドライバーに届いた依頼だけを数える
+  contribution: 依頼を誰に届けるかというプロダクトの振る舞いそのもので、寄与を切り分けられる
+  observable: true
+  compared_with: null
+  scale: ratio
+kpi: null
+target: null
+target_status: undecided

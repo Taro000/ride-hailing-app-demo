@@ -1,0 +1,14 @@
+id: KPI-01
+title: 配車の成立率
+status: active
+basis: inferred
+basis_note: 式と、事業が全体で数えることは質問 6 の回答。中間成果 OUT-01 への対応づけは推定
+premises: []
+outcome: OUT-01
+numerator: 迎車が乗車場所に到着した配車依頼
+denominator: 乗客が手配した配車依頼
+counted_over: すべての利用者とすべての利用状況
+overlaps_with: [QIU-01]
+overlap_note: null
+target: null
+target_status: undecided

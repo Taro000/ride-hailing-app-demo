@@ -1,0 +1,32 @@
+id: QIU-01
+title: 乗客が手配した配車で迎えの車に来てもらえる
+status: active
+basis: inferred
+basis_note: CUJ の手順とニーズは入力。中間成果は質問 5、式は事業が全体で数える式（質問 6）。式を利用状況に絞り込むことと利用状況は推定
+premises: []
+user: USR-01
+cuj: CUJ-01
+outcomes: [OUT-01]
+need: 手軽に配車して、目的地へ移動したい
+context_of_use:
+  device: スマートフォン
+  network: 問わない
+  user_type: 登録した乗客
+  task: 配車の手配
+  environment: null
+  other: null
+characteristic: effectiveness
+statement: スマートフォンで配車を手配する乗客は、手配した配車で、迎えの車に決めた乗る場所まで来てもらえる。
+failure_scenario: 依頼を出してもどのドライバーにも受けてもらえない、または許諾の後に取り消されて迎えの車が来ず、乗客はほかの手段で移動する。
+measure:
+  numerator: 迎車が乗車場所に到着した配車依頼
+  denominator: 乗客が手配した配車依頼
+  narrowed_to: スマートフォンで依頼した登録した乗客。試験用のアカウントを除く
+  denominator_needed_only: 依頼を出した乗客だけを数え、移動時間と料金を確かめただけで依頼しなかった人は含めない
+  contribution: 依頼から迎えまでの出来事で、近くにいるドライバーの数にも左右されるため、同じ地域・時間帯の中で比べるか A/B テストで比べる
+  observable: true
+  compared_with: null
+  scale: ratio
+kpi: KPI-01
+target: null
+target_status: undecided

@@ -1,0 +1,230 @@
+system:
+  name: 配車サービス
+  boundary: 乗客が乗る場所と降りる場所を決めて配車を手配し、手配した車に乗り、目的地で降り、ドライバーを評価し、マッチするドライバーの評価の閾値を設定するところ。ドライバーが配車依頼を受ける条件を設定し、依頼を選んで許諾し、依頼主を乗せて運転を始め、到着を確かめて決済するところ。運営・サポートの担当者が苦情と返金に対応し、参加者のアカウントを作成し、審査を通ったドライバーと車両を登録し、ドライバーを停止するところ。エンジニアが障害の原因を調べ、機能を追加・修正し、利用技術のバージョンアップに対応するところ。ドライバーと車両の審査そのものと、車の運転そのものは含まない。
+  purpose: 乗客とドライバーを結び付け、乗客が配車を手配して目的地まで移動でき、ドライバーが手間なく配車依頼を受けて乗客を運べるようにする
+  basis: inferred
+constraints:
+  - id: CON-01
+    statement: 乗客が手配時に確認した料金が、そのまま支払う額になる（確定額）。決済はこのシステムの中で行う
+    source: 質問 1 の回答
+    basis: confirmed
+  - id: CON-02
+    statement: このサービスは事業化しないデモである
+    source: 質問 4 の回答
+    basis: confirmed
+external_systems: []
+design_inputs: []
+kgis:
+  - id: KGI-01
+    name: 流通総額
+    measure: 完了した乗車の運賃の総額
+    target: null
+    basis: confirmed
+outcomes:
+  - id: OUT-01
+    statement: 配車が成立する依頼を増やす
+    verb: increase
+    kgis: [KGI-01]
+    basis: confirmed
+  - id: OUT-02
+    statement: 許諾後の取り消しと、乗車場所での乗客の不在を減らす
+    verb: decrease
+    kgis: [KGI-01]
+    basis: confirmed
+users:
+  - id: USR-01
+    name: 乗客
+    category: primary
+    data_role: both
+    considered: true
+    exclusion_reason: null
+    basis: stated
+  - id: USR-02
+    name: ドライバー
+    category: primary
+    data_role: both
+    considered: true
+    exclusion_reason: null
+    basis: stated
+  - id: USR-03
+    name: エンジニア
+    category: secondary-maintenance
+    data_role: consumer
+    considered: true
+    exclusion_reason: null
+    basis: stated
+  - id: USR-04
+    name: 運営・サポートの担当者
+    category: secondary-operation
+    data_role: both
+    considered: true
+    exclusion_reason: null
+    basis: confirmed
+cujs:
+  - id: CUJ-01
+    name: 配車手配
+    users: [USR-01]
+    user_goal: 決めた乗る場所から降りる場所まで、移動時間と料金を確かめたうえで車を手配する
+    steps:
+      - 乗る場所・降りる場所を決める
+      - 移動時間と料金を確認する
+      - 配車を手配する
+    outcomes: [OUT-01, OUT-02]
+    basis: stated
+    basis_note: null
+  - id: CUJ-02
+    name: 乗車（乗客）
+    users: [USR-01]
+    user_goal: 手配した車であることを確かめて乗る
+    steps:
+      - 手配した車かどうかを確認する
+    outcomes: [OUT-02]
+    basis: stated
+    basis_note: null
+  - id: CUJ-03
+    name: 降車（乗客）
+    users: [USR-01]
+    user_goal: 正しい場所に着いたことを確かめて降りる
+    steps:
+      - 正しい場所に到着したかを確認する
+    outcomes: []
+    basis: stated
+    basis_note: null
+  - id: CUJ-04
+    name: ドライバーの評価
+    users: [USR-01]
+    user_goal: 乗ったドライバーを評価する
+    steps:
+      - ドライバーを評価する
+    outcomes: []
+    basis: stated
+    basis_note: 入力の「それ以外」に並ぶ二つの行為は目標が異なるので、CUJ-04 と CUJ-05 に分けた
+  - id: CUJ-05
+    name: マッチするドライバーの閾値の設定
+    users: [USR-01]
+    user_goal: 評価が一定以上のドライバーとだけマッチするようにする
+    steps:
+      - 評価が一定以上のドライバーのみマッチするように閾値を設定する
+    outcomes: [OUT-02]
+    basis: stated
+    basis_note: 入力の「それ以外」に並ぶ二つの行為は目標が異なるので、CUJ-04 と CUJ-05 に分けた
+  - id: CUJ-06
+    name: 配車受付
+    users: [USR-02]
+    user_goal: 受けたい配車依頼を選び、内容を確かめて許諾する
+    steps:
+      - 配車依頼を選ぶ
+      - 依頼内容を確認する
+      - 依頼を許諾する
+    outcomes: [OUT-01, OUT-02]
+    basis: stated
+    basis_note: null
+  - id: CUJ-07
+    name: 乗車（ドライバー）
+    users: [USR-02]
+    user_goal: 依頼主であることを確かめて乗せ、運転を始める
+    steps:
+      - 依頼主かどうかを確認する
+      - 運転を始める
+    outcomes: [OUT-02]
+    basis: stated
+    basis_note: null
+  - id: CUJ-08
+    name: 降車（ドライバー）
+    users: [USR-02]
+    user_goal: 到着を確かめ、決済を終える
+    steps:
+      - 到着を確認する
+      - 決済を行う
+    outcomes: []
+    basis: stated
+    basis_note: null
+  - id: CUJ-09
+    name: 配車依頼を受ける条件の設定
+    users: [USR-02]
+    user_goal: 金額と現在地から乗車場所までの距離が自分の条件に合う配車依頼を受ける
+    steps:
+      - 配車依頼を受ける条件を設定する（金額・現在地から乗車場所までの距離）
+    outcomes: [OUT-01]
+    basis: stated
+    basis_note: null
+  - id: CUJ-10
+    name: 障害の原因の特定
+    users: [USR-03]
+    user_goal: 通知を受けた異常・エラーについて、ログやデータを調べて障害の原因を特定する
+    steps:
+      - 異常・エラーの通知受取
+      - ログやデータの調査
+      - 障害の原因を特定
+    outcomes: []
+    basis: stated
+    basis_note: null
+  - id: CUJ-11
+    name: 新しい機能の追加
+    users: [USR-03]
+    user_goal: 新しい機能を追加する
+    steps:
+      - 新しい機能を追加
+    outcomes: []
+    basis: stated
+    basis_note: null
+  - id: CUJ-12
+    name: 既存の機能の修正
+    users: [USR-03]
+    user_goal: 既存の機能を修正する
+    steps:
+      - 既存の機能を修正
+    outcomes: []
+    basis: stated
+    basis_note: null
+  - id: CUJ-13
+    name: 利用技術のバージョンアップへの対応
+    users: [USR-03]
+    user_goal: 利用技術のバージョンアップに対応する
+    steps:
+      - 利用技術のバージョンアップに対応
+    outcomes: []
+    basis: stated
+    basis_note: null
+  - id: CUJ-14
+    name: 苦情への対応
+    users: [USR-04]
+    user_goal: 寄せられた苦情に対応する
+    steps: []
+    outcomes: []
+    basis: confirmed
+    basis_note: 質問 2 の回答。手順は決まっていないため空けた
+  - id: CUJ-15
+    name: 返金への対応
+    users: [USR-04]
+    user_goal: 返金の求めに対応する
+    steps: []
+    outcomes: []
+    basis: confirmed
+    basis_note: 質問 2 の回答。手順は決まっていないため空けた
+  - id: CUJ-16
+    name: 参加者のアカウントの作成
+    users: [USR-04]
+    user_goal: 参加者のアカウントを作成する
+    steps: []
+    outcomes: []
+    basis: confirmed
+    basis_note: 質問 2 の回答。手順は決まっていないため空けた
+  - id: CUJ-17
+    name: 審査を通ったドライバーと車両の登録
+    users: [USR-04]
+    user_goal: 審査を通ったドライバーと車両を登録する
+    steps: []
+    outcomes: []
+    basis: confirmed
+    basis_note: 質問 2 の回答。手順は決まっていないため空けた
+  - id: CUJ-18
+    name: ドライバーの停止
+    users: [USR-04]
+    user_goal: ドライバーを停止する
+    steps: []
+    outcomes: []
+    basis: confirmed
+    basis_note: 質問 2 の回答。手順は決まっていないため空けた
+hints: []
+operational_facts: []

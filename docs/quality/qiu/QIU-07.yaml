@@ -1,0 +1,32 @@
+id: QIU-07
+title: 乗客が危険な運転や加害をするドライバーに当たらない
+status: active
+basis: inferred
+basis_note: 「変なドライバーに当たりたくない」は入力。乗車中の危険を健康・安全の問題として扱うことは推定
+premises: []
+user: USR-01
+cuj: CUJ-01
+outcomes: [OUT-01]
+need: 変なドライバーに当たりたくない
+context_of_use:
+  device: スマートフォン
+  network: 問わない
+  user_type: 登録した乗客
+  task: 配車の手配
+  environment: null
+  other: null
+characteristic: freedom from risk > health and safety risk mitigation
+statement: スマートフォンで配車を手配した乗客は、乗車中に危険な運転やドライバーからの加害に遭わない。
+failure_scenario: 知らないドライバーの車に乗った乗客が、乱暴な運転でけがをする、または車内で嫌がらせを受ける。
+measure:
+  numerator: 乗客が乗車中に危険な運転やドライバーからの加害を受けた乗車
+  denominator: 始まった乗車
+  narrowed_to: スマートフォンで依頼した登録した乗客。試験用のアカウントを除く
+  denominator_needed_only: 乗車が始まったものだけを数える
+  contribution: どのドライバーとマッチさせるかが効くが、運転と振る舞いそのものはプロダクトの外で決まる
+  observable: false
+  compared_with: null
+  scale: ratio
+kpi: null
+target: null
+target_status: undecided

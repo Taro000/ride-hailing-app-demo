@@ -1,0 +1,32 @@
+id: QIU-15
+title: ドライバーが許諾した依頼で取り消しにならずに乗車場所に着ける
+status: active
+basis: inferred
+basis_note: CUJ の手順とニーズは入力。中間成果は質問 5、式は事業が全体で数える式（質問 6）。式を利用状況に絞り込むことと利用状況は推定
+premises: []
+user: USR-02
+cuj: CUJ-06
+outcomes: [OUT-02]
+need: 出来るだけ多く・高い依頼を受けたい
+context_of_use:
+  device: 携帯端末
+  network: 問わない
+  user_type: 登録したドライバー
+  task: 配車依頼の受付
+  environment: 車内
+  other: null
+characteristic: effectiveness
+statement: 配車依頼を許諾したドライバーは、途中で取り消しにならずに、その依頼の乗車場所に着ける。
+failure_scenario: 許諾して乗車場所へ向かう途中で乗客に取り消され、向かった時間と距離がむだになり、ドライバーが受けられる依頼が減る。
+measure:
+  numerator: 迎車が乗車場所に到着した依頼
+  denominator: ドライバーが許諾した依頼
+  narrowed_to: 登録したドライバー。試験用のアカウントを除く
+  denominator_needed_only: ドライバーが許諾した依頼だけを数え、許諾されなかった依頼は含めない
+  contribution: 迎えまでの待ち時間や依頼の条件の合い方にプロダクトが効くが、乗客やドライバーの都合にも左右される
+  observable: true
+  compared_with: null
+  scale: ratio
+kpi: KPI-03
+target: null
+target_status: undecided

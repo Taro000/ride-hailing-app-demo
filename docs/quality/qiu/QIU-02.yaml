@@ -1,0 +1,32 @@
+id: QIU-02
+title: 乗客が手間をかけずに配車を手配できる
+status: active
+basis: inferred
+basis_note: ニーズ（手軽に配車したい）は入力。手間を時間で測ることと利用状況は推定
+premises: []
+user: USR-01
+cuj: CUJ-01
+outcomes: [OUT-01]
+need: 手軽に配車したい
+context_of_use:
+  device: スマートフォン
+  network: 問わない
+  user_type: 登録した乗客
+  task: 配車の手配
+  environment: null
+  other: null
+characteristic: efficiency
+statement: スマートフォンで配車を手配する乗客は、乗る場所・降りる場所を決めてから依頼を出すまでを、手間をかけずに短い時間で終えられる。
+failure_scenario: 屋外で乗る場所や降りる場所を入れるのに手間取り、乗客は途中でやめて流しのタクシーを拾う。
+measure:
+  numerator: 乗る場所を決め始めてから T_request_entry 以内に出された配車依頼
+  denominator: 出された配車依頼
+  narrowed_to: スマートフォンで依頼した登録した乗客。試験用のアカウントを除く
+  denominator_needed_only: 依頼を出し終えた手配だけを数える
+  contribution: 依頼の手順そのものにかかる時間で、プロダクトの作りが直接効く
+  observable: true
+  compared_with: null
+  scale: ratio
+kpi: null
+target: null
+target_status: undecided

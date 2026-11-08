@@ -1,0 +1,32 @@
+id: QIU-29
+title: 担当者が誤った額や二重の返金をしない
+status: active
+basis: inferred
+basis_note: CUJ は質問 2 の回答。ニーズ、測定量、利用状況は推定
+premises: []
+user: USR-04
+cuj: CUJ-15
+outcomes: []
+need: 返金で事業や乗客にお金の損を出したくない
+context_of_use:
+  device: 問わない
+  network: 問わない
+  user_type: 運営・サポートの担当者
+  task: 返金への対応
+  environment: null
+  other: null
+characteristic: freedom from risk > economic risk mitigation
+statement: 返金に対応する運営・サポートの担当者は、返金を認めた乗車の乗客に、認めた額を一度だけ返金する。
+failure_scenario: 同じ乗車に二重に返金したり、別の乗客や違う額で返金したりして、事業がお金を失い、乗客との間で揉める。
+measure:
+  numerator: 額や相手を誤った返金、または同じ乗車への二重の返金
+  denominator: 行った返金
+  narrowed_to: 乗客への返金
+  denominator_needed_only: 実際に行った返金だけを数える
+  contribution: 返金する相手と額をどう確かめるかにプロダクトが効く
+  observable: true
+  compared_with: null
+  scale: ratio
+kpi: null
+target: null
+target_status: undecided

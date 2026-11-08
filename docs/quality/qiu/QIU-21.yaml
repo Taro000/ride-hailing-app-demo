@@ -1,0 +1,32 @@
+id: QIU-21
+title: エンジニアが障害の原因を特定できる
+status: active
+basis: inferred
+basis_note: CUJ の手順とニーズは入力。測定量と利用状況は推定
+premises: []
+user: USR-03
+cuj: CUJ-10
+outcomes: []
+need: 障害・不具合の原因を、システムのログ・データを確認して特定したい
+context_of_use:
+  device: 問わない
+  network: 問わない
+  user_type: システムを保守するエンジニア
+  task: 稼働中のシステムで通知を受けた異常・エラーの原因の特定
+  environment: null
+  other: null
+characteristic: effectiveness
+statement: 稼働中のシステムの異常・エラーの通知を受けたエンジニアは、システムのログやデータを確かめて、障害の原因を特定できる。
+failure_scenario: 通知を受けて調べても、必要なログやデータが残っていない、または見られないために原因が分からず、同じ障害が繰り返されて乗客やドライバーが使えなくなる。
+measure:
+  numerator: 原因を特定できた障害
+  denominator: 通知を受けた異常・エラーのうち、障害として調べる必要があったもの
+  narrowed_to: 稼働中のシステムで起きた異常・エラー
+  denominator_needed_only: 調べる必要があったものだけを数え、誤った通知は含めない
+  contribution: ログやデータで何が分かるかにプロダクトが効くが、エンジニアの経験にも左右される
+  observable: false
+  compared_with: null
+  scale: ratio
+kpi: null
+target: null
+target_status: undecided

@@ -1,0 +1,32 @@
+id: QIU-05
+title: 乗客が示された移動時間を信じて手配できる
+status: active
+basis: inferred
+basis_note: 移動時間の確認とニーズは入力。乗客に問う測定量と利用状況は推定
+premises: []
+user: USR-01
+cuj: CUJ-01
+outcomes: [OUT-01]
+need: 出来るだけ早く目的地に移動したい。手配する前に移動時間を確かめて決めたい
+context_of_use:
+  device: スマートフォン
+  network: 問わない
+  user_type: 登録した乗客
+  task: 配車の手配
+  environment: null
+  other: null
+characteristic: satisfaction > trust
+statement: スマートフォンで配車を手配する乗客は、手配時に示された移動時間を信じて、手配するかどうかを決められる。
+failure_scenario: 示された移動時間より大幅に遅れて着くことが重なり、乗客は時間に間に合わせたい移動ではこのサービスを使わなくなる。
+measure:
+  numerator: 乗り終えた乗客に示された移動時間を信じて手配できたかを問い、N_eta_trust_level 以上と答えた回答
+  denominator: その問いへの回答
+  narrowed_to: スマートフォンで依頼した登録した乗客。試験用のアカウントを除く
+  denominator_needed_only: 乗り終えた乗客の回答だけを数える
+  contribution: 示す移動時間と実際の差にはプロダクトが効くが、道路の混み具合の影響も受ける
+  observable: false
+  compared_with: null
+  scale: ordinal
+kpi: null
+target: null
+target_status: undecided

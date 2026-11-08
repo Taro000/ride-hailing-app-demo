@@ -1,0 +1,32 @@
+id: QIU-06
+title: 乗客が変なドライバーや汚い車に当たらない
+status: active
+basis: assumed
+basis_note: ニーズは入力。乗客の評価で測ることは推定。評価に車の状態も含むことは QAS-02 による仮定
+premises: [QAS-02]
+user: USR-01
+cuj: CUJ-01
+outcomes: [OUT-01]
+need: 変なドライバーや汚い車に当たりたくない
+context_of_use:
+  device: スマートフォン
+  network: 問わない
+  user_type: 登録した乗客
+  task: 配車の手配
+  environment: null
+  other: null
+characteristic: satisfaction > usefulness
+statement: スマートフォンで配車を手配した乗客は、変なドライバーや汚い車に当たらず、乗ってよかったと感じる。
+failure_scenario: 態度の悪いドライバーや汚れた車に当たり、乗客は次からほかのサービスを選ぶ。
+measure:
+  numerator: 乗客がドライバーに N_ride_rating_ok 以上の評価を付けた乗車
+  denominator: 乗客が評価を付けた乗車
+  narrowed_to: スマートフォンで依頼した登録した乗客。試験用のアカウントを除く
+  denominator_needed_only: 評価を付けた乗車だけを数える
+  contribution: どのドライバーとマッチさせるか（乗客の閾値を含む）が効くが、ドライバーの振る舞いと車の手入れはプロダクトの外で決まる
+  observable: true
+  compared_with: null
+  scale: ordinal
+kpi: null
+target: null
+target_status: undecided

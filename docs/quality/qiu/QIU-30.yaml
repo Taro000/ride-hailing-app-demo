@@ -1,0 +1,32 @@
+id: QIU-30
+title: 担当者が参加者のアカウントを誤りなく作成できる
+status: active
+basis: inferred
+basis_note: CUJ は質問 2 の回答。参加者を乗客とドライバーと読むこと、ニーズ、測定量、利用状況は推定
+premises: []
+user: USR-04
+cuj: CUJ-16
+outcomes: []
+need: 参加者がすぐに使い始められるアカウントを作りたい
+context_of_use:
+  device: 問わない
+  network: 問わない
+  user_type: 運営・サポートの担当者
+  task: 参加者のアカウントの作成
+  environment: null
+  other: null
+characteristic: effectiveness
+statement: 参加者のアカウントを作成する運営・サポートの担当者は、作り直しや訂正の要らないアカウントを作成できる。
+failure_scenario: 乗客として参加する人をドライバーとして作るなど、アカウントを誤って作成し、参加者が使い始められないまま参加をやめる。
+measure:
+  numerator: 作り直しや訂正の要らなかったアカウント
+  denominator: 作成したアカウント
+  narrowed_to: 乗客とドライバーのアカウント
+  denominator_needed_only: 作成したアカウントだけを数える
+  contribution: 作成の手順と内容の確かめ方にプロダクトが効く
+  observable: true
+  compared_with: null
+  scale: ratio
+kpi: null
+target: null
+target_status: undecided

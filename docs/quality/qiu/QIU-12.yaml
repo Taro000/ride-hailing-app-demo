@@ -1,0 +1,32 @@
+id: QIU-12
+title: 乗客が着いてから手間をかけずに降りられる
+status: active
+basis: inferred
+basis_note: ニーズ（乗降の手間を省きたい）は入力。決済がシステムの中で行われることは質問 1 で確認済み（CON-01）。手間を時間で測ることと利用状況は推定
+premises: [CON-01]
+user: USR-01
+cuj: CUJ-03
+outcomes: []
+need: 乗降の手間を省きたい（正しい場所かの確認）
+context_of_use:
+  device: スマートフォン
+  network: 問わない
+  user_type: 登録した乗客
+  task: 目的地での降車
+  environment: 車内
+  other: null
+characteristic: efficiency
+statement: 乗車中の乗客は、降りる場所に着いたら、正しい場所かを手間をかけずに確かめ、短い時間で降りられる。
+failure_scenario: 着いてから正しい場所かを自分で確かめたり、決済が終わるのを待ったりして時間がかかり、乗客は降りるたびに手間を感じる。
+measure:
+  numerator: 降りる場所に着いてから T_alighting 以内に降車（到着の確認と決済）を終えた乗車
+  denominator: 完了した乗車
+  narrowed_to: スマートフォンで依頼した登録した乗客。試験用のアカウントを除く
+  denominator_needed_only: 完了した乗車だけを数える
+  contribution: 到着の確かめ方と決済の手順にプロダクトが直接効く
+  observable: true
+  compared_with: null
+  scale: ratio
+kpi: null
+target: null
+target_status: undecided

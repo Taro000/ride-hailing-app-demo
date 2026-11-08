@@ -1,0 +1,32 @@
+id: QIU-23
+title: エンジニアが個人の情報を必要以上に見ずに原因を特定できる
+status: active
+basis: inferred
+basis_note: ニーズ（ログ・データの確認、原因の特定）は入力。乗客やドライバーの個人の情報を必要以上に見ないことは推定
+premises: []
+user: USR-03
+cuj: CUJ-10
+outcomes: []
+need: システムのログ・データを確認して、障害の原因を特定したい
+context_of_use:
+  device: 問わない
+  network: 問わない
+  user_type: システムを保守するエンジニア
+  task: 稼働中のシステムで通知を受けた異常・エラーの原因の特定
+  environment: null
+  other: null
+characteristic: freedom from risk > economic risk mitigation
+statement: 障害を調べるエンジニアは、原因の特定に要らない乗客やドライバーの個人の情報を見ずに、ログやデータを確かめられる。
+failure_scenario: 調査のためにエンジニアが乗客の移動の記録（自宅や勤務先が分かる乗る場所・降りる場所）を必要以上に見て、それが漏れる、または悪用され、乗客が離れて事業の信用を失う。
+measure:
+  numerator: 原因の特定に要らない乗客やドライバーの個人の情報が見られた調査
+  denominator: 障害の調査
+  narrowed_to: 稼働中のシステムで起きた障害の調査
+  denominator_needed_only: 実際に行われた調査だけを数える
+  contribution: 調査でどの情報が見えるかにプロダクトが効く
+  observable: false
+  compared_with: null
+  scale: ratio
+kpi: null
+target: null
+target_status: undecided

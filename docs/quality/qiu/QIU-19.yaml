@@ -1,0 +1,32 @@
+id: QIU-19
+title: ドライバーが乗車ごとに正しい額の決済を終えられる
+status: active
+basis: inferred
+basis_note: CUJ の手順（到着を確認する、決済を行う）は入力。正しい額が手配時に乗客が確認した料金であり、決済がシステムの中で行われることは質問 1 で確認済み（CON-01）。ニーズ、測定量、利用状況は推定
+premises: [CON-01]
+user: USR-02
+cuj: CUJ-08
+outcomes: []
+need: 受けた依頼の運賃を確実に受け取りたい
+context_of_use:
+  device: 携帯端末
+  network: 問わない
+  user_type: 登録したドライバー
+  task: 到着後の決済
+  environment: 車内。降りる場所に止まっている間
+  other: null
+characteristic: effectiveness
+statement: 降りる場所に着いたドライバーは、到着を確かめ、その乗車の正しい額で決済を終えられる。
+failure_scenario: 到着後の決済が通らない、または額が違うまま終わり、ドライバーは運賃を受け取れないか、乗客と揉めて次の依頼を受けられない。
+measure:
+  numerator: 正しい額で決済を終えた乗車
+  denominator: 降りる場所に着いた乗車
+  narrowed_to: 登録したドライバー。試験用のアカウントを除く
+  denominator_needed_only: 降りる場所に着いた乗車だけを数える
+  contribution: 決済の手順と額の計算はプロダクトの振る舞いで決まる
+  observable: true
+  compared_with: null
+  scale: ratio
+kpi: null
+target: null
+target_status: undecided

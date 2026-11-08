@@ -1,0 +1,32 @@
+id: QIU-13
+title: 乗客が乗ったドライバーを評価できる
+status: active
+basis: inferred
+basis_note: CUJ の手順は入力。評価が閾値によるマッチに使われ、変なドライバーを避けるニーズにつながることと測定量は推定
+premises: []
+user: USR-01
+cuj: CUJ-04
+outcomes: []
+need: 変なドライバーや汚い車に当たりたくない（評価は閾値によるマッチに使われる）
+context_of_use:
+  device: スマートフォン
+  network: 問わない
+  user_type: 登録した乗客
+  task: 乗ったドライバーの評価
+  environment: null
+  other: null
+characteristic: effectiveness
+statement: 乗り終えた乗客は、乗ったドライバーを評価し、その評価が記録される。
+failure_scenario: 乗客が低い評価を付けようとしても記録されず、そのドライバーの評価が下がらないまま、閾値を設定したほかの乗客もそのドライバーに当たる。
+measure:
+  numerator: 評価が記録された乗車
+  denominator: 乗客が評価を始めた乗車
+  narrowed_to: スマートフォンで評価した登録した乗客。試験用のアカウントを除く
+  denominator_needed_only: 評価を始めた乗車だけを数え、評価しなかった乗車は含めない
+  contribution: 評価の手順と記録はプロダクトの振る舞いそのもの
+  observable: true
+  compared_with: null
+  scale: ratio
+kpi: null
+target: null
+target_status: undecided

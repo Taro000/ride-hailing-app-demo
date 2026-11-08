@@ -1,0 +1,32 @@
+id: QIU-11
+title: 乗客が決めた降りる場所で降りられる
+status: active
+basis: inferred
+basis_note: CUJ の手順とニーズは入力。測定量と利用状況は推定
+premises: []
+user: USR-01
+cuj: CUJ-03
+outcomes: []
+need: 正しい場所で降りたい。正しい場所かの確認の手間を省きたい
+context_of_use:
+  device: スマートフォン
+  network: 問わない
+  user_type: 登録した乗客
+  task: 目的地での降車
+  environment: 車内
+  other: null
+characteristic: effectiveness
+statement: 乗車中の乗客は、自分が決めた降りる場所で降りられる。
+failure_scenario: 乗客が決めた建物とは別の入口や似た名前の場所で降ろされ、歩いて戻るか乗り直すことになる。
+measure:
+  numerator: 乗客が決めた降りる場所から D_dropoff_gap 以内で降車した乗車
+  denominator: 完了した乗車
+  narrowed_to: スマートフォンで依頼した登録した乗客。試験用のアカウントを除く。乗車中に降りる場所を変えた乗車は、変えた後の場所で数える
+  denominator_needed_only: 完了した乗車だけを数える
+  contribution: 降りる場所がドライバーにどう伝わるかにプロダクトが効く
+  observable: true
+  compared_with: null
+  scale: ratio
+kpi: null
+target: null
+target_status: undecided

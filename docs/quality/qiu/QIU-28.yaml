@@ -1,0 +1,32 @@
+id: QIU-28
+title: 担当者が認めた返金を終えられる
+status: active
+basis: inferred
+basis_note: CUJ は質問 2 の回答。ニーズ、測定量、利用状況は推定
+premises: []
+user: USR-04
+cuj: CUJ-15
+outcomes: []
+need: 返金を認めた乗客に、確実に返金したい
+context_of_use:
+  device: 問わない
+  network: 問わない
+  user_type: 運営・サポートの担当者
+  task: 返金への対応
+  environment: null
+  other: null
+characteristic: effectiveness
+statement: 返金を認めた運営・サポートの担当者は、その乗車の乗客への返金を終えられる。
+failure_scenario: 担当者が返金を認めても返金が通らず、乗客は何度も問い合わせることになり、サービスへの信用を失う。
+measure:
+  numerator: 返金を終えた乗車
+  denominator: 担当者が返金を認めた乗車
+  narrowed_to: 乗客からの返金の求めを担当者が認めたもの
+  denominator_needed_only: 担当者が返金を認めたものだけを数え、認めなかった求めは含めない
+  contribution: 返金の手順と決済の取り消しはプロダクトの振る舞いで決まる
+  observable: true
+  compared_with: null
+  scale: ratio
+kpi: null
+target: null
+target_status: undecided

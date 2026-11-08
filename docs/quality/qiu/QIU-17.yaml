@@ -1,0 +1,32 @@
+id: QIU-17
+title: ドライバーが運転しながら端末を操作せずに依頼を受けられる
+status: active
+basis: assumed
+basis_note: ニーズは入力。乗客を乗せずに走っている間にも依頼が届くことは QAS-01 による仮定。走っているかどうかをどこで確かめるかは設計で確認する
+premises: [QAS-01]
+user: USR-02
+cuj: CUJ-06
+outcomes: [OUT-02]
+need: 出来るだけ多くの依頼を受けたい。配車受付までの手間を省きたい
+context_of_use:
+  device: 携帯端末
+  network: 問わない
+  user_type: 登録したドライバー
+  task: 配車依頼の受付
+  environment: 車内。乗客を乗せずに走っている間
+  other: null
+characteristic: freedom from risk > health and safety risk mitigation
+statement: 乗客を乗せずに走っているドライバーは、運転しながら端末を見て操作しなくても、受けたい依頼を受けられる。
+failure_scenario: 良い依頼を逃したくないドライバーが、走りながら依頼の内容を見て許諾の操作をし、前への注意がそれて事故を起こす。受けた依頼も取り消しになる。
+measure:
+  numerator: 車が走っている間に端末の操作で許諾された依頼
+  denominator: ドライバーが許諾した依頼
+  narrowed_to: 登録したドライバー。乗客を乗せずに走っている間に届いた依頼。試験用のアカウントを除く
+  denominator_needed_only: 許諾された依頼だけを数える
+  contribution: 依頼の受け方そのものにプロダクトが効く
+  observable: true
+  compared_with: null
+  scale: ratio
+kpi: null
+target: null
+target_status: undecided

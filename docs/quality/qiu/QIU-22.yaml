@@ -1,0 +1,32 @@
+id: QIU-22
+title: エンジニアが障害の原因を時間内に特定できる
+status: active
+basis: inferred
+basis_note: ニーズ（原因が特定できる）は入力。時間を区切ることと利用状況は推定
+premises: []
+user: USR-03
+cuj: CUJ-10
+outcomes: []
+need: 障害・不具合の原因が特定できる
+context_of_use:
+  device: 問わない
+  network: 問わない
+  user_type: システムを保守するエンジニア
+  task: 稼働中のシステムで通知を受けた異常・エラーの原因の特定
+  environment: null
+  other: null
+characteristic: efficiency
+statement: 稼働中のシステムの異常・エラーの通知を受けたエンジニアは、通知から短い時間で障害の原因を特定できる。
+failure_scenario: 原因の特定に何時間もかかり、その間、乗客は配車を手配できず、ドライバーは依頼を受けられない。
+measure:
+  numerator: 通知から T_cause_found 以内に原因を特定できた障害
+  denominator: 原因を特定できた障害
+  narrowed_to: 稼働中のシステムで起きた異常・エラー
+  denominator_needed_only: 原因を特定できた障害だけを数え、特定できなかったものは QIU-21 で数える
+  contribution: ログやデータの探しやすさにプロダクトが効くが、エンジニアの経験にも左右される
+  observable: false
+  compared_with: null
+  scale: ratio
+kpi: null
+target: null
+target_status: undecided

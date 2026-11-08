@@ -1,0 +1,32 @@
+id: QIU-10
+title: 乗客が手配した車以外に乗らない
+status: active
+basis: inferred
+basis_note: CUJ の手順（手配した車かどうかを確認する）は入力。別の車に乗ることを健康・安全の問題として扱うことは推定
+premises: []
+user: USR-01
+cuj: CUJ-02
+outcomes: [OUT-02]
+need: 手配した車に乗りたい。変なドライバーに当たりたくない
+context_of_use:
+  device: スマートフォン
+  network: 問わない
+  user_type: 登録した乗客
+  task: 手配した車への乗車
+  environment: 屋外の乗る場所
+  other: null
+characteristic: freedom from risk > health and safety risk mitigation
+statement: 乗る場所で待つ乗客は、手配した車以外の車に乗らない。
+failure_scenario: 乗客が手配した車だと思い込んで別の車に乗り、知らない人の車で違う場所へ連れて行かれる、または危険な目に遭う。手配した車のドライバーは乗る場所で乗客を待ち続ける。
+measure:
+  numerator: 乗客が手配された車以外の車に乗った乗車
+  denominator: 乗客が乗った乗車
+  narrowed_to: スマートフォンで依頼した登録した乗客。試験用のアカウントを除く
+  denominator_needed_only: 乗客が車に乗ったものだけを数える
+  contribution: 手配した車かどうかを確かめる手がかりにプロダクトが効く
+  observable: false
+  compared_with: null
+  scale: ratio
+kpi: null
+target: null
+target_status: undecided

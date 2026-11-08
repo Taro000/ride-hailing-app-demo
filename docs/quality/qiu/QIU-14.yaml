@@ -1,0 +1,32 @@
+id: QIU-14
+title: 閾値を設定した乗客が閾値以上のドライバーとだけマッチする
+status: active
+basis: inferred
+basis_note: CUJ の手順とニーズは入力。測定量と利用状況は推定
+premises: []
+user: USR-01
+cuj: CUJ-05
+outcomes: [OUT-02]
+need: 変なドライバーや汚い車に当たりたくない
+context_of_use:
+  device: スマートフォン
+  network: 問わない
+  user_type: マッチするドライバーの評価の閾値を設定した登録した乗客
+  task: 閾値を設定したうえでの配車の手配
+  environment: null
+  other: null
+characteristic: effectiveness
+statement: 評価の閾値を設定した乗客は、設定した評価以上のドライバーの車にだけ乗る。
+failure_scenario: 閾値を設定したのに閾値を下回る評価のドライバーがマッチし、乗客は乗るのをためらって配車を取り消す。
+measure:
+  numerator: 許諾したドライバーの評価が、乗客の設定した閾値以上だった配車依頼
+  denominator: 閾値を設定した乗客の配車依頼のうち、ドライバーが許諾したもの
+  narrowed_to: 閾値を設定した登録した乗客。試験用のアカウントを除く
+  denominator_needed_only: 閾値を設定した乗客の配車だけを数える
+  contribution: マッチの振る舞いそのもので、プロダクトの寄与を切り分けられる
+  observable: true
+  compared_with: null
+  scale: ratio
+kpi: null
+target: null
+target_status: undecided

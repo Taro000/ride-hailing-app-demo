@@ -1,0 +1,32 @@
+id: QIU-08
+title: 乗客が乗る場所で手配した車と合流して乗れる
+status: active
+basis: inferred
+basis_note: CUJ の手順とニーズは入力。中間成果は質問 5、式は事業が全体で数える式（質問 6）。式を利用状況に絞り込むことと利用状況は推定
+premises: []
+user: USR-01
+cuj: CUJ-02
+outcomes: [OUT-02]
+need: 手配した車に乗りたい。正しい車かの確認の手間を省きたい
+context_of_use:
+  device: スマートフォン
+  network: 問わない
+  user_type: 登録した乗客
+  task: 手配した車への乗車
+  environment: 屋外の乗る場所
+  other: null
+characteristic: effectiveness
+statement: 乗る場所で待つ乗客は、着いた迎えの車と行き違わずに合流し、手配した車に乗れる。
+failure_scenario: 乗る場所に迎えの車が着いても乗客が見つけられず、ドライバーは待ちきれずに乗客の不在として去り、乗客は乗れないまま配車をやり直す。
+measure:
+  numerator: 乗車が始まった依頼
+  denominator: 迎車が乗車場所に到着した依頼
+  narrowed_to: スマートフォンで依頼した登録した乗客。試験用のアカウントを除く
+  denominator_needed_only: 迎車が乗車場所に到着した依頼だけを数え、到着する前に取り消されたものは含めない（QIU-01 と QIU-15 で数える）
+  contribution: 乗る場所で車と乗客が互いを見つけられるかに、プロダクトが示す情報が効く
+  observable: true
+  compared_with: null
+  scale: ratio
+kpi: KPI-02
+target: null
+target_status: undecided

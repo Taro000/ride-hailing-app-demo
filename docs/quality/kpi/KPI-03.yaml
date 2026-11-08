@@ -1,0 +1,14 @@
+id: KPI-03
+title: 許諾後の成立率
+status: active
+basis: inferred
+basis_note: 式と、事業が全体で数えることは質問 6 の回答。OUT-02 のうち許諾後の取り消しは、この割合の残り（許諾したのに迎車が着かなかった依頼）にあたる。中間成果への対応づけは推定
+premises: []
+outcome: OUT-02
+numerator: 迎車が乗車場所に到着した依頼
+denominator: ドライバーが許諾した依頼
+counted_over: すべての利用者とすべての利用状況
+overlaps_with: [QIU-15]
+overlap_note: null
+target: null
+target_status: undecided
