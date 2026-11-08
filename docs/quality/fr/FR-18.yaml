@@ -1,0 +1,21 @@
+id: FR-18
+title: 届いた配車依頼を示す
+status: active
+basis: inferred
+basis_note: 機能は CUJ-06 の手順（入力）。受け入れ基準は推定。新規であることは質問 4 で確認済み
+premises: []
+statement: システムは、ドライバーに届いた配車依頼を一覧で示し、ドライバーが受けたい依頼を選べるようにする。
+origin: cuj-step
+cuj: CUJ-06
+cuj_step: 配車依頼を選ぶ
+traces_to: [QIU-16, QIU-20]
+proposal: null
+existing: false
+extends: null
+interface: ["画面: ドライバーの配車受付", "通知: ドライバー"]
+acceptance_criteria:
+  - 受付をしているドライバーに依頼が届くと、システムはそれを一覧に加え、ドライバーに知らせる。
+  - ほかのドライバーが許諾したか乗客が取り消した依頼を、システムは一覧から除く。
+  - もう受けられなくなった依頼をドライバーが選ぶと、システムはその依頼がもう受けられないことを示す。
+quality_hints:
+  - 効率性 (QIU-16) - 依頼を選んでから T_accept 以内に許諾を終えられる

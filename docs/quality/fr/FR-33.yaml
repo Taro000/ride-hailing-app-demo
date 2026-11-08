@@ -1,0 +1,21 @@
+id: FR-33
+title: 異常・エラーをエンジニアに知らせる
+status: active
+basis: inferred
+basis_note: 機能は CUJ-10 の手順（入力）。知らせる内容は推定。何を異常とみなし、どう見つけるかは設計と第 4 段階で決める。新規であることは質問 4 で確認済み
+premises: []
+statement: システムは、配車の手配、乗車、決済などの機能に異常やエラーが起きると、エンジニアに知らせる。
+origin: cuj-step
+cuj: CUJ-10
+cuj_step: 異常・エラーの通知受取
+traces_to: [QIU-21, QIU-22]
+proposal: null
+existing: false
+extends: null
+interface: ["通知: エンジニア"]
+acceptance_criteria:
+  - 機能に異常やエラーが起きると、システムは、どの機能で、いつ、どのような異常やエラーが起きたかをエンジニアに知らせる。
+  - 同じ異常やエラーが続けて起きるとき、システムは続いていることが分かるように知らせる。
+quality_hints:
+  - 有効性 (QIU-21) - 障害として調べる必要がある異常やエラーが、漏れなく知らされる
+  - 効率性 (QIU-22) - 通知から T_cause_found 以内に原因を特定できる

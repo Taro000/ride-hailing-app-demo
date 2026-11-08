@@ -1,0 +1,21 @@
+id: FR-17
+title: 依頼の受付を始める・やめる
+status: active
+basis: inferred
+basis_note: QIU-01 と QIU-20 からの推定（受付をしていないドライバーに依頼が届くと許諾されず、迎車が来ない）。新規であることは質問 4 で確認済み
+premises: []
+statement: システムは、ドライバーが配車依頼の受付を始めたりやめたりできるようにし、受付をしているドライバーにだけ依頼を届ける。
+origin: quality-in-use
+cuj: CUJ-06
+cuj_step: 配車依頼を選ぶ
+traces_to: [QIU-01, QIU-20]
+proposal: null
+existing: false
+extends: null
+interface: ["画面: ドライバーの配車受付"]
+acceptance_criteria:
+  - ドライバーが受付を始めると、システムはそのドライバーに依頼を届け始める。
+  - ドライバーが受付をやめると、システムはそのドライバーに新しい依頼を届けない。許諾した依頼はそのまま続く。
+  - 停止されたドライバーが受付を始めようとすると（FR-44）、システムは停止されていることを示し、受付を始めさせない。
+quality_hints:
+  - 有効性 (QIU-01) - 依頼が、応じられるドライバーに届く

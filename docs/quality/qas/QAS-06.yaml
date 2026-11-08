@@ -1,0 +1,12 @@
+id: QAS-06
+title: 苦情と返金の求めはシステムの中で受け付ける
+status: open
+stage: 2
+kind: decision
+statement: 乗客とドライバーは、乗車についての苦情や返金の求め（危険な運転や加害の報告を含む）をシステムの中で寄せ、担当者はシステムの中でそれを受けて、対応を終えるまでを記録する。
+why_unsure: 苦情と返金への対応の手順は決まっていない（第 1 段階、質問 2）。電話やメールなどシステムの外で受けるやり方もありうる。
+breadth: medium
+severity: medium
+rating_note: FR-37 が依存し、QIU-07 と QIU-27 の測定量のデータがこれによる。違っていれば FR-37 を外し、二つの QIU のデータの出どころを決め直す。システムの外で受けても対応はできるので、利用者への害は増えない
+answer: null
+answered_in: null

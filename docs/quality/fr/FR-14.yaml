@@ -1,0 +1,21 @@
+id: FR-14
+title: 乗り終えた乗客に移動時間を信じられたかを問う
+status: active
+basis: inferred
+basis_note: QIU-05 の測定量は乗客への問いで、入力にデータの出どころがないため加えた（推定）。新規であることは質問 4 で確認済み
+premises: []
+statement: システムは、乗車が終わった乗客に、手配時に示された移動時間を信じて手配できたかを一つだけ問い、回答を記録する。
+origin: quality-in-use
+cuj: CUJ-03
+cuj_step: 正しい場所に到着したかを確認する
+traces_to: [QIU-05]
+proposal: null
+existing: false
+extends: null
+interface: ["画面: 乗客の乗車後"]
+acceptance_criteria:
+  - 乗車が終わると、システムは乗客に、示された移動時間を信じて手配できたかを問う。
+  - 乗客が答えると、システムは回答をその乗車と結び付けて記録する。
+  - 乗客が答えずに閉じたとき、システムは回答なしとして記録し、同じ乗車について問い直さない。
+quality_hints:
+  - 信用性 (QIU-05) - 乗り終えたどの乗客にも問いが示され、回答が欠けずに記録される

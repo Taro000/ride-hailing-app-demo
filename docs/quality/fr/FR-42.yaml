@@ -1,0 +1,21 @@
+id: FR-42
+title: 試験用のアカウントを区別する
+status: active
+basis: inferred
+basis_note: 乗客とドライバーの QIU（QIU-01〜QIU-20）の測定量はどれも試験用のアカウントを除くため、試験用のアカウントを見分ける機能が要る（推定）。新規であることは質問 4 で確認済み
+premises: []
+statement: システムは、担当者がアカウントを試験用として作成できるようにし、試験用のアカウントによる依頼や乗車をほかと分けて数えられるように記録する。
+origin: quality-in-use
+cuj: CUJ-16
+cuj_step: null
+traces_to: [QIU-01, QIU-02, QIU-03, QIU-04, QIU-05, QIU-06, QIU-07, QIU-08, QIU-09, QIU-10, QIU-11, QIU-12, QIU-13, QIU-14, QIU-15, QIU-16, QIU-17, QIU-18, QIU-19, QIU-20]
+proposal: null
+existing: false
+extends: null
+interface: ["画面: 運営・サポートの担当者"]
+acceptance_criteria:
+  - 担当者がアカウントを試験用として作成すると、システムはそのアカウントを試験用として示す。
+  - システムは、試験用のアカウントによる依頼、乗車、評価、決済、苦情を、試験用のものと分かるように記録する。
+  - 担当者がアカウントを試験用からそうでないものに、またはその逆に変えると、システムは変えたことといつ変えたかを記録する。
+quality_hints:
+  - 有効性 (QIU-01) - 試験用のアカウントによる依頼が漏れなく区別され、数えるときに除ける

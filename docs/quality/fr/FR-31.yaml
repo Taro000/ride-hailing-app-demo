@@ -1,0 +1,21 @@
+id: FR-31
+title: 支払った額を乗客に示す
+status: active
+basis: inferred
+basis_note: QIU-04 からの推定（請求の誤りに乗客が気づけるようにする）。新規であることは質問 4 で確認済み
+premises: []
+statement: システムは、決済が済むと、乗客にその乗車で支払った額を示し、乗客が過去の乗車と支払った額を後から確かめられるようにする。
+origin: quality-in-use
+cuj: CUJ-08
+cuj_step: 決済を行う
+traces_to: [QIU-04, QIU-12]
+proposal: null
+existing: false
+extends: null
+interface: ["通知: 乗客", "画面: 乗客の乗車の履歴"]
+acceptance_criteria:
+  - 決済が済むと、システムは支払った額、確定した料金、乗った区間を乗客に示す。乗車中に降りる場所を変えたときは、変えた後の区間と承認した料金を示す。
+  - 乗客が乗車の履歴を開くと、システムは過去の乗車ごとに、日時、区間、支払った額と、返金があればその額を示す。
+  - 決済が済んでいない乗車を、システムは履歴の中で済んでいないことが分かるように示す。
+quality_hints:
+  - 経済リスク緩和性 (QIU-04) - 示す額が実際に請求した額と一致する

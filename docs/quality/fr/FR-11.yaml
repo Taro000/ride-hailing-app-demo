@@ -1,0 +1,20 @@
+id: FR-11
+title: 乗客とドライバーが連絡を取り合う
+status: active
+basis: inferred
+basis_note: QIU-08 の失敗のシナリオ（着いた車を乗客が見つけられない）からの推定。どのような手段で連絡するかは設計で決める。新規であることは質問 4 で確認済み
+premises: []
+statement: システムは、配車が確定してから乗車が始まるまで、その依頼の乗客とドライバーが互いに連絡を取れるようにする。
+origin: quality-in-use
+cuj: CUJ-02
+cuj_step: 手配した車かどうかを確認する
+traces_to: [QIU-08, QIU-09]
+proposal: null
+existing: false
+extends: null
+interface: ["画面: 乗客の配車手配", "画面: ドライバーの迎車"]
+acceptance_criteria:
+  - 配車が確定してから乗車が始まるまで、乗客とドライバーは、その依頼の相手にシステムを通じて連絡できる。
+  - 依頼が取り消されるか乗車が終わると、乗客とドライバーはシステムを通じて相手に連絡できなくなる。
+quality_hints:
+  - 有効性 (QIU-08) - 乗車場所で互いを見つけられないとき、連絡を取って合流できる

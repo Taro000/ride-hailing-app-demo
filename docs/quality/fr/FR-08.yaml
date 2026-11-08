@@ -1,0 +1,21 @@
+id: FR-08
+title: 迎車の位置と着く見込みを示す
+status: active
+basis: inferred
+basis_note: QIU-08 と QIU-15 の失敗のシナリオ（車を見つけられない、向かう途中で取り消される）からの推定。新規であることは質問 4 で確認済み
+premises: []
+statement: システムは、配車が確定してから迎車が乗車場所に着くまで、迎車のいる場所と乗車場所に着く見込みの時刻を乗客に示す。
+origin: quality-in-use
+cuj: CUJ-02
+cuj_step: 手配した車かどうかを確認する
+traces_to: [QIU-08, QIU-15]
+proposal: null
+existing: false
+extends: null
+interface: ["画面: 乗客の配車手配"]
+acceptance_criteria:
+  - 配車が確定してから迎車が乗車場所に着くまで、システムは迎車のいる場所と、乗車場所に着く見込みの時刻を示す。
+  - 迎車のいる場所が分からなくなったとき、システムは最後に分かった場所とその時刻を示し、今の場所が分からないことを伝える。
+quality_hints:
+  - 有効性 (QIU-08) - 乗客が迎車の着く時刻に合わせて乗車場所にいられる
+  - 有効性 (QIU-15) - 迎車を待つ乗客が、来るかどうか分からずに取り消すことがない

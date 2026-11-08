@@ -1,0 +1,21 @@
+id: FR-30
+title: 一つの乗車に一度だけ請求する
+status: active
+basis: inferred
+basis_note: QIU-04（二重の請求を含む）からの推定。同じ乗車への決済をどう見分けるかは設計で決める。新規であることは質問 4 で確認済み
+premises: [CON-01, CON-03, EXT-01]
+statement: システムは、一つの乗車について決済が何度行われても、乗客に一度だけ請求する。
+origin: quality-in-use
+cuj: CUJ-08
+cuj_step: 決済を行う
+traces_to: [QIU-04, QIU-19]
+proposal: null
+existing: false
+extends: null
+interface: ["画面: ドライバーの乗車中", EXT-01]
+acceptance_criteria:
+  - 決済が済んだ乗車でドライバーがもう一度決済を行うと、システムは最初の結果を示し、乗客に二度目の請求をしない。
+  - EXT-01 が答えず結果がドライバーに示されなかった乗車でドライバーが決済をやり直すと、システムはその乗車に一度だけ請求し、済んだかどうかを示す。
+  - 同じ乗客が同じ区間を同じ料金で二度乗ったとき、システムはそれぞれの乗車に請求する。
+quality_hints:
+  - 経済リスク緩和性 (QIU-04) - 同じ乗車に二重に請求しない。EXT-01 が答えないときも同じ

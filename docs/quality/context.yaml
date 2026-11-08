@@ -5,15 +5,31 @@ system:
   basis: inferred
 constraints:
   - id: CON-01
-    statement: 乗客が手配時に確認した料金が、そのまま支払う額になる（確定額）。決済はこのシステムの中で行う
-    source: 質問 1 の回答
+    statement: 乗客が確認した料金が、そのまま支払う額になる（確定額）。確定額は手配時に乗客が確認した料金で、乗車中に降りる場所を変えて乗客が新しい料金を承認したときは、その料金に更新される。決済はこのシステムの中で行う
+    source: 質問 1 の回答。確定額の更新は第 2 段階の質問 7 の回答
     basis: confirmed
   - id: CON-02
     statement: このサービスは事業化しないデモである
     source: 質問 4 の回答
     basis: confirmed
-external_systems: []
-design_inputs: []
+  - id: CON-03
+    statement: 決済と返金は外部の決済サービス（EXT-01）のテスト環境を通して行い、実際のお金は動かない
+    source: 第 2 段階の質問 1 の回答
+    basis: confirmed
+external_systems:
+  - id: EXT-01
+    role: 外部の決済サービス（テスト環境で、乗客の支払いと返金を処理する）
+    creates_data: true
+    basis: confirmed
+design_inputs:
+  - id: DIN-01
+    statement: 決済と返金には Stripe のテスト環境（サンドボックス）を使う。システムの中で記録するだけの仮の仕組みは使わない
+    source: 第 2 段階の質問 1 の回答
+    basis: confirmed
+  - id: DIN-02
+    statement: 乗客とドライバーが同じ依頼の相手であることは確認コードで確かめる。乗客が伝えたコードをドライバーが入れる
+    source: 第 2 段階の質問 2 の回答
+    basis: confirmed
 kgis:
   - id: KGI-01
     name: 流通総額

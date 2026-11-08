@@ -1,0 +1,21 @@
+id: FR-06
+title: 配車の確定を乗客に知らせる
+status: active
+basis: inferred
+basis_note: 機能は CUJ-01 の手順（入力）。知らせる内容は推定。新規であることは質問 4 で確認済み
+premises: []
+statement: システムは、ドライバーが依頼を許諾すると、配車が確定したことを、迎えに来るドライバーと車、乗車場所に着く見込みの時刻とともに乗客に知らせる。
+origin: cuj-step
+cuj: CUJ-01
+cuj_step: 配車を手配する
+traces_to: [QIU-01, QIU-08]
+proposal: null
+existing: false
+extends: null
+interface: ["通知: 乗客", "画面: 乗客の配車手配"]
+acceptance_criteria:
+  - ドライバーが依頼を許諾すると、システムは配車が確定したことを乗客に知らせ、ドライバーの名前、車を見分ける手がかり（FR-09）、乗車場所に着く見込みの時刻を示す。
+  - 乗客が知らせを見ていなくても、配車の画面を開くと、システムは確定した配車の内容を示す。
+quality_hints:
+  - 有効性 (QIU-01) - 許諾された依頼の乗客が、配車が確定したことを知る
+  - 有効性 (QIU-08) - 乗客が迎えに来る車を知ったうえで乗車場所で待てる

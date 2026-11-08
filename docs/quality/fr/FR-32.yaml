@@ -1,0 +1,21 @@
+id: FR-32
+title: 依頼を受ける条件を設定する
+status: active
+basis: inferred
+basis_note: 機能と条件の中身は CUJ-09 の手順（入力）。受け入れ基準は推定。新規であることは質問 4 で確認済み
+premises: []
+statement: システムは、ドライバーが配車依頼を受ける条件として、最低の金額と、現在地から乗車場所までの最大の距離を設定、変更、解除できるようにする。
+origin: cuj-step
+cuj: CUJ-09
+cuj_step: 配車依頼を受ける条件を設定する（金額・現在地から乗車場所までの距離）
+traces_to: [QIU-20]
+proposal: null
+existing: false
+extends: null
+interface: ["画面: ドライバーの設定"]
+acceptance_criteria:
+  - ドライバーが条件を設定するか変えると、システムはその後に届ける依頼にその条件を使う（FR-19）。
+  - ドライバーが条件を解除すると、システムは金額と距離によって依頼を除かない。
+  - 金額や距離に 0 より小さい値や数でない値を入れると、システムは受け付けず、正しい値を求める。
+quality_hints:
+  - 有効性 (QIU-20) - 設定した条件が、その後のどの依頼にも使われる

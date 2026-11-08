@@ -1,0 +1,22 @@
+id: FR-46
+title: 支払い方法を登録する
+status: active
+basis: inferred
+basis_note: 決済と返金が外部の決済サービス（EXT-01）のテスト環境を通ること（質問 1、CON-03）と、乗客が降車のときに支払いの操作をしないこと（QIU-12、FR-29）からの推定。新規であることは質問 4 で確認済み
+premises: [CON-03, EXT-01]
+statement: システムは、乗客が決済に使う支払い方法を登録し、変えられるようにする。
+origin: quality-in-use
+cuj: CUJ-01
+cuj_step: 配車を手配する
+traces_to: [QIU-12, QIU-19]
+proposal: null
+existing: false
+extends: null
+interface: ["画面: 乗客の設定", EXT-01]
+acceptance_criteria:
+  - 乗客が支払い方法を入れると、システムはそれを EXT-01 に登録し、登録できたことを示す。
+  - EXT-01 が支払い方法を受け付けなかったとき、システムは登録できなかったことを示し、別の支払い方法を求める。
+  - 乗客が支払い方法を変えると、システムはその後の決済に新しい支払い方法を使う。
+quality_hints:
+  - 効率性 (QIU-12) - 降車のときに、乗客の支払いの操作が要らない
+  - 有効性 (QIU-19) - 決済のときに、使える支払い方法が登録されている

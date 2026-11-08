@@ -1,0 +1,21 @@
+id: FR-10
+title: 迎車の到着を乗客に知らせる
+status: active
+basis: inferred
+basis_note: 機能は CUJ-02 の手順（入力）。受け入れ基準は推定。迎車が着いたことをどう知るかは設計で決める。新規であることは質問 4 で確認済み
+premises: []
+statement: システムは、迎車が乗車場所に着くと、そのことを乗客に知らせる。
+origin: cuj-step
+cuj: CUJ-02
+cuj_step: 手配した車かどうかを確認する
+traces_to: [QIU-08, QIU-09, KPI-02]
+proposal: null
+existing: false
+extends: null
+interface: ["通知: 乗客"]
+acceptance_criteria:
+  - 迎車が乗車場所に着くと、システムは迎車が着いたことを乗客に知らせる。
+  - 乗車が始まるまで、システムは迎車が着いていることを乗客の画面に示し続ける。
+quality_hints:
+  - 有効性 (QIU-08) - 迎車が着いたことを乗客が知り、行き違わずに合流できる
+  - 効率性 (QIU-09) - 迎車が着いてから T_boarding 以内に乗車が始まる
