@@ -1,0 +1,14 @@
+id: FRP-08
+title: 依頼の前に、ドライバーが見つかるまでと迎車の時間を含めた目的地への到着予定時刻を示す
+status: proposed
+basis: confirmed
+basis_note: 第 3 段階の質問 8 の回答（手配のときに示す目的地への到着予定時刻は、ドライバーが見つかるまでの時間と迎車の時間を含めて計算する）。FR-03 は二つの場所の間の移動時間の見込みだけを示し、目的地への到着予定時刻を示さない
+premises: []
+proposed_by: functional-requirements-to-product-quality
+origin: [QR-08]
+changes: FR-03
+reason: QR-08 は手配のときに示す目的地への到着予定時刻どおりに着くことを求めるが、FR-03 はその時刻を示さない。
+suggested_statement: システムは、乗る場所と降りる場所が決まると、依頼する前に、ドライバーが見つかるまでの時間と迎車の時間を含めた目的地への到着予定時刻と、乗客が支払う料金を示す。
+affects: []
+placeholders: []
+resolution: null

@@ -1,0 +1,22 @@
+id: QR-12
+title: 料金を確かめて依頼したことと承認したことを後から示せる
+status: active
+basis: inferred
+basis_note: 失敗のシナリオと点は推定。依頼したときの料金と承認した料金を記録することは FR-45 の受け入れ基準
+premises: [CON-01]
+model: product
+layer: external
+characteristic: security > non-repudiation
+statement: システムは、乗客がある料金を確かめて依頼したこと、乗車中に新しい降りる場所と料金を承認したこと、ドライバーが到着を確認したことを、誰がいつ行ったかとともに、後から否定できない形で示せる。
+applies_to: [FR-04, FR-28, FR-45, FR-47]
+traces_to: [QIU-04, QIU-27]
+entry_point: null
+stakeholders: [USR-01, USR-02, USR-04]
+failure_scenario: 乗客が「新しい料金を承認していない」と苦情を寄せ、担当者は乗客が承認したことを示せず、乗客とドライバーのどちらの言い分が正しいか決められない。
+score: {impact: 3, likelihood: 2}
+handling: minimum-line
+handling_reason: null
+implies_internal: []
+conflicts: []
+stated_numbers: []
+placeholders: []

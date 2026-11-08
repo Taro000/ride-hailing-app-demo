@@ -1,0 +1,23 @@
+id: QR-05
+title: 乗る場所の位置が、乗客が実際に待つ場所を表す
+status: active
+basis: inferred
+basis_note: 失敗のシナリオと点は推定。乗客の現在地は乗客の端末から得る（FR-02）。場所の名前や住所に結び付く位置は EXT-02 が作る（質問 3 で確認済み）。降りる場所と到着を確認した場所の位置は QR-70 に分けた（#16）。扱い（重視）は #16、#17、#20 で確認済み（CUJ-06 と CUJ-07 の組。CUJ-01 と CUJ-02 にもたどるが、ほかの CUJ の組からたどる分は数えない）
+premises: [EXT-02]
+model: data
+layer: data-inherent
+characteristic: accuracy
+statement: 配車依頼に乗る場所として入る位置は、乗客が実際に待つ場所（乗客が現在地や場所の名前・住所で決めた建物の入口など）から D_place_position_gap 以上離れない。
+applies_to: [FR-01, FR-02, FR-20, FR-24]
+traces_to: [QIU-01, QIU-08, QIU-15, QIU-18]
+entry_point: null
+stakeholders: [USR-01, USR-02, EXT-02]
+failure_scenario: EXT-02 が場所の名前に結び付ける位置が建物の裏口を指している、または乗客の現在地がずれて示されたまま依頼され、迎車は乗客のいない場所に着き、ドライバーは依頼主を見つけられずに取り消す。
+score: {impact: 4, likelihood: 3}
+handling: emphasized
+handling_reason: null
+implies_internal: []
+conflicts: []
+stated_numbers: []
+placeholders:
+  - {name: D_place_position_gap, meaning: "依頼に入る乗る場所・降りる場所の位置、および到着を確認した場所として記録する位置と、それが表す実際の場所（建物の入口など）との距離の許容", from: QR-05}

@@ -1,0 +1,22 @@
+id: QR-09
+title: 同じ名前の場所の取り違えを、依頼の前に防ぐ
+status: active
+basis: inferred
+basis_note: 失敗のシナリオと点は推定。FR-01 は決めた場所を示すため、取り違えたまま依頼されるのは年に一度程度とみた。場所の名前と所在地は EXT-02 が作る（質問 3 で確認済み）。候補を住所などで区別し位置を示すことは #18 の回答。位置をどう示すかは設計で決める。扱い（重視）は #18、#20 で確認済み（CUJ-03 の組）
+premises: [EXT-02]
+model: product
+layer: external
+characteristic: usability > user error protection
+statement: システムは、乗客が場所の名前や住所で乗る場所・降りる場所を決めるとき、同じ名前や似た名前の候補を所在地などで区別して示し、選んだ場所の位置を示して、乗客が依頼する前と乗車中に降りる場所を変えて承認する前に、取り違えていないか確かめられるようにする。
+applies_to: [FR-01, FR-47]
+traces_to: [QIU-01, QIU-11]
+entry_point: null
+stakeholders: [USR-01, EXT-02]
+failure_scenario: 乗客が同じ名前の別の店舗を降りる場所に選んだまま依頼し、迎車は来ても違う店舗の前で降ろされる。
+score: {impact: 4, likelihood: 2}
+handling: emphasized
+handling_reason: null
+implies_internal: []
+conflicts: []
+stated_numbers: []
+placeholders: []

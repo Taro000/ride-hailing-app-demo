@@ -16,10 +16,27 @@ constraints:
     statement: 決済と返金は外部の決済サービス（EXT-01）のテスト環境を通して行い、実際のお金は動かない
     source: 第 2 段階の質問 1 の回答
     basis: confirmed
+  - id: CON-04
+    statement: カードの情報は、このシステムのサーバー、ログ、データを通らず、保存されない。カードの情報は外部の決済サービス（EXT-01）が受け取る
+    source: 第 3 段階の質問 1 の回答（カードの情報の扱いの標準を模す開発方針）
+    basis: confirmed
+  - id: CON-05
+    statement: 乗客とドライバーは、開発方針で決めた一種類のスマートフォンのブラウザでこのサービスを使う。ほかの端末とブラウザには対応しない
+    source: 第 3 段階の質問 1 の回答（開発方針）
+    basis: confirmed
+  - id: CON-06
+    statement: 参加者は実在の人で、システムが扱う位置情報も本物である。個人の情報の扱いに関する法令に従う
+    source: 第 3 段階の質問 1 の回答
+    basis: confirmed
 external_systems:
   - id: EXT-01
     role: 外部の決済サービス（テスト環境で、乗客の支払いと返金を処理する）
     creates_data: true
+    basis: confirmed
+  - id: EXT-02
+    role: 外部の地図のサービス（場所の名前・住所と位置、道と移動時間の見込みのもとになるデータを作る）
+    creates_data: true
+    source: 第 3 段階の質問 3 の回答
     basis: confirmed
 design_inputs:
   - id: DIN-01
@@ -29,6 +46,26 @@ design_inputs:
   - id: DIN-02
     statement: 乗客とドライバーが同じ依頼の相手であることは確認コードで確かめる。乗客が伝えたコードをドライバーが入れる
     source: 第 2 段階の質問 2 の回答
+    basis: confirmed
+  - id: DIN-03
+    statement: カードの情報は、決済のサービスが用意する入力部品で入れる
+    source: 第 3 段階の質問 1 の回答（カードの情報の扱いの標準を模す開発方針）
+    basis: confirmed
+  - id: DIN-04
+    statement: ネイティブアプリを使わず、スマートフォンのブラウザで使う Web アプリとする。対象は iOS の Safari だけ
+    source: 第 3 段階の質問 1 の回答（開発方針）
+    basis: confirmed
+  - id: DIN-05
+    statement: 外部の地図のサービス（EXT-02）は Google Maps Platform を使う
+    source: 第 3 段階の質問 3 の回答
+    basis: confirmed
+  - id: DIN-06
+    statement: 新しい版の配備はデモの回を開くときに行う。配車を止めずに新しい版を入れることは求めない
+    source: 第 3 段階の未確認の仮定の一覧への訂正（決めたこと #13）
+    basis: confirmed
+  - id: DIN-07
+    statement: 担当者は参加者に、アカウントの設定の符号を直接渡す
+    source: 第 3 段階の未確認の仮定の一覧への訂正（決めたこと #15）
     basis: confirmed
 kgis:
   - id: KGI-01

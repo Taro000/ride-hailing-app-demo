@@ -1,0 +1,22 @@
+id: QR-23
+title: ドライバーに示す乗る場所と降りる場所が、乗客が決めた場所と食い違わない
+status: active
+basis: inferred
+basis_note: 失敗のシナリオと点は推定。乗車中に降りる場所を変える機能は第 2 段階の質問 7 で加わった（FR-47）。変えた場所がドライバーに伝わらない場面は年に一度程度とみた
+premises: []
+model: data
+layer: data-inherent
+characteristic: consistency
+statement: ドライバーに示す乗車場所と降りる場所は、その依頼で乗客が決めた場所と同じで、乗車中に乗客が新しい降りる場所を承認したときは、承認した場所と同じになる。
+applies_to: [FR-24, FR-47]
+traces_to: [QIU-11, QIU-15]
+entry_point: null
+stakeholders: [USR-01, USR-02]
+failure_scenario: 乗客が乗車中に降りる場所を変えて承認したのに、ドライバーの画面には元の降りる場所が示されたままで、乗客は元の場所で降ろされ、新しい料金で請求される。
+score: {impact: 4, likelihood: 2}
+handling: minimum-line
+handling_reason: null
+implies_internal: []
+conflicts: []
+stated_numbers: []
+placeholders: []

@@ -1,0 +1,23 @@
+id: QR-34
+title: 調査で見る内容では個人の情報が隠れ、理由を示したときだけ見える
+status: active
+basis: inferred
+basis_note: 隠すこと、理由を示したときだけ見せることは FR-35 の受け入れ基準。失敗のシナリオと点は推定。障害を調べるたびに依頼を見るため、隠し漏れに触れる場面は数か月に一度程度とみた。誰がどの機能を使えるかの区別は FRP-02。扱い（最低限守る線）は #12 で確認済み（エンジニアの CUJ だけにたどる QR は今期は重視にしない）
+premises: [QAS-15]
+model: product
+layer: external
+characteristic: security > confidentiality
+statement: エンジニアが調査で見るどの画面と記録でも、乗客とドライバーの名前、連絡先、乗る場所と降りる場所は隠れており、エンジニアが理由を示したときだけ、その依頼の分に限って見える。
+applies_to: [FR-34, FR-35]
+traces_to: [QIU-23]
+entry_point: null
+stakeholders: [USR-03, USR-01, USR-02]
+failure_scenario: 異常の知らせに添えられた記録に乗客の降りる場所（自宅）がそのまま入っており、隠す画面を通らずにエンジニアの目に触れ、それが漏れる。
+score: {impact: 4, likelihood: 3}
+handling: minimum-line
+handling_reason: null
+implies_internal: [QR-56]
+conflicts:
+  - {with: QR-33, note: "個人の情報を隠しても、同じ乗客や同じドライバーの依頼であることは分かり（FR-35）、経過をたどることは妨げない"}
+stated_numbers: []
+placeholders: []

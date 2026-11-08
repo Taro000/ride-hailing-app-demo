@@ -1,0 +1,22 @@
+id: QR-47
+title: 試験用のアカウントとその依頼や乗車は、漏れなく試験用として記録される
+status: active
+basis: inferred
+basis_note: 失敗のシナリオと点は推定。QIU-01〜QIU-20 の測定量はどれも試験用のアカウントを除く（第 2 段階の報告）
+premises: []
+model: data
+layer: data-inherent
+characteristic: completeness
+statement: 試験用として作成したアカウントと、そのアカウントによる依頼、乗車、評価、決済、苦情は、どれも試験用であることが記録されている。
+applies_to: [FR-42]
+traces_to: [QIU-01, QIU-02, QIU-03, QIU-04, QIU-05, QIU-06, QIU-08, QIU-09, QIU-10, QIU-11, QIU-12, QIU-13, QIU-14, QIU-15, QIU-16, QIU-17, QIU-18, QIU-19, QIU-20]
+entry_point: null
+stakeholders: [USR-04]
+failure_scenario: 担当者が試験用の印を付け忘れたアカウントで繰り返し配車を試し、その依頼が配車の成立率に混ざって、事業は実際より高い成立率を見て判断する。
+score: {impact: 3, likelihood: 2}
+handling: minimum-line
+handling_reason: null
+implies_internal: []
+conflicts: []
+stated_numbers: []
+placeholders: []

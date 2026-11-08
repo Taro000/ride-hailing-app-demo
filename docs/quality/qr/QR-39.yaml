@@ -1,0 +1,23 @@
+id: QR-39
+title: 前の版に戻すと元の振る舞いに戻り、進んでいる依頼と記録を使い続けられる
+status: active
+basis: inferred
+basis_note: 前の版に戻すと元の振る舞いに戻り、進んでいる依頼と記録を使い続けられることと、最低限守る線とすることは #13 で確認済み。配車を止めずに新しい版を入れる要求はない（配備はデモの回を開くときに行う、設計への申し送り DIN-06）。変えた振る舞いを止めることは FR-36。失敗のシナリオと点は推定
+premises: [QAS-16]
+model: product
+layer: external
+characteristic: portability > installability
+statement: 機能の追加、修正、利用技術のバージョンアップを含む新しい版に問題が見つかれば、T_rollback 以内に前の版に戻せ、戻すと元の振る舞いに戻り、進んでいる依頼と乗車、それまでの記録をそのまま使い続けられる。
+applies_to: [FR-36]
+traces_to: [QIU-24, QIU-25, QIU-26]
+entry_point: null
+stakeholders: [USR-03, USR-01, USR-02]
+failure_scenario: 利用技術のバージョンアップを入れた後に到着の確認が動かなくなり、前の版に戻すと、乗車中だった乗車の記録が新しい版の形のまま読めず、ドライバーは到着を確認できない。
+score: {impact: 4, likelihood: 3}
+handling: minimum-line
+handling_reason: null
+implies_internal: [QR-52]
+conflicts: []
+stated_numbers: []
+placeholders:
+  - {name: T_rollback, meaning: "エンジニアが新しい版や変えた振る舞いを戻すと決めてから、前の振る舞いに戻るまでの時間", from: QR-39}

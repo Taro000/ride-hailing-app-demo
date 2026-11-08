@@ -1,0 +1,24 @@
+id: QR-33
+title: 異常が漏れなくすぐ知らされ、その依頼の経過を欠けなくたどれる
+status: active
+basis: inferred
+basis_note: 失敗のシナリオと点は推定。新しく作るシステムで、知らせ漏れや記録の欠けで原因が分からない場面は数か月に一度程度とみた。何を異常とみなし、どう見つけ、どの段階をどう記録するかは設計と第 4 段階で決める（FR-33, FR-34）。稼働中のシステムの振る舞いとして確かめるため外部品質に置いた。扱い（最低限守る線）は #12 で確認済み（エンジニアの CUJ だけにたどる QR は今期は重視にしない）
+premises: [QAS-15]
+model: product
+layer: external
+characteristic: maintainability > analysability
+statement: システムは、機能に異常やエラーが起きると、起きてから T_alert_delay 以内に、どの機能で、いつ、何が起きたかを漏れなくエンジニアに知らせ、知らされた異常からその依頼でシステムが行ったことを、依頼から決済まで欠けた段階なく、システムのどの部分で起きたかが分かるようにたどらせる。
+applies_to: [FR-33, FR-34]
+traces_to: [QIU-21, QIU-22]
+entry_point: null
+stakeholders: [USR-03, USR-01, USR-02]
+failure_scenario: 決済の失敗が続いてもエンジニアに知らされず、乗客の問い合わせで気づいて調べても、その依頼の EXT-01 とのやり取りの段階が記録されておらず、原因が分からないまま同じ失敗が繰り返される。
+score: {impact: 4, likelihood: 3}
+handling: minimum-line
+handling_reason: null
+implies_internal: [QR-53]
+conflicts:
+  - {with: QR-34, note: "個人の情報を隠しても、同じ乗客や同じドライバーの依頼であることは分かり（FR-35）、経過をたどることは妨げない"}
+stated_numbers: []
+placeholders:
+  - {name: T_alert_delay, meaning: "機能に異常やエラーが起きてから、エンジニアに知らせるまでの時間", from: QR-33}

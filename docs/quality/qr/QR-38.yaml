@@ -1,0 +1,22 @@
+id: QR-38
+title: 追加、修正、版上げを公開しても、変えなかった機能は以前どおりに動く
+status: active
+basis: inferred
+basis_note: 失敗のシナリオと点は推定。新しく作るシステムで変更が多く、公開が既存の機能を壊す場面は数か月に一度程度とみた。どの変更が壊したかはプロダクトの外のエンジニアの記録で数える（第 2 段階の質問 5）。公開した後の稼働中の振る舞いとして確かめるため外部品質に置いた。扱い（最低限守る線）は #13 で確認済み（機能の追加・修正・版上げの CUJ の重視は 0 件）
+premises: [QAS-16]
+model: product
+layer: external
+characteristic: maintainability > modifiability
+statement: エンジニアが機能の追加、既存の機能の修正、利用技術のバージョンアップを公開しても、変えなかった機能は公開の前と同じように振る舞う。
+applies_to: [FR-01, FR-03, FR-04, FR-12, FR-15, FR-21, FR-27, FR-28, FR-29, FR-30, FR-36, FR-39, FR-40]
+traces_to: [QIU-24, QIU-25, QIU-26]
+entry_point: null
+stakeholders: [USR-03, USR-01, USR-02, USR-04]
+failure_scenario: 評価の機能を直して公開したら決済の額の求め方が変わり、到着を確認しても決済が通らなくなり、乗客とドライバーは乗降のたびに困る。
+score: {impact: 5, likelihood: 3}
+handling: minimum-line
+handling_reason: null
+implies_internal: [QR-52]
+conflicts: []
+stated_numbers: []
+placeholders: []

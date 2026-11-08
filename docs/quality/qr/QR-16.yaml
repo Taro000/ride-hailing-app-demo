@@ -1,0 +1,23 @@
+id: QR-16
+title: 閾値を設定した乗客の依頼は、閾値以上のドライバーにだけ届く
+status: active
+basis: assumed
+basis_note: 失敗のシナリオと点は推定。評価がまだないドライバーに届けないことは QAS-05 による仮定。ドライバーの評価を乗客の評価からどうまとめるかは入力になく（第 2 段階の未解決の点）、新しい評価を反映することはこの QR に含む（#14）。扱い（重視）は質問 2 で確認済み（CUJ-05 の組）
+premises: [QAS-05]
+model: product
+layer: external
+characteristic: functional suitability > functional correctness
+statement: システムは、評価の閾値を設定した乗客の依頼を、届ける時点の評価がその閾値以上のドライバーにだけ届け、評価がまだないドライバーには届けない。比べる評価は、乗客が付けた新しい評価を T_rating_reflect 以内に反映した値である。閾値を設定していない乗客の依頼は、評価によってドライバーを除かない。
+applies_to: [FR-05, FR-15, FR-16]
+traces_to: [QIU-14, QIU-06]
+entry_point: null
+stakeholders: [USR-01, USR-02]
+failure_scenario: 乗客が閾値を上げた直後の依頼に古い閾値が使われる、または評価が閾値を下回ったばかりのドライバーに依頼が届いて許諾され、乗客は乗るのをためらって配車を取り消す。
+score: {impact: 4, likelihood: 2}
+handling: emphasized
+handling_reason: null
+implies_internal: [QR-54]
+conflicts: []
+stated_numbers: []
+placeholders:
+  - {name: T_rating_reflect, meaning: "乗客が評価を付けてから、閾値によるマッチに使うドライバーの評価がそれを反映するまでの時間", from: QR-16}

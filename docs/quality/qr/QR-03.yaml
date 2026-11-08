@@ -1,0 +1,22 @@
+id: QR-03
+title: 一つの依頼の状態と割り当てたドライバーは一つに定まる
+status: active
+basis: inferred
+basis_note: 失敗のシナリオと点は推定。許諾と取り消しが重なる場面は FR-07、FR-21、FR-23 の受け入れ基準にあり、量の事実がないデモ（CON-02）では重なりはまれとみた。扱い（重視）は質問 2 で確認済み（CUJ-01 の組）
+premises: [CON-02]
+model: data
+layer: data-inherent
+characteristic: consistency
+statement: 一つの配車依頼の状態（ドライバーを探している、許諾された、取り消された、乗車中、終わった）と割り当てたドライバーは、許諾や取り消しの操作が重なっても一つに定まり、乗客とドライバーに示すものと食い違わない。
+applies_to: [FR-04, FR-07, FR-18, FR-21, FR-23, FR-26, FR-27]
+traces_to: [QIU-01, QIU-15]
+entry_point: null
+stakeholders: [USR-01, USR-02]
+failure_scenario: 乗客が取り消すのとほぼ同時にドライバーが許諾し、依頼は取り消されたのに許諾したドライバーの画面では迎車中のままになり、ドライバーは取り消された乗車場所へ向かい続ける。
+score: {impact: 4, likelihood: 2}
+handling: emphasized
+handling_reason: null
+implies_internal: [QR-51]
+conflicts: []
+stated_numbers: []
+placeholders: []

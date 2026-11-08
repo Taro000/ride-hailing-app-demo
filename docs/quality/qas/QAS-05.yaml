@@ -5,8 +5,8 @@ stage: 2
 kind: judgment
 statement: 乗客が評価の閾値を設定しているとき、評価がまだ一つもないドライバーには、その乗客の依頼を届けない。
 why_unsure: 入力は評価が一定以上のドライバーとだけマッチするとだけ述べ、評価がまだないドライバーの扱いを書いていない。
-breadth: low
+breadth: medium
 severity: low
-rating_note: FR-05 だけが依存する。違っていても届ける相手の決まりを一つ変えるだけで、閾値を設定していない乗客には関わらない
+rating_note: FR-05 と、第 3 段階の QR-16 が依存する。違っていても届ける相手の決まりを一つ変えるだけで、閾値を設定していない乗客には関わらない
 answer: null
 answered_in: null

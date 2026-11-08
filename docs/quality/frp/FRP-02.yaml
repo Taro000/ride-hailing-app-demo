@@ -1,0 +1,14 @@
+id: FRP-02
+title: 利用者の種類ごとに使える機能を分ける
+status: proposed
+basis: inferred
+basis_note: QR-13、QR-34、QR-57 からの推定。第 2 段階の報告の未解決の点が見込んでいた提案。セキュリティのリスク分析の分類（役割ごとの権限）にも当たる（第 3 段階の質問 1）
+premises: []
+proposed_by: functional-requirements-to-product-quality
+origin: [QR-13, QR-34, QR-57]
+changes: null
+reason: 乗客、ドライバー、担当者、エンジニアのそれぞれがどの機能を使えるかを分ける機能がどの FR にもなく、確定額や評価を決める操作を許された人に限ること、エンジニアに隠した個人の情報を見せないこと、位置情報と乗車の記録を見ることを許された人に限ること（個人の情報の扱いに関する法令）が成り立たない。
+suggested_statement: システムは、乗客、ドライバー、運営・サポートの担当者、エンジニアのそれぞれに、その種類の利用者に許した機能だけを使わせる。
+affects: []
+placeholders: []
+resolution: null

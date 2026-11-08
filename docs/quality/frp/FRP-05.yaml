@@ -1,0 +1,14 @@
+id: FRP-05
+title: 記録してから 3 年を過ぎた記録とデータを、個人を特定できない形に変える
+status: proposed
+basis: inferred
+basis_note: QR-59 からの推定。保存期間（3 年）は第 3 段階の質問 1、記録した日から数えることと、状態の変化の種類と時刻を残して操作した人と位置を消すことは第 3 段階の質問 7 の回答。使い続けている参加者のアカウントの情報が 3 年で消えた後にどう使い続けるかは、第 2 段階が決める
+premises: [CON-06]
+proposed_by: functional-requirements-to-product-quality
+origin: [QR-59]
+changes: null
+reason: 記録してから 3 年を過ぎた個人の情報を個人を特定できない形に変える機能がどの FR にもなく、個人の情報の扱いに関する法令が求める保存期間を守れない。
+suggested_statement: システムは、位置情報や個人の情報を含む記録とデータを、記録してから 3 年を過ぎると、状態の変化の種類と時刻を残したまま、操作した人と位置を消し、個人を特定できない形に変える。使い続けている参加者のアカウントの情報も同じように扱う。
+affects: []
+placeholders: []
+resolution: null

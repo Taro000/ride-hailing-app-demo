@@ -1,0 +1,23 @@
+id: QR-42
+title: 過去の乗車の記録を、苦情や返金を扱う間は取り出せる
+status: active
+basis: inferred
+basis_note: 失敗のシナリオと点は推定。乗車の記録をどれだけ残すかは入力になく、名前を付けた値にした。法令が残す期間を定めるかは質問 1 で尋ねた。扱い（最低限守る線）は質問 2 と質問 4 で確認済み（CUJ-15 で点の低いものとして外した）
+premises: []
+model: data
+layer: data-system-dependent
+characteristic: availability
+statement: 乗車の記録（場所、各段階の時刻、ドライバーと車、料金、決済と返金の額、評価、取り消し）は、その乗車から N_ride_record_days の間、担当者が乗車を探して取り出せ、乗客が自分の乗車の履歴として見られる。
+applies_to: [FR-31, FR-38]
+traces_to: [QIU-27, QIU-29]
+entry_point: null
+stakeholders: [USR-04, USR-01]
+failure_scenario: 乗客が一か月前の乗車について「違う場所で降ろされた」と苦情を寄せたが、その乗車の記録がもう取り出せず、担当者は対応を終えられない。
+score: {impact: 4, likelihood: 2}
+handling: minimum-line
+handling_reason: null
+implies_internal: []
+conflicts: []
+stated_numbers: []
+placeholders:
+  - {name: N_ride_record_days, meaning: "乗車の記録を、その乗車から担当者と乗客が取り出せる日数", from: QR-42}

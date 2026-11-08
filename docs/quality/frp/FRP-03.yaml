@@ -1,0 +1,14 @@
+id: FRP-03
+title: 担当者の操作を、行った担当者とともに記録する
+status: proposed
+basis: inferred
+basis_note: QR-44 からの推定。訂正したことの記録は FR-41、FR-43 にあるが、誰が行ったかはどの FR にもない。第 2 段階の報告の未解決の点が見込んでいた提案
+premises: []
+proposed_by: functional-requirements-to-product-quality
+origin: [QR-44]
+changes: null
+reason: 返金、アカウントの作成と訂正、ドライバーと車両の登録と訂正、ドライバーの停止と再開を、どの担当者が行ったかを記録する機能がなく、誤った登録や返金を担当者までたどれない。
+suggested_statement: システムは、担当者による返金、アカウントの作成と訂正、ドライバーと車両の登録と訂正、ドライバーの停止と再開を、行った担当者、時刻、内容とともに記録する。
+affects: []
+placeholders: []
+resolution: null

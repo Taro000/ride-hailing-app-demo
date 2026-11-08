@@ -1,0 +1,22 @@
+id: QR-20
+title: 登録した車とドライバーの内容が実際の車とドライバーに一致する
+status: active
+basis: inferred
+basis_note: 失敗のシナリオと点は推定。内容は担当者が入れる（FR-43）。登録で入れる項目は名前、顔写真、連絡先、車種、色、ナンバーだけ（質問 5）。FR-43 は登録の前に内容を示して確かめさせるため、誤りは年に一度程度とみた。扱い（最低限守る線）は、CUJ-02 の上限（質問 4）のため。CUJ-02 の組は質問 9 で決まった
+premises: []
+model: data
+layer: data-inherent
+characteristic: accuracy
+statement: 登録されたドライバーの名前と顔写真、車種、色、車のナンバーは、実際のドライバーと車に一致し、訂正されると乗客に示す手がかりも訂正した内容になる。
+applies_to: [FR-09, FR-43]
+traces_to: [QIU-09, QIU-10, QIU-31]
+entry_point: null
+stakeholders: [USR-01, USR-02, USR-04]
+failure_scenario: 担当者が車の色を誤って登録し、乗客は示された色の車を探して、近くに止まった同じ色の別の車に乗る。
+score: {impact: 5, likelihood: 2}
+handling: minimum-line
+handling_reason: null
+implies_internal: []
+conflicts: []
+stated_numbers: []
+placeholders: []

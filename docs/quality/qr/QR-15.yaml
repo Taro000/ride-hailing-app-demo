@@ -1,0 +1,23 @@
+id: QR-15
+title: 配車の経過の記録に欠けがない
+status: active
+basis: inferred
+basis_note: 失敗のシナリオと点は推定。記録する段階は FR-45 の受け入れ基準。この記録は多くの QIU と KPI の測定量のデータになり（第 2 段階の報告）、担当者が乗車の記録を確かめるもとにもなる。苦情の確かめと障害の調査に使う記録が欠けないことは QR-41 で扱う
+premises: []
+model: data
+layer: data-inherent
+characteristic: completeness
+statement: どの配車依頼についても、起きた段階（依頼、届けた先、許諾、迎車の到着、乗車の開始、降りる場所の変更、到着の確認、決済、評価、取り消しや不在で終えたこととそれを行った人）が、それぞれの時刻とともに欠けずに記録され、乗り終えた乗客への問いの回答（回答なしを含む）がその乗車と結び付いて記録されている。
+applies_to: [FR-12, FR-14, FR-22, FR-28, FR-38, FR-45]
+traces_to: [QIU-01, QIU-03, QIU-05, QIU-08, QIU-09, QIU-11, QIU-12, QIU-15, QIU-16, QIU-19, QIU-20, QIU-33]
+entry_point: null
+stakeholders: [USR-01, USR-02, USR-04]
+failure_scenario: 取り消された依頼で誰が取り消したかが記録されず、許諾後の取り消しや合流の失敗が数えられないまま、担当者も苦情に関わる乗車の経過を確かめられない。
+score: {impact: 3, likelihood: 3}
+handling: minimum-line
+handling_reason: null
+implies_internal: []
+conflicts:
+  - {with: QR-59, note: "記録が欠けないことは 3 年のうちの記録について成り立ち、3 年を過ぎた記録は状態の変化の種類と時刻だけが残る"}
+stated_numbers: []
+placeholders: []

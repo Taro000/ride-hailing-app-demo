@@ -1,0 +1,23 @@
+id: QR-02
+title: 端末との通信が途切れても、進んでいる配車が失われない
+status: active
+basis: inferred
+basis_note: 失敗のシナリオと点は推定。QIU-01 の利用状況（通信は問わない）と、乗客とドライバーが屋外や走る車の中でスマートフォンを使うことから、通信の途切れは毎週起きるとみた。扱い（最低限守る線）は質問 4 で確認済み（CUJ-01 の QIU にたどり、CUJ-01 の組の外に置く）
+premises: []
+model: product
+layer: external
+characteristic: reliability > fault tolerance
+statement: 乗客やドライバーの端末とシステムとの通信が一時的に途切れても、その間に行った依頼、許諾、取り消し、乗車の開始、到着の確認の操作は失われも二重にもならず、つながり直すと、乗客とドライバーの画面は依頼の今の状態を示す。
+applies_to: [FR-04, FR-06, FR-07, FR-08, FR-12, FR-21, FR-23, FR-27, FR-28]
+traces_to: [QIU-01, QIU-15, QIU-18]
+entry_point: null
+stakeholders: [USR-01, USR-02]
+failure_scenario: 電波の弱い場所でドライバーが許諾した操作が途中で途切れ、ドライバーは許諾したつもりで乗車場所へ向かう一方、依頼はほかのドライバーに届き続け、乗車場所に二台が来るか、どちらも来ない。
+score: {impact: 4, likelihood: 4}
+handling: minimum-line
+handling_reason: null
+implies_internal: [QR-51]
+conflicts:
+  - {with: QR-06, note: "途切れた操作を確かめ直すことで相手に示すまでの時間が延びうる。途切れていないときは T_dispatch_propagation 以内に示し、途切れたときは失わないことを先にする"}
+stated_numbers: []
+placeholders: []

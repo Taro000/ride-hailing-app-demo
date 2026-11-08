@@ -1,0 +1,22 @@
+id: QR-43
+title: 担当者の機能が、担当者が使おうとしたときに使える
+status: active
+basis: inferred
+basis_note: 失敗のシナリオと点は推定。担当者の作業はどれも手順が決まっておらず（第 1 段階の質問 2）、使えない間は後で行えるため、影響度を低くみた。停止がすぐ効くことは QR-49 で扱う
+premises: []
+model: product
+layer: external
+characteristic: reliability > availability
+statement: システムは、苦情の受け付けと記録、乗車の照会、返金、アカウントの作成と訂正、ドライバーと車両の登録と訂正、ドライバーの停止の機能を、担当者が使おうとしたときに使える状態に保つ。
+applies_to: [FR-37, FR-38, FR-39, FR-41, FR-43, FR-44]
+traces_to: [QIU-27, QIU-28, QIU-30, QIU-31, QIU-33]
+entry_point: null
+stakeholders: [USR-04]
+failure_scenario: 担当者の画面が使えず、乗客から返金を求められても乗車を確かめられず、対応が翌日に持ち越される。
+score: {impact: 3, likelihood: 2}
+handling: minimum-line
+handling_reason: null
+implies_internal: []
+conflicts: []
+stated_numbers: []
+placeholders: []

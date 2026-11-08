@@ -1,0 +1,22 @@
+id: QR-11
+title: 乗客の個人の情報は、要る人に要る間だけ見える
+status: retired
+basis: confirmed
+basis_note: #19 で、乗車中の危険（危険な運転や犯罪）は利用時の品質要求の対象にしないと決まり、たどる QIU-07 がなくなったため廃止した（QAS-08 への訂正）。位置情報と乗車の記録を見られる人を限ることは QR-57 が扱う
+premises: []
+model: product
+layer: external
+characteristic: security > confidentiality
+statement: システムは、乗客の名前と連絡の手段を、その依頼を許諾したドライバーには許諾してから乗車が終わるまでだけ見せ、乗客の乗車の履歴と支払った額を、その乗客本人と運営・サポートの担当者のほかには見せない。
+applies_to: [FR-11, FR-25, FR-31, FR-38]
+traces_to: [QIU-07]
+entry_point: null
+stakeholders: [USR-01, USR-02, USR-04]
+failure_scenario: 乗車を終えたドライバーが乗客の名前や連絡の手段、降りた場所（自宅）を見続けられ、乗車の後に乗客へ付きまといや嫌がらせをする。
+score: {impact: 5, likelihood: 2}
+handling: minimum-line
+handling_reason: null
+implies_internal: []
+conflicts: []
+stated_numbers: []
+placeholders: []

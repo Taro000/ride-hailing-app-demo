@@ -1,0 +1,22 @@
+id: QR-32
+title: 設定した条件に合う依頼だけがドライバーに届く
+status: active
+basis: assumed
+basis_note: 条件の中身（金額、現在地から乗車場所までの距離）は入力。失敗のシナリオと点は推定。距離は道のりか直線かが入力になく、FR-19 の距離の意味に従う（未解決の点）。扱い（重視）は QAS-14 による暫定の決定
+premises: [QAS-14]
+model: product
+layer: external
+characteristic: functional suitability > functional correctness
+statement: システムは、依頼を受ける条件を設定したドライバーに、届ける時点で金額が最低の金額以上で、ドライバーの現在地から乗車場所までの距離が最大の距離以下の依頼だけを届け、条件を変えるか解除するとその後に届ける依頼にそれを使う。
+applies_to: [FR-19, FR-32]
+traces_to: [QIU-20]
+entry_point: null
+stakeholders: [USR-02]
+failure_scenario: ドライバーが最低の金額を上げた後も古い条件で依頼が届く、または距離を直線で比べて川の向こうの乗車場所の依頼が届き、ドライバーは一件ずつ断る手間を取られる。
+score: {impact: 3, likelihood: 2}
+handling: emphasized
+handling_reason: null
+implies_internal: [QR-54]
+conflicts: []
+stated_numbers: []
+placeholders: []

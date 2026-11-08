@@ -1,0 +1,22 @@
+id: QR-35
+title: 個人の情報を見た操作を、エンジニア一人ずつまでたどれる
+status: active
+basis: inferred
+basis_note: 誰が見たかを記録することは FR-35 の受け入れ基準。失敗のシナリオと点は推定。エンジニアが本人であることは QR-10
+premises: []
+model: product
+layer: external
+characteristic: security > accountability
+statement: エンジニアが隠した個人の情報を見た操作は、どのエンジニアが、いつ、どの依頼の、どの情報を、どの理由で見たかまで、一人ずつたどれる。
+applies_to: [FR-35]
+traces_to: [QIU-23]
+entry_point: null
+stakeholders: [USR-03, USR-01, USR-02]
+failure_scenario: 共用のアカウントで調査が行われ、乗客の移動の記録が漏れたとき、誰が見たのかたどれない。
+score: {impact: 4, likelihood: 2}
+handling: minimum-line
+handling_reason: null
+implies_internal: []
+conflicts: []
+stated_numbers: []
+placeholders: []

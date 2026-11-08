@@ -1,0 +1,22 @@
+id: QR-01
+title: 配車の依頼から決済まで、使いたいときに使える
+status: active
+basis: inferred
+basis_note: 失敗のシナリオと点は推定。まだ作っておらず（第 2 段階の質問 4）止まった記録はないため、起こりやすさは新しく作るシステムとして見積もった。どの部分の停止が配車の流れを止めるかは設計が確かめる。扱い（重視）は質問 2 で確認済み（CUJ-01 の組）
+premises: []
+model: product
+layer: external
+characteristic: reliability > availability
+statement: システムは、乗客が配車を依頼し、ドライバーが依頼を受けて迎えに行き、乗車を始め、到着を確認して決済を終えるまでの一連の機能を、乗客とドライバーが使おうとしたときに使える状態に保つ。
+applies_to: [FR-01, FR-03, FR-04, FR-06, FR-08, FR-09, FR-10, FR-11, FR-12, FR-13, FR-17, FR-18, FR-20, FR-21, FR-24, FR-27, FR-28, FR-29]
+traces_to: [QIU-01, QIU-08, QIU-12, QIU-15, QIU-18, QIU-19]
+entry_point: null
+stakeholders: [USR-01, USR-02]
+failure_scenario: システムが止まり、乗客は依頼を出せず、迎車中のドライバーは乗車場所や依頼主の手がかりを見られず、着いた乗車は決済を終えられない。
+score: {impact: 5, likelihood: 3}
+handling: emphasized
+handling_reason: null
+implies_internal: [QR-52]
+conflicts: []
+stated_numbers: []
+placeholders: []

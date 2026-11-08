@@ -1,0 +1,24 @@
+id: QR-21
+title: 迎車の到着を、実際に着いたときにすぐ知らせる
+status: retired
+basis: confirmed
+basis_note: 質問 9 の回答で、迎車の到着の知らせを QR-06（依頼、許諾、取り消しを相手にすぐ示す）と一つの品質要求にまとめたため廃止した。中身は QR-06 にある
+premises: []
+model: product
+layer: external
+characteristic: functional suitability > functional correctness
+statement: システムは、迎車が実際に乗車場所に着いたときに、着いてから T_arrival_notice 以内にそのことを乗客に知らせ、着く前には着いたとして知らせない。乗客の不在として終えられるまでの T_noshow_wait は、実際に着いた時刻から数える。
+applies_to: [FR-10, FR-26]
+traces_to: [QIU-08, QIU-09]
+entry_point: null
+stakeholders: [USR-01, USR-02]
+failure_scenario: 迎車が乗車場所の一つ手前の交差点にいるうちに着いたと知らされ、乗客は見当たらない車を探し、ドライバーは早く不在として終えられるようになって去る。
+score: {impact: 4, likelihood: 3}
+handling: emphasized
+handling_reason: null
+implies_internal: []
+conflicts: []
+stated_numbers: []
+placeholders:
+  - {name: T_arrival_notice, meaning: "迎車が実際に乗車場所に着いてから、乗客に着いたことを知らせるまでの時間", from: QR-21}
+  - {name: T_noshow_wait, meaning: "第 2 段階の値。迎車が乗車場所に着いてから、ドライバーが乗客の不在として依頼を終えられるようになるまでの時間", from: FR-26}

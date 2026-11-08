@@ -1,0 +1,14 @@
+id: FRP-06
+title: 支払い方法は乗客が EXT-01 に直接入れ、システムは登録の結果だけを受け取る
+status: proposed
+basis: inferred
+basis_note: QR-60 からの推定。FR-46 の受け入れ基準「乗客が支払い方法を入れると、システムはそれを EXT-01 に登録し」は、システムがカードの情報を受け取って渡すと読め、CON-04 と QR-60 が禁じることを通しうる
+premises: [CON-04, EXT-01]
+proposed_by: functional-requirements-to-product-quality
+origin: [QR-60]
+changes: FR-46
+reason: カードの情報がシステムのサーバー、ログ、データを通らないこと（CON-04）を、FR-46 の受け入れ基準が保てない。
+suggested_statement: 乗客が支払い方法を入れるとき、カードの情報は EXT-01 が直接受け取り、システムは EXT-01 が返した登録の結果だけを受け取って、登録できたかどうかを示す。
+affects: []
+placeholders: []
+resolution: null

@@ -1,0 +1,22 @@
+id: QR-31
+title: 決済と返金の結果は、EXT-01 から来たと確かめられたものだけを受け入れる
+status: active
+basis: assumed
+basis_note: 失敗のシナリオと点は推定。今期は対象外とすることは QAS-20 による暫定の決定
+premises: [CON-03, EXT-01, QAS-20]
+model: product
+layer: external
+characteristic: security > authenticity
+statement: システムは、決済と返金の結果を、EXT-01 から来たことが確かめられたときだけ乗車と返金に結び付ける。
+applies_to: [FR-29, FR-39]
+traces_to: [QIU-19, QIU-28]
+entry_point: null
+stakeholders: [USR-02, USR-04, EXT-01]
+failure_scenario: 誰かが EXT-01 を装って「済んだ」という結果を送り、払われていない乗車が決済済みとして扱われる。
+score: {impact: 2, likelihood: 1}
+handling: excluded
+handling_reason: 今期は対象外。決済と返金はテスト環境を通り実際のお金は動かず（CON-03）、事業化しないデモ（CON-02）で結果を装う動機も小さい
+implies_internal: []
+conflicts: []
+stated_numbers: []
+placeholders: []

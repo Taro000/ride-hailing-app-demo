@@ -1,0 +1,22 @@
+id: QR-48
+title: 登録とともに記録した審査を通ったことが、システムの外の審査の記録にたどれる
+status: retired
+basis: confirmed
+basis_note: 質問 5 の回答で、審査の日付と審査の記録を探す手がかりも記録しないことになり、外の審査の記録にたどる手がかりがなくなったため廃止した
+premises: []
+model: data
+layer: data-inherent
+characteristic: credibility
+statement: 登録されたドライバーと車両ごとに記録した審査を通ったこと（審査の日付と審査の記録を探す手がかり）は、システムの外の審査の記録に実際にあり、そのドライバーと車両の審査を指している。
+applies_to: [FR-43]
+traces_to: [QIU-32, QIU-31]
+entry_point: null
+stakeholders: [USR-04, USR-02]
+failure_scenario: 担当者が審査の記録を探す手がかりに別のドライバーのものを入れて登録し、審査を受けていないドライバーが乗客を乗せる。
+score: {impact: 5, likelihood: 2}
+handling: emphasized
+handling_reason: null
+implies_internal: []
+conflicts: []
+stated_numbers: []
+placeholders: []

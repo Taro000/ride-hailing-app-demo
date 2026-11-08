@@ -1,0 +1,23 @@
+id: QR-04
+title: 請求する額と示す額が確定額と一致し、一度だけ請求する
+status: active
+basis: inferred
+basis_note: 確定額の決まりは CON-01、決済が EXT-01 のテスト環境を通ることは CON-03。失敗のシナリオと点は推定。乗車中の料金の更新（FR-47）と、EXT-01 が答えないときのやり直し（FR-29, FR-30）が誤りの起きやすい場面とみた。扱い（重視）は #18 で確認済み（CUJ-03 の組。CUJ-08 でもたどる）
+premises: [CON-01, CON-03, EXT-01]
+model: product
+layer: external
+characteristic: functional suitability > functional correctness
+statement: システムは、一つの乗車について、確定額（CON-01）を乗客に一度だけ請求し、乗客に示す料金、ドライバーに示す金額、請求する額、乗客に示す支払った額をどれも確定額と一致させる。乗車中に乗客が新しい料金を承認したときは、承認した料金で同じことが成り立つ。
+applies_to: [FR-03, FR-20, FR-29, FR-30, FR-31, FR-47]
+traces_to: [QIU-04, QIU-19]
+entry_point: null
+stakeholders: [USR-01, USR-02, EXT-01]
+failure_scenario: 乗車中に降りる場所を変えて承認した料金が決済に使われず元の料金で請求される、または EXT-01 が答えなかった決済をドライバーがやり直して二重に請求され、乗客は確認した額と違う額を請求される。
+score: {impact: 5, likelihood: 3}
+handling: emphasized
+handling_reason: null
+implies_internal: [QR-50]
+conflicts:
+  - {with: QR-24, note: "EXT-01 が答えないときに一度だけ請求することを確かめる間も、T_payment_response のうちに済んだかどうか分からないことを示し、乗客を待たせない。結果が分かってから示し直す（FR-29）"}
+stated_numbers: []
+placeholders: []

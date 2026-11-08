@@ -1,0 +1,22 @@
+id: QR-27
+title: 評価は、その乗車に乗った乗客からだけ付く
+status: active
+basis: assumed
+basis_note: 失敗のシナリオと点は推定。アカウントは担当者が作り（FR-41）、評価は乗り終えた乗車に一つだけ付く（FR-15）ため、偽の評価を作る道は細いとみた。今期は対象外とすることは QAS-19 による暫定の決定
+premises: [QAS-19]
+model: data
+layer: data-inherent
+characteristic: credibility
+statement: ドライバーの評価に加わる評価は、どれも実際に乗車が始まって終わった乗車について、その乗車の乗客が付けたもので、一つの乗車に一つだけである。
+applies_to: [FR-15]
+traces_to: [QIU-06, QIU-14]
+entry_point: null
+stakeholders: [USR-01, USR-02]
+failure_scenario: ドライバーが知り合いに乗客として依頼させ、乗らずに終えた乗車に高い評価を付けさせて、自分の評価を閾値より上げる。
+score: {impact: 3, likelihood: 1}
+handling: excluded
+handling_reason: 今期は対象外。アカウントは担当者が作り（FR-41）、評価は乗り終えた乗車に一つだけ付く（FR-15）ため、偽の評価を作る道が細く、事業化しないデモ（CON-02）で評価を操作する動機も小さい
+implies_internal: []
+conflicts: []
+stated_numbers: []
+placeholders: []

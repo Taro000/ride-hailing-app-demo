@@ -1,0 +1,23 @@
+id: QR-28
+title: 走っている間は依頼を選ぶ操作と許諾を受け付けず、止まれば受け付ける
+status: active
+basis: inferred
+basis_note: 走っている間は依頼を選ぶ操作と許諾を受け付けず、止まってから操作するよう示すことは第 2 段階の質問 3 で確認済み（FR-22）。失敗のシナリオと点は推定。車の速さをどう確かめるかは設計で決め、ドライバーの端末から得られる速さの確からしさは設計が確かめる。QIU-16（短い時間で許諾を終える）とぶつかるが、走っている間の操作を受け付けないことを先にすると第 2 段階の質問 3 で決まっている。扱い（最低限守る線）は #17 で確認済み（QAS-11 への訂正）
+premises: [QAS-01, QAS-11]
+model: product
+layer: external
+characteristic: functional suitability > functional correctness
+statement: システムは、車が実際に V_moving_lock 以上の速さで動いている間は、依頼を選ぶ操作と許諾の操作を一つも受け付けず、車が止まっているか V_moving_lock を下回るときは、それらの操作を受け付ける。
+applies_to: [FR-22]
+traces_to: [QIU-17, QIU-16]
+entry_point: null
+stakeholders: [USR-02]
+failure_scenario: 車の速さが遅れて判断され、走り出した直後のドライバーの許諾の操作が受け付けられ、ドライバーは画面を見て操作を続けて前への注意がそれる。逆に信号で止まっているのに走っているとみなされ、許諾できないうちに依頼がほかのドライバーに取られる。
+score: {impact: 5, likelihood: 2}
+handling: minimum-line
+handling_reason: null
+implies_internal: [QR-55]
+conflicts: []
+stated_numbers: []
+placeholders:
+  - {name: V_moving_lock, meaning: "第 2 段階の値。車が走っているとみなし、依頼を選ぶ操作と許諾を受け付けなくなる速さ", from: FR-22}

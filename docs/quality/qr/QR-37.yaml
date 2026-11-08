@@ -1,0 +1,23 @@
+id: QR-37
+title: 障害を調べるのに要る記録が、調べる間は取り出せる
+status: active
+basis: inferred
+basis_note: 失敗のシナリオと点は推定。記録をどれだけ残すかは入力になく、名前を付けた値にした
+premises: []
+model: data
+layer: data-system-dependent
+characteristic: availability
+statement: 依頼の経過をたどるのに要る記録（FR-34）は、その依頼から N_trace_retention_days の間、エンジニアが取り出せる。
+applies_to: [FR-34]
+traces_to: [QIU-21]
+entry_point: null
+stakeholders: [USR-03]
+failure_scenario: 週明けに先週末の決済の失敗を調べようとすると、その依頼の記録がもう取り出せず、原因が分からない。
+score: {impact: 4, likelihood: 2}
+handling: minimum-line
+handling_reason: null
+implies_internal: []
+conflicts: []
+stated_numbers: []
+placeholders:
+  - {name: N_trace_retention_days, meaning: "依頼の経過をたどる記録を、その依頼から取り出せる日数", from: QR-37}

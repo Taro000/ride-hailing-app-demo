@@ -1,0 +1,22 @@
+id: QR-44
+title: 返金、登録、訂正、停止の操作を、担当者一人ずつまでたどれる
+status: active
+basis: inferred
+basis_note: 失敗のシナリオと点は推定。訂正したことの記録は FR-41、FR-43 の受け入れ基準、返金の記録は FR-39 の受け入れ基準にあるが、誰が行ったかはどの FR にもなく、FRP-03 で提案した。担当者が本人であることは QR-10。セキュリティのリスク分析の分類（管理の画面の操作の記録）にも当たる（質問 1）。どの QR もたどるすべての CUJ で数え、上限を超えた CUJ では点の低いものを外す）。扱い（重視）は質問 2、質問 4、#15 で確認済み（CUJ-14 と CUJ-15 の組）
+premises: []
+model: product
+layer: external
+characteristic: security > accountability
+statement: 担当者による苦情の対応の記録、返金、アカウントの作成と訂正、試験用の区別の変更、ドライバーと車両の登録と訂正、ドライバーの停止と再開は、どの担当者が、いつ、何を行ったかまで、一人ずつたどれる。
+applies_to: [FR-37, FR-39, FR-41, FR-42, FR-43, FR-44]
+traces_to: [QIU-27, QIU-29, QIU-30, QIU-31, QIU-32, QIU-33]
+entry_point: null
+stakeholders: [USR-04]
+failure_scenario: 審査を通っていないドライバーが登録されていたと分かったが、どの担当者が登録したのか分からず、同じ誤りが繰り返される。
+score: {impact: 4, likelihood: 2}
+handling: emphasized
+handling_reason: null
+implies_internal: []
+conflicts: []
+stated_numbers: []
+placeholders: []

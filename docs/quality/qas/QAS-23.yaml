@@ -1,0 +1,12 @@
+id: QAS-23
+title: 旅客運送の法令を模す開発方針の QR は最低限守る線
+status: open
+stage: 3
+kind: decision
+statement: 旅客運送の法令を模す開発方針から来る QR-61（料金を運賃表に従って求める）、QR-62（運賃表が定めに合う）、QR-63（登録されたドライバーだけが受付できる）を最低限守る線とする。
+why_unsure: 点から決めた。本物らしく作るための開発方針で、事業がどれほど重く見るかは入力にない。
+breadth: medium
+severity: low
+rating_note: 3 つの QR の扱いが依存する。どれも開発方針から来るため対象から外さず、最低限守る線でも監視は残る
+answer: null
+answered_in: null

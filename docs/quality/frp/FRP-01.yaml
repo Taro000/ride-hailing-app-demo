@@ -1,0 +1,14 @@
+id: FRP-01
+title: 本人であることを確かめて使い始める
+status: proposed
+basis: inferred
+basis_note: QR-10 からの推定。第 2 段階の報告の未解決の点が見込んでいた提案。どう確かめるかは設計で決める
+premises: []
+proposed_by: functional-requirements-to-product-quality
+origin: [QR-10]
+changes: null
+reason: 乗客、ドライバー、担当者、エンジニアがアカウントの本人であることを確かめる機能がどの FR にもなく、審査を通ったドライバーのアカウントを別の人が使って乗客を乗せることを防げない。
+suggested_statement: システムは、乗客、ドライバー、運営・サポートの担当者、エンジニアが、そのアカウントの本人であることを確かめてから、そのアカウントで機能を使わせる。
+affects: []
+placeholders: []
+resolution: null

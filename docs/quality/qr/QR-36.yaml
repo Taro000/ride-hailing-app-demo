@@ -1,0 +1,22 @@
+id: QR-36
+title: 記録の中の個人の情報は、写されても許された人のほかには読めない
+status: active
+basis: inferred
+basis_note: 失敗のシナリオと点は推定。どう読めなくするかは設計で決める
+premises: []
+model: data
+layer: data-system-dependent
+characteristic: confidentiality
+statement: システムが持つ記録の中の乗客とドライバーの名前、連絡先、乗る場所と降りる場所は、記録が写されたり持ち出されたりしても、読むことを許された人のほかには読めない。
+applies_to: [FR-34, FR-35, FR-38, FR-45]
+traces_to: [QIU-23]
+entry_point: null
+stakeholders: [USR-01, USR-02, USR-03, USR-04]
+failure_scenario: 調査のために写した記録がエンジニアの手元に残り、そこから乗客の乗る場所と降りる場所の一覧が漏れる。
+score: {impact: 4, likelihood: 2}
+handling: minimum-line
+handling_reason: null
+implies_internal: []
+conflicts: []
+stated_numbers: []
+placeholders: []

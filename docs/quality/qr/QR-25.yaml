@@ -1,0 +1,22 @@
+id: QR-25
+title: 付けた評価が欠けずに記録され、ドライバーの評価に加わる
+status: retired
+basis: confirmed
+basis_note: #14 で、評価が欠けずに記録されることは品質要求にしないと決まったため廃止した（QAS-10 への訂正）
+premises: [QAS-10]
+model: data
+layer: data-inherent
+characteristic: completeness
+statement: 乗り終えた乗客が付けた評価は、一つも欠けずにその乗車の評価として記録され、そのドライバーの評価に加わっている。
+applies_to: [FR-15]
+traces_to: [QIU-13]
+entry_point: null
+stakeholders: [USR-01, USR-02]
+failure_scenario: 乗客が付けた低い評価が記録されないまま失われ、そのドライバーの評価が下がらず、閾値を設定したほかの乗客もそのドライバーに当たる。
+score: {impact: 3, likelihood: 2}
+handling: emphasized
+handling_reason: null
+implies_internal: []
+conflicts: []
+stated_numbers: []
+placeholders: []

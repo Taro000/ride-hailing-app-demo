@@ -1,0 +1,22 @@
+id: QR-14
+title: スマートフォンとその上のブラウザが更新されても使い続けられる
+status: active
+basis: inferred
+basis_note: 失敗のシナリオと点は推定。乗客とドライバーが使う端末は開発方針で一種類のスマートフォンのブラウザに限る（CON-05、質問 1 で確認済み）。ほかの端末に対応しないことは第 1 段階の利用状況に関わり、未解決の点に挙げた
+premises: [CON-05]
+model: product
+layer: external
+characteristic: portability > adaptability
+statement: 乗客とドライバーが使うスマートフォンとその上のブラウザ（CON-05）が更新されても、配車の手配から決済までの機能は使い続けられる。
+applies_to: [FR-01, FR-04, FR-18, FR-21, FR-27, FR-28, FR-29]
+traces_to: [QIU-01, QIU-16]
+entry_point: null
+stakeholders: [USR-01, USR-02]
+failure_scenario: ドライバーのスマートフォンのブラウザが更新された後、依頼の一覧が開けなくなり、ドライバーは依頼を受けられず、乗客の依頼は許諾されないまま終わる。
+score: {impact: 4, likelihood: 2}
+handling: minimum-line
+handling_reason: null
+implies_internal: []
+conflicts: []
+stated_numbers: []
+placeholders: []

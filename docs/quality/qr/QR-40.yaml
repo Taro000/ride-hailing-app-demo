@@ -1,0 +1,22 @@
+id: QR-40
+title: 利用技術のバージョンアップでデータを移しても、失われず変わらない
+status: active
+basis: inferred
+basis_note: 失敗のシナリオと点は推定。バージョンアップにデータの移し替えが伴うかは設計による
+premises: []
+model: data
+layer: data-system-dependent
+characteristic: portability
+statement: 利用技術のバージョンアップに伴ってデータを移しても、アカウント、登録、依頼と乗車の記録、評価、決済と返金の記録は、欠けも文字化けもせず、移す前と同じ値で使える。
+applies_to: [FR-15, FR-38, FR-41, FR-43, FR-45]
+traces_to: [QIU-26]
+entry_point: null
+stakeholders: [USR-03, USR-01, USR-02, USR-04]
+failure_scenario: 利用技術のバージョンアップでデータを移したら、乗客の名前の一部が文字化けし、ドライバーに示す依頼主の名前が読めなくなる。
+score: {impact: 4, likelihood: 2}
+handling: minimum-line
+handling_reason: null
+implies_internal: []
+conflicts: []
+stated_numbers: []
+placeholders: []

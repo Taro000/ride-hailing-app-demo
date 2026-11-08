@@ -1,0 +1,23 @@
+id: QR-08
+title: 手配のときに示す目的地への到着予定時刻どおりに着く
+status: active
+basis: inferred
+basis_note: 失敗のシナリオと点は推定。道の混み具合とドライバーが見つかるまでの時間は日々変わるため、到着予定時刻が外れる場面は毎週あるとみた。到着予定時刻がドライバーが見つかるまでの時間と迎車の時間を含むことは質問 8 で確認済み。FR-03 は移動時間の見込みしか示さないため、FRP-08 で変更を提案した。見込みは道のデータからシステムが作る値で、作り方の誤りとして機能正確性に置いた（報告書の品質要求の下の注記）。見込みのもとになる道のデータは EXT-02 が作る（質問 3 で確認済み）。扱い（重視）は質問 2 で確認済み（CUJ-01 の組）
+premises: [EXT-02]
+model: product
+layer: external
+characteristic: functional suitability > functional correctness
+statement: システムが依頼の前に示す目的地への到着予定時刻（ドライバーが見つかるまでの時間と迎車の時間を含む）と、乗車中に降りる場所を変えるときに示す到着予定の時刻は、実際に目的地に着いた時刻から T_arrival_estimate_gap を超えて外れない。
+applies_to: [FR-03, FR-04, FR-20, FR-47]
+traces_to: [QIU-05]
+entry_point: null
+stakeholders: [USR-01, USR-02, EXT-02]
+failure_scenario: 手配のときに示された到着予定時刻が、ドライバーが見つかるまでと迎車の時間を少なく見込んでおり、目的地に大幅に遅れて着くことが重なって、乗客は時間に間に合わせたい移動ではこのサービスを使わなくなる。
+score: {impact: 3, likelihood: 4}
+handling: emphasized
+handling_reason: null
+implies_internal: [QR-67]
+conflicts: []
+stated_numbers: []
+placeholders:
+  - {name: T_arrival_estimate_gap, meaning: "示した目的地への到着予定時刻と、実際に目的地に着いた時刻との差の許容", from: QR-08}

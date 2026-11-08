@@ -1,0 +1,22 @@
+id: QR-30
+title: 記録した決済と返金の額と結果が EXT-01 の処理と食い違わない
+status: active
+basis: inferred
+basis_note: 失敗のシナリオと点は推定。EXT-01 が答えなかった決済と返金（FR-29, FR-39）が食い違いの起きやすい場面とみた。返金できる残りの額（FR-40）はこの記録から求まる。照らし合わせて示す機能は第 2 段階で加えないと決めた（第 2 段階の検討して加えなかった機能）。#18 の回答の押さえ（支払いの前に額を押さえること）はどの FR にもなく、第 2 段階の未解決の点に挙げた。扱い（重視）は #18、#20 で確認済み（CUJ-03 の組）
+premises: [CON-03, EXT-01]
+model: data
+layer: data-inherent
+characteristic: consistency
+statement: システムが乗車ごとに記録する決済と返金の額と結果（済んだ、済まなかった）は、EXT-01 が実際に処理した額と結果と食い違わない。
+applies_to: [FR-29, FR-31, FR-38, FR-39, FR-40]
+traces_to: [QIU-19, QIU-04, QIU-29]
+entry_point: null
+stakeholders: [USR-01, USR-02, USR-04, EXT-01]
+failure_scenario: EXT-01 が答えなかった決済が EXT-01 では済んでいたのに、システムには済んでいないと記録されたままになり、乗車の履歴に誤った状態が示され、担当者は支払われた額を誤って確かめて返金の額を決める。
+score: {impact: 4, likelihood: 2}
+handling: emphasized
+handling_reason: null
+implies_internal: []
+conflicts: []
+stated_numbers: []
+placeholders: []
