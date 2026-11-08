@@ -7,6 +7,6 @@ statement: 質問 3 の回答の「到着を受け付ける範囲」は、迎車
 why_unsure: 回答はどの到着かを名指ししていない。降りる場所の監視は 30 m のままとした回答と合うのは、乗る場所への迎車の到着の読みである。
 breadth: medium
 severity: low
-rating_note: SLI-07 と、第 2 段階の FR-10、FR-26、第 3 段階の QR-06 が依存する。違っていても範囲の値を一つ書き換えるだけで済む
+rating_note: SLI-14 と、第 2 段階の FR-10、FR-26、第 3 段階の QR-06 が依存する。違っていても範囲の値を一つ書き換えるだけで済む
 answer: null
 answered_in: null

@@ -2,7 +2,7 @@ id: NFR-20
 title: 乗る前の画面の分かりやすさの使いやすさの評価
 status: retired
 basis: confirmed
-basis_note: 決めたこと #20 の訂正で、乗る前の画面の使いやすさは品質要求にしないことになったため廃止した。QR-22 は第 3 段階が見直す
+basis_note: 決めたこと 20 の訂正で、乗る前の画面の使いやすさは品質要求にしないことになったため廃止した。QR-22 は第 3 段階が見直す
 premises: [QAS-30]
 from: [QR-22]
 kind: audit

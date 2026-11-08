@@ -2,7 +2,7 @@ id: SLI-13
 title: 新しい評価をマッチに使う評価に反映する速さ
 status: active
 basis: assumed
-basis_note: しきい値 1 時間（T_rating_reflect）は暫定の決定（QAS-36）。評価のまとめ方はまだ決まっていない（第 2 段階の未解決の点）が、反映したかどうかはまとめ方によらず数えられる
+basis_note: しきい値 T_rating_reflect（1 時間）は暫定の決定（QAS-36）。評価のまとめ方は FR-15 のすべての評価の平均（第 2 段階の質問 9）で、反映したかどうかはその平均が新しい評価を含んだかで数える
 premises: [OPF-01, QAS-36]
 function: GOOD ÷ VALID
 refs: [QR-16, NFR-34]
@@ -20,7 +20,7 @@ elements:
     unit: 評価
     counting_rule: 一つの乗車への評価は一つと数える。評価はシステムが受けた日に数える
   GOOD:
-    definition: VALID のうち、システムが受けてから 1 時間（T_rating_reflect）以内に、そのドライバーのマッチに使う評価がそれを含んだもの
+    definition: VALID のうち、システムが受けてから T_rating_reflect（1 時間）以内に、そのドライバーのマッチに使う評価がそれを含んだもの
     unit: 評価
     counting_rule: VALID と同じ。一度も反映されなかった評価は GOOD に数えない
 scale: ratio

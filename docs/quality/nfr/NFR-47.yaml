@@ -2,7 +2,7 @@ id: NFR-47
 title: カードの情報がシステムを通らないことを確かめるリリース前の確認
 status: active
 basis: inferred
-basis_note: 最低限守る線で、公開の前に確かめられるためリリース前の確認にした（推定）。支払い方法を EXT-01 に直接入れる機能は FRP-06 を待つ
+basis_note: 最低限守る線で、公開の前に確かめられるためリリース前の確認にした（推定）。支払い方法を乗客が EXT-01 に直接入れることは FR-46（FRP-06 の受け入れ）
 premises: [CON-04, EXT-01]
 from: [QR-60]
 kind: gate

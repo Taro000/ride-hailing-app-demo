@@ -7,7 +7,7 @@ premises: [OPF-02, EXT-02]
 from: [QR-70]
 kind: monitor
 cuj: CUJ-03
-statement: 到着を確認した乗車のうち、到着を確認した位置が降りる場所の位置から 30 m（D_place_position_gap）以上離れたものを、一件ごとにエンジニアにチケットで知らせる。
+statement: 到着を確認した乗車のうち、到着を確認した位置が降りる場所の位置から D_place_position_gap（30 m）以上離れたものを、一件ごとにエンジニアにチケットで知らせる。
 conditions:
   workload: null
   users: 登録した乗客とドライバー。試験用のアカウントを除く

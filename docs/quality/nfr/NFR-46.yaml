@@ -2,7 +2,7 @@ id: NFR-46
 title: 3 年を過ぎた個人の情報の監視
 status: active
 basis: inferred
-basis_note: 3 年は QR-59 の入力の値。個人を特定できない形に変える機能は FRP-05 を待つ
+basis_note: 3 年は QR-59 の入力の値。個人を特定できない形に変える機能は FR-51（FRP-05 の受け入れ）
 premises: [CON-06]
 from: [QR-59]
 kind: monitor

@@ -2,12 +2,12 @@ id: NFR-29
 title: 決済の結果を示すまでの速さの監視
 status: active
 basis: assumed
-basis_note: しきい値 10 秒（T_payment_response）は暫定の決定（QAS-33）。決済はデモ 1 回に数件（OPF-02）のため、割合ではなく一件ごとに知らせる
+basis_note: しきい値 T_payment_response（10 秒）は暫定の決定（QAS-33）。決済はデモ 1 回に数件（OPF-02）のため、割合ではなく一件ごとに知らせる
 premises: [OPF-01, OPF-02, OPF-03, EXT-01, QAS-33]
 from: [QR-24]
 kind: monitor
 cuj: CUJ-08
-statement: ドライバーが決済を行ってから、済んだか、済まなかったか、済んだかどうか分からないことを応えるまでが 10 秒（T_payment_response）を超えたものを、一件ごとにエンジニアに知らせる。
+statement: ドライバーが決済を行ってから、済んだか、済まなかったか、済んだかどうか分からないことを応えるまでが T_payment_response（10 秒）を超えたものを、一件ごとにエンジニアに知らせる。
 conditions:
   workload: デモの回の間（OPF-01）。参加者と依頼の量は OPF-02 と OPF-03
   users: 登録したドライバーと乗客。試験用のアカウントを除く

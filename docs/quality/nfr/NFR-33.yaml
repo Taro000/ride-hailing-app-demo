@@ -2,12 +2,12 @@ id: NFR-33
 title: 少ない操作で評価を送れることの受け入れの試験
 status: active
 basis: assumed
-basis_note: 操作の回数は公開の前に数えられるためゲートにした（推定）。N_rating_operations の 3 回は暫定の決定（QAS-35）
+basis_note: 操作の回数は公開の前に数えられるためゲートにした（推定）。N_rating_operations の 3 回は暫定の決定（QAS-35）。評価は 1〜5 の 5 段階から一つを選ぶ（FR-15）
 premises: [QAS-35]
 from: [QR-68]
 kind: gate
 cuj: CUJ-04
-statement: 評価の画面を変えるリリースの前に、乗車が終わった画面から乗ったドライバーの評価を送り終えるまでの乗客の操作が 3 回（N_rating_operations）以内であることを、受け入れの試験で確かめる。
+statement: 評価の画面を変えるリリースの前に、乗車が終わった画面から乗ったドライバーの評価を送り終えるまでの乗客の操作が N_rating_operations（3 回）以内であることを、受け入れの試験で確かめる。
 conditions:
   workload: null
   users: 乗り終えた乗客
