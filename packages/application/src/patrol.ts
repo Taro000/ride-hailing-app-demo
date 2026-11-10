@@ -43,18 +43,29 @@ export async function sweepOnce(deps: MoneyDeps): Promise<void> {
   }
 }
 
+// 一つの操作の確かめが失敗しても（乗客の操作と版がぶつかったときなど）、ほかの操作の確かめは続ける。次の見回りでやり直す。
 async function withLease(
   deps: MoneyDeps,
   op: MoneyOpRow,
   now: Date,
   fn: (op: MoneyOpRow) => Promise<void>,
 ): Promise<void> {
-  if (!(await acquireLease(deps.db, op, now, deps.settings.opStaleMs))) return;
   try {
-    const fresh = await getMoneyOp(deps.db.client, op.moneyOpId);
-    if (fresh && fresh.status === "checking") await fn(fresh);
-  } finally {
-    await releaseLease(deps.db, op);
+    if (!(await acquireLease(deps.db, op, now, deps.settings.opStaleMs))) return;
+    try {
+      const fresh = await getMoneyOp(deps.db.client, op.moneyOpId);
+      if (fresh && fresh.status === "checking") await fn(fresh);
+    } finally {
+      await releaseLease(deps.db, op);
+    }
+  } catch (error) {
+    deps.logger.log({
+      event: "sweep.op_failed",
+      severity: "WARNING",
+      message: error instanceof Error ? error.message : String(error),
+      ride_id: op.rideId,
+      money_op_id: op.moneyOpId,
+    });
   }
 }
 

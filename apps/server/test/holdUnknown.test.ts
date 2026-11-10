@@ -139,6 +139,37 @@ describe("押さえの結果が分からないとき", () => {
     ]);
   });
 
+  it("一つの確かめが失敗しても、同じ見回りでほかの確かめを続け、次の見回りでやり直す", async () => {
+    let failFor: string | null = "cus_fake_0001";
+    h = await setup({
+      wrapPayments: (inner): PaymentGateway => ({
+        createHold: inner.createHold.bind(inner),
+        cancelHold: inner.cancelHold.bind(inner),
+        listPaymentIntents: async (customerId, createdGte, trace) => {
+          if (customerId === failFor) {
+            failFor = null;
+            throw new Error("unexpected failure");
+          }
+          return inner.listPaymentIntents(customerId, createdGte, trace);
+        },
+      }),
+    });
+    const first = await h.loginAs("passenger@example.com");
+    const second = await h.loginAs("timeout@example.com");
+    h.stripe.nextHold("timeout_after_create");
+    const a = (await (await first.book((await first.estimate()).estimateId)).json()) as HoldPending;
+    const b = (await (await second.book((await second.estimate()).estimateId)).json()) as HoldPending;
+
+    h.clock.advance(5_000);
+    await h.sweep();
+    expect(await rideOf(a.ride.rideId)).toEqual({ state: "hold_checking", payment: "hold_checking" });
+    expect(await rideOf(b.ride.rideId)).toEqual({ state: "searching", payment: "held" });
+    expect(h.logger.entries.some((entry) => entry.event === "sweep.op_failed")).toBe(true);
+
+    await h.sweep();
+    expect(await rideOf(a.ride.rideId)).toEqual({ state: "searching", payment: "held" });
+  });
+
   it("インスタンスが一つ目のトランザクションの後に止まっても、T_op_stale の後に確かめて片付ける", async () => {
     let crash = true;
     h = await setup({
