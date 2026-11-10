@@ -1,0 +1,22 @@
+id: FND-80
+title: IFC-07 の状態の履歴の検索に、続きの読み方、エラーの種類の値、時間の範囲の片側と端の含み方が決まっていない
+status: open
+version: 1
+basis: inferred
+basis_note: 仕様書の型は入力。画面が困る点と直し方の案は推定
+needs_agreement: false
+approver_candidates: []
+raised_by: high-level-design-to-detailed-design
+raised_in: 4-detailed-design/ELM-03.md
+to: architecture-to-high-level-design
+targets:
+- IFC-07
+severity: minor
+evidence: engineer.openapi.yaml の HistorySearchResult は items（状態の変化）と clientErrors（ブラウザのエラー）の二つの並びに nextCursor を一つだけ持ち、次の要求で二つの並びをどう続けるか（時刻で合わせて続けるのか、並びごとか）が書かれていない。errorKind は値のない文字で、どの種類（ブラウザのエラーの kind か、サーバーの出来事か）で絞るかが分からず、画面が選択肢を作れない。from と to は片方だけでもよいのか、31 日の上限を片方のときどう数えるのか、to を含むのかが書かれていない。第 4 段階の MOD-13 は、二つの並びを時刻で合わせて続け、エラーの種類はブラウザのエラーの 8 種類、時間の範囲は両端を求め、to は分の終わりまで含むと仮に置いた
+suggestion: nextCursor を、二つの並びを時刻で合わせた一つの続きと書くか、並びごとのカーソルにする。errorKind の値を列挙する。from と to の片側の扱いと、端を含むかを書く
+resolution: 
+changelog:
+- version: 1
+  date: '2026-11-08'
+  change: 出した
+  reason: 第 4 段階（ELM-03）

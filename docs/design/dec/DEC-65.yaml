@@ -1,0 +1,51 @@
+id: DEC-65
+title: 画面のデータをブラウザに残さない
+status: draft
+version: 1
+basis: inferred
+basis_note: 推定（ELM-03 の前提の質問 5 は回答なし）
+needs_agreement: false
+approver_candidates: []
+stage: detailed-design
+question: 画面のデータをブラウザのどこに置くか
+addresses:
+- DRV-21
+- DRV-32
+- DRV-29
+options:
+- name: メモリだけ。保存領域を使わない（ブラウザのエラーの記録を除く）
+  effect: ブラウザに個人情報が残らない
+  cost: 読み込み直すと下書きが消える
+- name: 下書きを sessionStorage に保つ
+  effect: 読み込み直しに強い
+  cost: 個人情報がタブを閉じるまで残る
+- name: localStorage に取り置く
+  effect: 開き直しも速い
+  cost: 同じ PC の別の人に個人情報が残る
+chosen: メモリだけ。保存領域を使わない（ブラウザのエラーの記録を除く）
+rationale: 管理の画面は名前、連絡先、位置、苦情の文、符号を扱う。保存領域に置くと、同じ PC の別の人やブラウザの拡張に残りうる（DRV-21）。一人の担当が PC で使う画面なので、読み込み直しで下書きが消える損は小さい
+rejected:
+- option: 下書きを sessionStorage に保つ
+  reason: 個人情報が残る
+- option: localStorage に取り置く
+  reason: 同じ PC の別の人に残る
+gains:
+- ブラウザに個人情報が残らない
+costs:
+- 読み込み直すと下書きが消える
+sensitive_points: []
+trade_offs: []
+assumptions: []
+depends_on:
+- DEC-16
+- DEC-23
+parameters: []
+debt: 
+deferred: false
+revisit_when: 
+as_is: new
+changelog:
+- version: 1
+  date: '2026-11-08'
+  change: 作成
+  reason: 第 4 段階（ELM-03）の下書き。質問 1〜4 の回答を反映（質問 5 は回答なし）

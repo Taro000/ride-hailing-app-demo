@@ -1,0 +1,66 @@
+id: MOD-19
+title: 画面の組み立て
+status: draft
+version: 1
+basis: inferred
+basis_note: ライブラリは質問 2 で確認済み（DEC-56〜58）。経路の表、始めの画面、一覧の新しさは推定（前提の質問 5 は回答なし）
+needs_agreement: true
+approver_candidates:
+- 開発の責任者
+component: ELM-03
+name: 画面の組み立て
+responsibility: どの画面をどの URL に置き、どの役割に見せるかを組み立てる
+visibility: internal
+interface:
+- operation: main() -> Unit
+  pre: "/backoffice/ の下のどの URL でも"
+  post: MOD-18 の install、TanStack Query の QueryClient（retry false。送り直しは WS-API だけ）、MOD-02 の start、WS-API の onUnauthenticated と onVersionMismatch の取り付け、経路の表で画面を組み立てる。/backoffice/ は operator なら苦情の一覧、engineer だけなら状態の履歴の検索に移る。各経路に誤りの境界と RequireRole を置く
+  errors: []
+invariants: []
+depends_on:
+- MOD-01
+- MOD-02
+- MOD-03
+- MOD-04
+- MOD-07
+- MOD-10
+- MOD-11
+- MOD-13
+- MOD-14
+- MOD-15
+- MOD-18
+functions:
+- FR-01
+realizes: []
+drivers:
+- DRV-25
+- DRV-21
+decisions:
+- DEC-23
+- DEC-56
+- DEC-57
+- DEC-58
+- DEC-60
+- DEC-65
+- DEC-66
+behaviour: '報告書の節: MOD-19 画面の組み立て（4-detailed-design/ELM-03.md）'
+verification:
+- checks: 経路の表の各経路が許す役割で開き、ほかの役割で「権限がありません」
+  how: Playwright の通しの確かめ
+- checks: QueryClient が送り直さない
+  how: 偽物が 503 を返したとき、TanStack Query からの要求が一回で、WS-API の送り直しだけが起きることの部品のテスト
+- checks: アクセシビリティ（DEC-66）
+  how: Playwright と @axe-core/playwright で、すべての経路と主なダイアログを WCAG 2.2 AA の自動の確かめにかけ、違反 0 件を CI のゲートにする
+parameters:
+- name: 一覧の新しさ（staleTime）
+  value: 30 秒
+  basis: 提案。担当は一人で、前面に戻ると読み直す
+- name: 使われなくなった取り置きを捨てるまで（gcTime）
+  value: 5 分
+  basis: TanStack Query の既定
+as_is: new
+changelog:
+- version: 1
+  date: '2026-11-08'
+  change: 作成
+  reason: 第 4 段階（ELM-03）の下書き。質問 1〜4 の回答を反映（質問 5 は回答なし）

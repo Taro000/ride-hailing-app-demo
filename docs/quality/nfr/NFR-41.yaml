@@ -1,9 +1,9 @@
 id: NFR-41
 title: 保存期間を過ぎた個人情報
 status: draft
-version: 2
+version: 3
 basis: inferred
-basis_note: T_pii_retention は 3 年（2026-11-01 の利用者の回答。この段階では値を提案していない）
+basis_note: T_pii_retention は 3 年（2026-11-01 の利用者の回答。この段階では値を提案していない）。現在地の受信の記録を足したことは QR-40 版 3 への追随。受信の記録は T_log_retention の間だけ残すので、ふつうは数えられない
 needs_agreement: true
 approver_candidates:
 - プロダクトオーナー
@@ -13,9 +13,9 @@ from:
 - QR-40
 kind: monitor
 cuj: null
-statement: 毎日、T_pii_retention を過ぎても操作した人や位置が残る記録を数え、1 件でもあるか、FR-53 の処理が失敗すると、エンジニアに知らせる。
+statement: 毎日、T_pii_retention を過ぎても操作した人や位置が残る記録（現在地の受信の記録を含む）を数え、1 件でもあるか、FR-53 の処理が失敗すると、エンジニアに知らせる。
 conditions:
-  workload: 少人数の参加者のデモ。件数は未定（運用の事実）。常時稼働し、使うのはデモの回だけ（質問 1）
+  workload: 少人数の参加者のデモ。件数は未定（運用の事実）。サーバーはデモの回だけ、毎日の処理はデモの期間だけ動く（2026-11-03 の回答、設計 1-1）
   users: デモの参加者（乗客、ドライバー、運営・サポート担当）。エンジニアのテスト用アカウント、合成の監視、負荷試験は除く
   transactions: null
 slo: null
@@ -34,3 +34,7 @@ changelog:
   date: '2026-11-01'
   change: T_pii_retention の値を basis_note に書いた
   reason: 2026-11-01 の利用者の回答への追随
+- version: 3
+  date: '2026-11-03'
+  change: conditions.workload の「常時稼働し、使うのはデモの回だけ」を「サーバーはデモの回だけ、毎日の処理はデモの期間だけ動く」に直した。数える記録に、現在地の受信の記録を足した
+  reason: 設計の連鎖が返した課題（常時稼働の前提）への 2026-11-03 の利用者の回答（docs/quality-chain-answers.md の設計 1-1）。第 3 段階の再実行（2026-11-03）の QR-40 版 3 への追随

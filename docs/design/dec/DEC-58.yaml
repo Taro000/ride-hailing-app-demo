@@ -1,0 +1,53 @@
+id: DEC-58
+title: 画面の経路のライブラリ
+status: draft
+version: 1
+basis: confirmed
+basis_note: ELM-03 の質問 2 で確認済み
+needs_agreement: true
+approver_candidates:
+- 開発の責任者
+stage: detailed-design
+question: 画面の経路をどう扱うか
+addresses:
+- IFC-28
+- IFC-29
+- DEC-16
+- DRV-26
+options:
+- name: React Router 7（宣言の形）
+  effect: よく知られ、戻るボタン、経路の引数、入れ子の経路を持つ
+  cost: 経路の引数の型は自分で守る
+- name: TanStack Router
+  effect: 経路と引数の型の守りが強い
+  cost: 学ぶものが増える
+- name: 自分で作る
+  effect: 依存が増えない
+  cost: 戻るボタンと経路の引数を作る手間
+chosen: React Router 7（宣言の形）
+rationale: 経路と戻るボタンを作らずに済む（DRV-26）。型の守りは経路の表の単体テスト（MOD-03）で補う。ELM-03 の質問 2 で確認済み
+rejected:
+- option: TanStack Router
+  reason: 学ぶものが増え、型の守りは経路の表のテストで足りる
+- option: 自分で作る
+  reason: DRV-26 で負ける
+gains:
+- 経路と戻るボタンを作らない
+costs:
+- 経路の引数の型は自分で守る
+sensitive_points: []
+trade_offs: []
+assumptions: []
+depends_on:
+- DEC-23
+- DEC-16
+parameters: []
+debt: 
+deferred: false
+revisit_when: 
+as_is: new
+changelog:
+- version: 1
+  date: '2026-11-08'
+  change: 作成
+  reason: 第 4 段階（ELM-03）の下書き。質問 1〜4 の回答を反映（質問 5 は回答なし）

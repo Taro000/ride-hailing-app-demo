@@ -1,0 +1,85 @@
+id: MOD-02
+title: セッションと役割
+status: draft
+version: 1
+basis: inferred
+basis_note: セッションの扱いは IFC-01、DEC-43、DEC-49（入力）。重ねた画面でログインし直すこと、別のアカウントなら読み込み直すことは推定（DEC-61。前提の質問 5 は回答なし）
+needs_agreement: false
+approver_candidates: []
+component: ELM-03
+name: セッションと役割
+responsibility: いまのセッションと役割を保ち、切れたときにログインし直させる
+visibility: internal
+interface:
+- operation: start() -> SessionState
+  pre: アプリを開いた
+  post: GET /api/v1/auth/session を suppressAuthEvent で読む。401 は Anonymous、nextStep と役割で NeedsPasskey、NeedsPasskeyRegistration、Active、NoStaffRole にする
+  errors:
+  - 'Unreachable: 答えがない（もう一度の操作を示す）'
+- operation: state() -> SessionState
+  pre: なし
+  post: 今の状態を返す（購読できる）
+  errors: []
+- operation: 'hasRole(r: StaffRole) -> Bool'
+  pre: なし
+  post: Active で、その役割があるときだけ真
+  errors: []
+- operation: config() -> BackofficeConfig
+  pre: Active
+  post: GET /api/v1/config を Active になったときに一度読む。mapsBrowserKey はログインしたセッションの応答にだけある（IFC-01）
+  errors:
+  - 読めなければ mapsBrowserKey を null にする（地図は出ず、MOD-05 は表だけを示す）
+- operation: handleUnauthenticated() -> Unit
+  pre: WS-API が 401 UNAUTHENTICATED を知らせた
+  post: Active なら Expired(前のアカウント) にし、ログインし直しの重ねた画面（MOD-01 の relogin）を出す。下の画面は消さない
+  errors: []
+- operation: 'completeRelogin(s: StaffSession) -> Unit'
+  pre: Expired
+  post: 同じアカウントなら Active に戻して重ねた画面を閉じる（画面と run は残る）。別のアカウントなら resetAll()
+  errors: []
+- operation: logout() -> Unit
+  pre: なし
+  post: POST /api/v1/auth/logout を kind session で送り、応答に関わらず resetAll()
+  errors:
+  - なし（失敗してもサーバーのセッションは期限で消える）
+- operation: resetAll() -> Unit
+  pre: なし
+  post: メモリの中の取り置き、顔写真、run、符号を捨てるため、ページを /backoffice/ で読み込み直す
+  errors: []
+invariants:
+- Active なら nextStep は none で、役割に operator か engineer がある
+- 前のアカウントのデータを別のアカウントに示さない（別のアカウントでログインし直したらページを読み込み直す）
+depends_on:
+- MOD-01
+functions:
+- FR-01
+realizes:
+- IFC-01 GET /api/v1/auth/session
+- IFC-01 POST /api/v1/auth/logout
+- IFC-01 GET /api/v1/config
+drivers:
+- DRV-25
+- DRV-21
+- DRV-29
+decisions:
+- DEC-43
+- DEC-49
+- DEC-61
+- DEC-65
+behaviour: '報告書の節: MOD-02 セッションと役割（4-detailed-design/ELM-03.md）'
+verification:
+- checks: 状態遷移図のすべての遷移
+  how: 状態と出来事の組の単体テスト
+- checks: 使っている途中の 401 で重ねた画面が出て、同じアカウントなら画面の入力と run が残る
+  how: MSW で 401 を返す部品のテスト
+- checks: 別のアカウントとログアウトで前のデータが消える（ログアウトの要求が失敗しても）
+  how: 読み込み直しが呼ばれ、取り置きが空になることの部品のテスト
+- checks: 役割のない参加者のアカウントで開いたとき管理の API を呼ばない
+  how: 部品のテスト
+parameters: []
+as_is: new
+changelog:
+- version: 1
+  date: '2026-11-08'
+  change: 作成
+  reason: 第 4 段階（ELM-03）の下書き。質問 1〜4 の回答を反映（質問 5 は回答なし）

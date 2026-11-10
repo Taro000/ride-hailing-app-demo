@@ -1,0 +1,102 @@
+id: MOD-01
+title: スタッフのログイン
+status: draft
+version: 1
+basis: inferred
+basis_note: ログインの手順とエラーは IFC-01 と DEC-20・43（入力）。パスキーのライブラリは質問 2 で確認済み（DEC-59）。手順の分け方と N_passkey_fail は推定（前提の質問 5 は回答なし）
+needs_agreement: true
+approver_candidates:
+- 開発の責任者
+component: ELM-03
+name: スタッフのログイン
+responsibility: 役割のアカウントのパスワードとパスキーの手順を進め、役割の経路を使えるセッションにする
+visibility: public
+interface:
+- operation: 'StaffSignIn(mode: first | relogin, onSignedIn: (s: StaffSession) -> Unit) -> 画面'
+  pre: なし
+  post: ログインした StaffSession を onSignedIn で返す。セッションを保つのは MOD-02
+  errors:
+  - 下の操作のエラーを画面に示す
+- operation: 'submitPassword(c: Credentials) -> SignInStep'
+  pre: c が contracts の Credentials の検査に通る
+  post: POST /api/v1/auth/login を kind session、suppressAuthEvent で送る。ログインの応答の判断表で次の段を決める
+  errors:
+  - 'InvalidCredentials: 401 INVALID_CREDENTIALS（FR-01 AC5）'
+  - 'Locked{until: Instant}: 429 ACCOUNT_LOCKED'
+  - 'RateLimited{retryAfterSeconds}: 429 RATE_LIMITED'
+  - 'Invalid(FieldError の並び): 400 INVALID_REQUEST'
+  - 'Forbidden: 403 FORBIDDEN'
+  - 'Unreachable{traceId}: 送り直しを尽くしても答えがない'
+- operation: verifyPasskey() -> SignedIn(StaffSession)
+  pre: 段が NeedPasskey（パスワードのセッションがある）
+  post: authentication-options（kind read）、MOD-17 の authenticate、authenticate（kind once。同じ応答は二度使えないので送り直さない）の順に進め、nextStep が none になる
+  errors:
+  - 'PasskeyCancelled: 担当が取り消した'
+  - 'PasskeyUnsupported: ブラウザがパスキーを使えない'
+  - 'PasskeyFailed: 401 PASSKEY_FAILED'
+  - 'SessionLost: 401 UNAUTHENTICATED（パスワードからやり直す）'
+  - 'Unreachable: 答えがない（options から始め直す）'
+- operation: registerPasskey() -> SignedIn(StaffSession)
+  pre: 段が NeedPasskeyRegistration
+  post: registration-options、MOD-17 の register、register の順に進める。register は MOD-20 の run（キーあり）で送る
+  errors:
+  - PasskeyCancelled
+  - PasskeyUnsupported
+  - 'AlreadyRegistered: この認証器は登録済み'
+  - 'RegistrationFailed: 400 PASSKEY_REGISTRATION_FAILED'
+  - 'SessionLost: 401 UNAUTHENTICATED'
+  - MOD-20 の結果（結果が分からない、ログイン待ち、待ち、止まった、KeyReused）。結果が分からないときは同じキーで確かめる
+- operation: 'bootstrap(b: StaffBootstrap) -> NeedPasskeyRegistration(StaffSession)'
+  pre: b が contracts の StaffBootstrap の検査に通る
+  post: POST /api/v1/auth/staff-bootstrap を MOD-20 の run で送る。最初の役割のアカウントとセッションができ、次の段はパスキーの登録
+  errors:
+  - 'SecretInvalid: 401 BOOTSTRAP_SECRET_INVALID'
+  - 'AlreadyBootstrapped: 409 ALREADY_BOOTSTRAPPED（ログインへ案内する）'
+  - 'Invalid: 400 INVALID_REQUEST'
+  - MOD-20 の結果（結果が分からない、ログイン待ち、待ち、止まった、KeyReused）
+invariants:
+- パスワードと最初のアカウントの秘密は入力欄と送る要求の中にだけあり、要求が終わったら欄を空にする。保存領域、URL、記録、ログに書かない
+- SignedIn を返すのは、nextStep が none で、役割に operator か engineer があるときだけ
+depends_on:
+- MOD-17
+- MOD-20
+functions:
+- FR-01
+realizes:
+- IFC-01 POST /api/v1/auth/login
+- IFC-01 POST /api/v1/auth/passkeys/authentication-options
+- IFC-01 POST /api/v1/auth/passkeys/authenticate
+- IFC-01 POST /api/v1/auth/passkeys/registration-options
+- IFC-01 POST /api/v1/auth/passkeys/register
+- IFC-01 POST /api/v1/auth/staff-bootstrap
+- IFC-28 ログイン（エンジニアの画面も同じログインを使う）
+drivers:
+- DRV-29
+- DRV-25
+decisions:
+- DEC-20
+- DEC-43
+- DEC-48
+- DEC-59
+behaviour: '報告書の節: MOD-01 スタッフのログイン（4-detailed-design/ELM-03.md）'
+verification:
+- checks: ログインの応答の判断表 10 行（FR-01 AC5 を含む）
+  how: WS-API の偽物の単体テスト
+- checks: パスキーの失敗の扱い（取り消し、PASSKEY_FAILED が 3 回、UNAUTHENTICATED、使えないブラウザ）
+  how: MOD-17 の偽物の単体テスト
+- checks: 最初のアカウントの流れ（201、401、409、答えがないときは同じキー）
+  how: MSW で仕様書の例を返す部品のテスト
+- checks: 最初のアカウント、パスキーの登録、ログアウト、ログイン、パスキー、苦情の一覧の通し（FR-01 AC4）
+  how: 手元のサーバーと偽物で動かす Playwright。Chromium の仮の認証器（CDP の WebAuthn.addVirtualAuthenticator）
+- checks: パスワードと秘密を残さない
+  how: 終わった後に DOM と保存領域に残らず、WS-REC に渡した記録にメールアドレスがないことを確かめる部品のテスト
+parameters:
+- name: N_passkey_fail
+  value: 3 回
+  basis: 提案。打ち間違えでない失敗が続くときは、パスワードの段から始め直す方が早い
+as_is: new
+changelog:
+- version: 1
+  date: '2026-11-08'
+  change: 作成
+  reason: 第 4 段階（ELM-03）の下書き。質問 1〜4 の回答を反映（質問 5 は回答なし）

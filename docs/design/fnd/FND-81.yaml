@@ -1,0 +1,23 @@
+id: FND-81
+title: DriverView に accountId がなく、IFC-07 に今のテスト用の印を読む操作がない
+status: open
+version: 1
+basis: inferred
+basis_note: 仕様書の型と FR-01 AC6 は入力。エンジニアが困る点と直し方の案は推定
+needs_agreement: false
+approver_candidates: []
+raised_by: high-level-design-to-detailed-design
+raised_in: 4-detailed-design/ELM-03.md
+to: architecture-to-high-level-design
+targets:
+- IFC-06
+- IFC-07
+severity: minor
+evidence: FR-01 AC6 のテスト用の印は PATCH /api/v1/engineer/accounts/{accountId} で付けるが、ドライバーのアカウントの ID（acc_）は登録の応答（DriverCreated）にしかなく、DriverView にも一覧にもない。登録の後でテスト用のドライバーに印を付けるには、エンジニアは状態の履歴の検索の操作した人などから ID を探すしかない（乗客は PassengerView の passengerId が acc_ なので得られる）。どのアカウントについても今の印を読む操作がなく、画面は付けるか外すかを明示して送るしかない（第 4 段階の MOD-15）
+suggestion: DriverView に accountId（と testAccount）を足すか、GET /api/v1/engineer/accounts/{accountId}（役割と印）を足す
+resolution: 
+changelog:
+- version: 1
+  date: '2026-11-08'
+  change: 出した
+  reason: 第 4 段階（ELM-03）

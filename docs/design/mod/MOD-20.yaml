@@ -1,0 +1,75 @@
+id: MOD-20
+title: 状態を変える操作の進め方
+status: draft
+version: 1
+basis: inferred
+basis_note: キーと送り直しの決まり（DEC-48、DEC-50）と原則 DRV-30 は入力。結果の判断表、業務の断りの後に新しいキーにすること、「待つのをやめる」は推定。DRV-30 は ELM-03 の drivers にない（FND-83）
+needs_agreement: true
+approver_candidates:
+- 開発の責任者
+component: ELM-03
+name: 状態を変える操作の進め方
+responsibility: 状態を変える操作一つを、冪等キーを保ったまま結果が定まるまで進める
+visibility: internal
+interface:
+- operation: 'start(name: Text) -> OperationRun'
+  pre: なし
+  post: 控え（キーとトレース ID）を一つ作り、状態は入力中
+  errors: []
+- operation: 'run.send(req: ApiRequest) -> OperationOutcome<T>'
+  pre: run が閉じていない。欄の検査に通っている
+  post: 送信中にし、WS-API に kind change と控えで送る。結果を判断表で分ける。Done、Rejected、Stopped、KeyReused は run を閉じ、Pending、NeedsLogin、Waiting、Unknown は開いたままにする（次の send も同じキー）。送信中の二度目の send は同じ結果を待つ
+  errors:
+  - 例外を投げない（すべて結果で返す）
+- operation: run.stopWaiting() -> Unit
+  pre: 送信中
+  post: WS-API の abort で待つのをやめ、結果が分からないにする
+  errors: []
+- operation: run.abandon() -> Unit
+  pre: なし
+  post: 控えを捨てる。結果が分からないままなら、画面を離れる前に MOD-03 が確かめる
+  errors: []
+- operation: run.state -> RunState
+  pre: なし
+  post: 今の状態
+  errors: []
+invariants:
+- 一つの run は一つのキーだけを使う
+- 閉じた run は送らない
+- 送信中、結果待ち、結果が分からない、ログイン待ち、待ちの run は MOD-03 に未保存として届け出る
+depends_on:
+- MOD-03
+functions:
+- FR-37
+- FR-50
+realizes: []
+drivers:
+- DRV-28
+- DRV-29
+- DRV-30
+decisions:
+- DEC-48
+- DEC-50
+- DEC-61
+behaviour: '報告書の節: 状態を変える操作の進め方（MOD-20。共通の状態遷移）（4-detailed-design/ELM-03.md）'
+verification:
+- checks: 結果の判断表 16 行
+  how: WS-API の偽物で各応答を返す単体テスト（判断表から作る）
+- checks: 二度押しが一つの要求になる
+  how: 送信中に二度 send して、偽物が受けた要求が一つでキーが同じことを確かめる単体テスト
+- checks: 閉じた run は送らない、開いた run は同じキー
+  how: Rejected の後と Unknown の後の send の単体テスト
+- checks: 未保存の届け出
+  how: 送信中、結果が分からない、ログイン待ちで MOD-03 の hasUnsaved が真になる単体テスト
+- checks: 送り直しの最悪の待ちと「待つのをやめる」
+  how: 偽の時計で、15 秒を過ぎたら表示が出て、押すと結果が分からないになる部品のテスト
+parameters:
+- name: "「待つのをやめる」を示すまで"
+  value: 15 秒
+  basis: DEC-50 のブラウザのタイムアウト（一回目の試みが切れたとき）。送り直しを尽くすまでの最悪は 67 秒（4 回 × 15 秒 + 1 + 2 + 4 秒。計算）
+as_is: new
+changelog:
+- version: 1
+  date: '2026-11-08'
+  change: 作成
+  reason: 第 4 段階（ELM-03）の下書き。質問 1〜4 の回答を反映（質問 5 は回答なし）

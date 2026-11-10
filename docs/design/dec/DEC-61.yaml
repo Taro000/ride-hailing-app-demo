@@ -1,0 +1,56 @@
+id: DEC-61
+title: セッションが切れたときの控えと入力の扱い
+status: draft
+version: 1
+basis: inferred
+basis_note: IFC-06・07 の 401 の決まりと DAT-14 のキーの範囲（アカウントごと）は入力。重ねた画面と、別のアカウントなら読み込み直すことは推定（ELM-03 の前提の質問 5 は回答なし）
+needs_agreement: false
+approver_candidates: []
+stage: detailed-design
+question: 使っている途中でセッションが切れたとき、結果の分からない操作と入力をどう扱うか
+addresses:
+- DEC-48
+- DEC-43
+- IFC-06
+- IFC-07
+- DRV-30
+options:
+- name: 重ねた画面でログインし直し、下の画面と控えを保つ。別のアカウントならページを読み込み直してすべて捨てる
+  effect: 同じアカウントなら入力と控えが残り、同じキーで送れる
+  cost: 別のアカウントでログインし直すと入力と控えを失う
+- name: ログインの画面に移り、控えと入力を sessionStorage に保つ
+  effect: 読み込み直しにも強い
+  cost: 個人情報と控えがブラウザに残る（DEC-65 に反する）
+- name: 切れたら控えを捨てる
+  effect: 作りが簡単
+  cost: 結果の分からない操作を同じキーで確かめられない
+chosen: 重ねた画面でログインし直し、下の画面と控えを保つ。別のアカウントならページを読み込み直してすべて捨てる
+rationale: IFC-06・07 の 401 の決まり（ログインの後に同じ冪等キーで送る）を、ブラウザに個人情報と控えを残さず（DEC-65）満たす。キーはアカウントごとに一意（DAT-14）なので、別のアカウントで同じキーを送っても前の操作は確かめられない。前のアカウントのデータを見せないため、読み込み直して捨てる
+rejected:
+- option: ログインの画面に移り、控えと入力を sessionStorage に保つ
+  reason: DEC-65 に反する
+- option: 切れたら控えを捨てる
+  reason: 結果の分からない操作を同じキーで確かめられず、DRV-30 を一部しか満たさない
+gains:
+- ログインし直しても入力と控えが残る
+- 前のアカウントのデータが別のアカウントに見えない
+costs:
+- 別のアカウントでログインし直すと入力と控えを失う
+sensitive_points:
+- スタッフのセッションの長さ（最後に使ってから 1 時間、長くても 8 時間。DEC-43）
+trade_offs: []
+assumptions: []
+depends_on:
+- DEC-43
+- DEC-48
+- DEC-65
+parameters: []
+debt: 
+deferred: false
+revisit_when: 
+as_is: new
+changelog:
+- version: 1
+  date: '2026-11-08'
+  change: 作成
+  reason: 第 4 段階（ELM-03）の下書き。質問 1〜4 の回答を反映（質問 5 は回答なし）

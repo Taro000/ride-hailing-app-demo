@@ -1,0 +1,59 @@
+id: MOD-11
+title: 請求の記録
+status: draft
+version: 1
+basis: inferred
+basis_note: 示すもの（FR-49、IFC-06 の Billing）は入力。返金の入力を示す判断表と、依頼 ID で開く画面は推定
+needs_agreement: false
+approver_candidates: []
+component: ELM-03
+name: 請求の記録
+responsibility: 依頼の請求の記録を開いて示す
+visibility: public
+interface:
+- operation: 'openBilling(rideId: RideId) -> Billing'
+  pre: rideId がパターンに合う
+  post: GET /api/v1/admin/rides/{rideId}/billing を、開くたびと MOD-12 が求めるたびに読む
+  errors:
+  - 'NotFound: 404（「この依頼は見つかりません」）'
+  - '共通: 答えがない（WS-API の送り直しを尽くした）、403、429。401 は MOD-02 がログインし直させる'
+- operation: RideIdLookup -> 画面
+  pre: operator
+  post: 依頼 ID を入れて請求の記録を開く
+  errors:
+  - パターンに合わなければ「ride_ で始まる依頼 ID を入れてください」
+- operation: BillingScreen(rideId) -> 画面
+  pre: operator
+  post: 料金、変化、請求、返金、決済の状態、差（FR-49 AC2）、突き合わせ（FR-49 AC3）を示し、請求ごとの返金の入力（MOD-12）を判断表で示す。MOD-12 に refresh = openBilling(rideId) を渡す
+  errors:
+  - '共通: 答えがない（WS-API の送り直しを尽くした）、403、429。401 は MOD-02 がログインし直させる'
+invariants: []
+depends_on:
+- MOD-03
+- MOD-12
+functions:
+- FR-49
+realizes:
+- IFC-06 GET /api/v1/admin/rides/{rideId}/billing
+- IFC-28 請求と返金（返金は MOD-12）
+drivers:
+- DRV-21
+decisions:
+- DEC-41
+- DEC-46
+- DEC-57
+behaviour: '報告書の節: MOD-11 請求の記録（4-detailed-design/ELM-03.md）'
+verification:
+- checks: FR-49 AC1〜3
+  how: 料金の変化、差、一致しない日を持つ請求の記録の部品のテスト
+- checks: 返金の入力の判断表 5 行
+  how: 単体テスト
+- checks: FR-49 AC4
+  how: MOD-04 のリンクから開く部品のテスト
+parameters: []
+as_is: new
+changelog:
+- version: 1
+  date: '2026-11-08'
+  change: 作成
+  reason: 第 4 段階（ELM-03）の下書き。質問 1〜4 の回答を反映（質問 5 は回答なし）

@@ -1,0 +1,22 @@
+id: FND-83
+title: ELM-03 は返金とブラウザのエラーの記録を行うが、drivers に原則の DRV-30 と DRV-32 がない
+status: open
+version: 1
+basis: inferred
+basis_note: ELM-03・01・04 の drivers と DRV-30・32 の文は入力。直し方の案は推定
+needs_agreement: false
+approver_candidates: []
+raised_by: high-level-design-to-detailed-design
+raised_in: 4-detailed-design/ELM-03.md
+to: architecture-drivers-to-architecture
+targets:
+- ELM-03
+severity: minor
+evidence: ELM-03 は返金（FR-50。お金を動かす操作で、結果が分からないときは同じキー、失敗の後は新しいキー）を始め、ブラウザのエラーの記録（IFC-05）を送る。それぞれ原則の DRV-30（お金の操作は繰り返しても一度だけ）と DRV-32（ログに個人情報を残さない）が縛るが、ELM-03 の drivers は DRV-21・25・28・29 だけ。ELM-01 は DRV-32 を、ELM-04 は DRV-30・32 を持つ。第 4 段階は MOD-12・20 に DRV-30 を、MOD-05・18 に DRV-32 を割り当てた
+suggestion: ELM-03 の drivers に DRV-30 と DRV-32 を足す
+resolution: 
+changelog:
+- version: 1
+  date: '2026-11-08'
+  change: 出した
+  reason: 第 4 段階（ELM-03）

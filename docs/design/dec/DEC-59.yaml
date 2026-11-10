@@ -1,0 +1,54 @@
+id: DEC-59
+title: パスキーのブラウザの部品
+status: draft
+version: 1
+basis: confirmed
+basis_note: ELM-03 の質問 2 で確認済み。関数と誤りの符号は @simplewebauthn/browser 13.3 の文書（Context7）
+needs_agreement: true
+approver_candidates:
+- 開発の責任者
+stage: detailed-design
+question: パスキーの確かめと登録をブラウザでどう扱うか
+addresses:
+- DEC-20
+- IFC-01
+- DRV-29
+options:
+- name: "@simplewebauthn/browser 13"
+  effect: サーバーの options の JSON をそのまま渡し、応答を JSON で返す。取り消しや登録済みを誤りの符号で見分けられる
+  cost: 依存が一つ増える
+- name: ブラウザの JSON の関数（PublicKeyCredential.parseRequestOptionsFromJSON）
+  effect: 依存が増えない
+  cost: 対応していないブラウザが残り、誤りの見分けを自分で作る
+- name: Better Auth のクライアント
+  effect: サーバーに Better Auth を使うなら組み合わせやすい
+  cost: IFC-01 は独自の経路で、クライアントの経路の形と合わない
+chosen: "@simplewebauthn/browser 13"
+rationale: WebAuthn の JSON の形の変換と誤りの見分けを作らずに済む（DRV-26）。パスキーを使うのは管理とエンジニアの画面だけで、MOD-17 に閉じる。ELM-03 の質問 2 で確認済み
+rejected:
+- option: ブラウザの JSON の関数（PublicKeyCredential.parseRequestOptionsFromJSON）
+  reason: 対応していないブラウザが残る
+- option: Better Auth のクライアント
+  reason: IFC-01 の経路の形と合わない
+gains:
+- 変換と誤りの見分けを作らない
+costs:
+- 依存が一つ増える
+sensitive_points:
+- RP ID がサービスのホスト名であること（DEC-20、DEC-43）
+trade_offs: []
+assumptions:
+- サーバーの options と応答の検証は WebAuthn の JSON の形で、@simplewebauthn/browser の形と合う（ELM-04 の詳細設計で確かめる）
+depends_on:
+- DEC-20
+- DEC-43
+parameters: []
+debt: 
+deferred: false
+revisit_when: 
+as_is: new
+changelog:
+- version: 1
+  date: '2026-11-08'
+  change: 作成
+  reason: 第 4 段階（ELM-03）の下書き。質問 1〜4 の回答を反映（質問 5 は回答なし）

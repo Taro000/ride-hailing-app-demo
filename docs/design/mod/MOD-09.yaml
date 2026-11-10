@@ -1,0 +1,65 @@
+id: MOD-09
+title: 設定の符号の受け渡し
+status: draft
+version: 1
+basis: inferred
+basis_note: 符号を一度だけ示すこと、同じキーの送り直しで null になること（IFC-06、DEC-48）は入力。閉じるまで示し写せる示し方は質問 4 で確認済み（DEC-62）。分け方と読み上げは推定
+needs_agreement: false
+approver_candidates: []
+component: ELM-03
+name: 設定の符号の受け渡し
+responsibility: 設定の符号を一度だけ示し、示せなかったときは出し直させる
+visibility: internal
+interface:
+- operation: 'show(issue: SetupCodeIssue) -> Unit'
+  pre: 作成、登録、出し直しの 201 の結果
+  post: code があれば、閉じるまで符号と期限（日本時間）を示すダイアログを開く。code が null なら「符号を表示できませんでした（応答が届かなかったため）。出し直してください」と出し直しのボタンを示す
+  errors: []
+- operation: 'reissue(subject: SetupSubject) -> SetupCodeIssue'
+  pre: 確かめのダイアログで「はい」（前の符号は使えなくなり、新しい符号でパスワードを決めると今のパスワードとほかの端末のログインが切れると示す）
+  post: 押すたびに新しい run（新しいキー）で、乗客は POST /api/v1/admin/passengers/{passengerId}/setup-code、ドライバーは POST /api/v1/admin/drivers/{driverId}/setup-code を送る。前の符号は使えない（FR-48 AC6）。結果を show に渡す
+  errors:
+  - 'NotFound: 404'
+  - MOD-20 の結果（結果が分からない、ログイン待ち、待ち、止まった、KeyReused）。結果が分からないときは同じ run で確かめる（最初の結果が返ると code は null なので、もう一度出し直しを案内する）
+- operation: copy() -> Unit
+  pre: 符号を示している
+  post: 符号をクリップボードに写す（DEC-62）
+  errors:
+  - 写せなければ「写せませんでした。画面の符号を伝えてください」
+invariants:
+- 符号はダイアログの部品のメモリにだけあり、一度に一つまで
+- 符号を保存領域、URL、記録、ログ、エラーの文に入れない
+- ダイアログを閉じたら符号をメモリから消し、二度と示さない
+- 符号を示している間は MOD-03 に止める理由を届け出る（版の読み直しで符号を失わない）
+depends_on:
+- MOD-03
+- MOD-20
+functions:
+- FR-48
+realizes:
+- IFC-06 POST /api/v1/admin/passengers/{passengerId}/setup-code
+- IFC-06 POST /api/v1/admin/drivers/{driverId}/setup-code
+drivers:
+- DRV-29
+- DRV-21
+decisions:
+- DEC-43
+- DEC-48
+- DEC-62
+behaviour: '報告書の節: MOD-09 設定の符号の受け渡し（4-detailed-design/ELM-03.md）'
+verification:
+- checks: 示し方の判断表 3 行と状態遷移
+  how: 単体テスト
+- checks: 閉じたら符号が DOM、保存領域、記録に残らない
+  how: 部品のテスト（保存領域の書き込みを見張り、WS-REC に渡した記録を調べる）
+- checks: 応答が届かず同じキーで送り直すと符号が null になり、出し直せる（FR-48 AC6）
+  how: MSW で一度目の応答を落とす部品のテストと Playwright
+- checks: 版の読み直しで符号を失わない
+  how: 符号を示している間に版の違いを起こし、読み直さないことの部品のテスト
+parameters: []
+as_is: new
+changelog:
+- version: 1
+  date: '2026-11-08'
+  change: 作成
+  reason: 第 4 段階（ELM-03）の下書き。質問 1〜4 の回答を反映（質問 5 は回答なし）

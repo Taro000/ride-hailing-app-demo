@@ -1,0 +1,57 @@
+id: MOD-17
+title: パスキーの端末の操作
+status: draft
+version: 1
+basis: inferred
+basis_note: ライブラリは質問 2 で確認済み（DEC-59）。関数と誤りの符号は @simplewebauthn/browser 13.3 の文書（Context7）。誤りの置き換えは推定
+needs_agreement: false
+approver_candidates: []
+component: ELM-03
+name: パスキーの端末の操作
+responsibility: 端末のパスキーで、確かめと登録の応答を作る
+visibility: internal
+interface:
+- operation: isSupported() -> Bool
+  pre: なし
+  post: browserSupportsWebAuthn() の結果
+  errors: []
+- operation: 'authenticate(optionsJSON: Json) -> Json'
+  pre: サーバーの authentication-options の応答
+  post: startAuthentication({optionsJSON}) の応答（AuthenticationResponseJSON）を返す。前の手続きが動いていれば止まる
+  errors:
+  - 'Cancelled: WebAuthnError で cause が NotAllowedError'
+  - 'Aborted: ERROR_CEREMONY_ABORTED'
+  - 'Unsupported: WebAuthn is not supported'
+  - 'Failed{code}: そのほかの WebAuthnError'
+- operation: 'register(optionsJSON: Json) -> Json'
+  pre: サーバーの registration-options の応答
+  post: startRegistration({optionsJSON}) の応答（RegistrationResponseJSON）を返す
+  errors:
+  - Cancelled
+  - Aborted
+  - Unsupported
+  - 'AlreadyRegistered: ERROR_AUTHENTICATOR_PREVIOUSLY_REGISTERED'
+  - Failed{code}
+invariants: []
+depends_on: []
+functions:
+- FR-01
+realizes: []
+drivers:
+- DRV-29
+decisions:
+- DEC-20
+- DEC-59
+behaviour: '報告書の節: MOD-17 パスキーの端末の操作（4-detailed-design/ELM-03.md）'
+verification:
+- checks: 誤りの置き換え（各符号と NotAllowedError）
+  how: ライブラリを偽物にした単体テスト
+- checks: 本物のブラウザでの確かめと登録
+  how: Playwright と Chromium の仮の認証器
+parameters: []
+as_is: new
+changelog:
+- version: 1
+  date: '2026-11-08'
+  change: 作成
+  reason: 第 4 段階（ELM-03）の下書き。質問 1〜4 の回答を反映（質問 5 は回答なし）

@@ -1,0 +1,54 @@
+id: DEC-60
+title: 管理とエンジニアの画面の URL
+status: draft
+version: 1
+basis: inferred
+basis_note: 推定（ELM-03 の前提の質問 5 は回答なし）
+needs_agreement: false
+approver_candidates: []
+stage: detailed-design
+question: 管理とエンジニアの画面をどの URL に置くか
+addresses:
+- IFC-28
+- IFC-29
+- DEC-16
+- DEC-23
+options:
+- name: "/backoffice/ の下。経路の引数は ID だけ。最初のアカウントの画面はログインからつながない"
+  effect: 運営とエンジニアの二つの役割の画面が入る名前。入口のログに個人情報が残らない
+  cost: ELM-04 が /backoffice/ の下を配る
+- name: "/admin/ の下"
+  effect: 短い
+  cost: エンジニアの画面も入るので名前が合わない
+- name: 別の名前のサービス
+  effect: 画面ごとに入口を分けられる
+  cost: DEC-06 の一つのサービスと DEC-23 の同じ入口に反する
+chosen: "/backoffice/ の下。経路の引数は ID だけ。最初のアカウントの画面はログインからつながない"
+rationale: 同じ入口（DEC-23）なので、クッキーとパスキーの RP ID が同じになる。経路の引数を ID だけにして、入口のログに個人情報を残さない（DEC-16）。最初のアカウントの画面は一度しか使わず、つなぐと入口を知らせるだけなのでつながない
+rejected:
+- option: "/admin/ の下"
+  reason: エンジニアの画面も入るので名前が合わない
+- option: 別の名前のサービス
+  reason: DEC-06 と DEC-23 に反する
+gains:
+- 一つの入口でクッキーとパスキーが使える
+- 入口のログに個人情報が残らない
+costs:
+- ELM-04 が /backoffice/ の下の静的なファイルを配る
+sensitive_points: []
+trade_offs: []
+assumptions:
+- ELM-04 が /backoffice/ の下の静的なファイルを配り、知らない経路に /backoffice/index.html を返す（ELM-04 の詳細設計への引き継ぎ）
+depends_on:
+- DEC-16
+- DEC-23
+parameters: []
+debt: 
+deferred: false
+revisit_when: 
+as_is: new
+changelog:
+- version: 1
+  date: '2026-11-08'
+  change: 作成
+  reason: 第 4 段階（ELM-03）の下書き。質問 1〜4 の回答を反映（質問 5 は回答なし）

@@ -1,0 +1,56 @@
+id: DEC-57
+title: API の応答の取り置き
+status: draft
+version: 1
+basis: confirmed
+basis_note: ELM-03 の質問 2 で確認済み。retry false と staleTime、gcTime の既定は TanStack Query 5.90 の文書（Context7）
+needs_agreement: true
+approver_candidates:
+- 開発の責任者
+stage: detailed-design
+question: API の応答の取り置きと読み直しをどう扱うか
+addresses:
+- DEC-48
+- IFC-06
+- IFC-07
+- DRV-26
+options:
+- name: TanStack Query 5（ライブラリの送り直しを切る）
+  effect: 取り置き、同じ読み込みのまとめ、古い応答を画面に出さないこと、前面に戻ったときの読み直しを持つ
+  cost: 送り直しを切り忘れると DEC-48 に反する
+- name: 自分で作るフック
+  effect: 依存が増えない
+  cost: 取り置き、古い応答の捨て方、前面に戻ったときの読み直しを作る手間
+- name: SWR
+  effect: 小さく、読み込みの取り置きを持つ
+  cost: 変更の操作の扱いが薄く、TanStack Query と比べて得るものがない
+chosen: TanStack Query 5（ライブラリの送り直しを切る）
+rationale: 取り置きと読み直しを作らずに済む（DRV-26）。DEC-48 の「送り直しは一か所（ブラウザの API の呼び出しのモジュール）」を守るため、ライブラリの送り直しは QueryClient の既定で切る。ELM-03 の質問 2 で確認済み
+rejected:
+- option: 自分で作るフック
+  reason: DRV-26 で負ける
+- option: SWR
+  reason: 変更の操作の扱いが薄く、得るものがない
+gains:
+- 取り置きと読み直しを作らない
+- 古い応答を画面に出さない
+costs:
+- ライブラリの送り直しを切り続ける（CI のテストで確かめる）
+sensitive_points:
+- retry false を QueryClient の既定にすること
+trade_offs: []
+assumptions:
+- 乗客とドライバーの画面も同じものを使う（ELM-01・02 の詳細設計で確かめる）
+depends_on:
+- DEC-48
+- DEC-26
+parameters: []
+debt: 
+deferred: false
+revisit_when: 
+as_is: new
+changelog:
+- version: 1
+  date: '2026-11-08'
+  change: 作成
+  reason: 第 4 段階（ELM-03）の下書き。質問 1〜4 の回答を反映（質問 5 は回答なし）

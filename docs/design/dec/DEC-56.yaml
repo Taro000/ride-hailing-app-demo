@@ -1,0 +1,58 @@
+id: DEC-56
+title: 画面の部品のライブラリ
+status: draft
+version: 1
+basis: confirmed
+basis_note: ELM-03 の質問 2 で確認済み
+needs_agreement: true
+approver_candidates:
+- 開発の責任者
+stage: detailed-design
+question: 画面の部品をどのライブラリで作るか（DEC-24 が第 4 段階に任せた）
+addresses:
+- DEC-24
+- IFC-28
+- IFC-29
+- DRV-26
+options:
+- name: React Aria Components
+  effect: 名前、役割、状態、焦点、キーボードの操作を部品が持ち、axe の確かめに通りやすい。FileTrigger、NumberField、Form の validationErrors がある
+  cost: 見た目は自分で作る。学ぶもの
+- name: Radix UI
+  effect: スタイルのない部品で、よく使われる
+  cost: 数の入力やファイルの選択の部品がなく、足す手間がある
+- name: 自分で作る
+  effect: 依存が増えない
+  cost: WCAG の振る舞いを一人で作って確かめる
+chosen: React Aria Components
+rationale: DEC-24 が候補に挙げ、IFC-28・29 の WCAG 2.2 AA（DEC-66）を一人の手間（DRV-26）で満たす。web-shared の部品として乗客とドライバーの画面（DRV-24）にも使える。ELM-03 の質問 2 で確認済み
+rejected:
+- option: Radix UI
+  reason: 数の入力とファイルの選択を足す手間があり、DEC-24 の候補でない
+- option: 自分で作る
+  reason: DRV-26 で負ける
+gains:
+- アクセシビリティの振る舞いを部品が持つ
+- 三つの SPA で同じ部品を使う
+costs:
+- 学ぶもの
+- 見た目を自分で作る
+sensitive_points:
+- 部品の版を上げたときの振る舞いの変化（axe の確かめで捕まえる）
+trade_offs: []
+assumptions:
+- web-shared の部品も React Aria Components で作る（持ち主 ELM-01 の詳細設計で確かめる）
+depends_on:
+- DEC-24
+- DEC-23
+- DEC-26
+parameters: []
+debt: 
+deferred: false
+revisit_when: 
+as_is: new
+changelog:
+- version: 1
+  date: '2026-11-08'
+  change: 作成
+  reason: 第 4 段階（ELM-03）の下書き。質問 1〜4 の回答を反映（質問 5 は回答なし）

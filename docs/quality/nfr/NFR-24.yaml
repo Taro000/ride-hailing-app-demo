@@ -1,7 +1,7 @@
 id: NFR-24
 title: 手配の画面の応答
 status: draft
-version: 2
+version: 3
 basis: inferred
 basis_note: 3 秒と 5% は提案。T_book は第 1 段階で 30 秒に決まった（QIU-03）。3 秒の要求が数回続いても、入力の時間を残せる見込み
 needs_agreement: true
@@ -14,7 +14,7 @@ kind: monitor
 cuj: CUJ-01
 statement: 手配の画面の要求（場所の検索、到着予定時刻と料金の計算、手配の確定）のうち 3 秒を超えたものが、1 時間に 5% を超えると、エンジニアに知らせる。
 conditions:
-  workload: 少人数の参加者のデモ。件数は未定（運用の事実）。常時稼働し、使うのはデモの回だけ（質問 1）
+  workload: 少人数の参加者のデモ。件数は未定（運用の事実）。サーバーはデモの回だけ、毎日の処理はデモの期間だけ動く（2026-11-03 の回答、設計 1-1）
   users: デモの参加者（乗客、ドライバー、運営・サポート担当）。エンジニアのテスト用アカウント、合成の監視、負荷試験は除く
   transactions: null
 slo: null
@@ -33,3 +33,7 @@ changelog:
   date: '2026-11-01'
   change: 根拠に T_book の値を書いた
   reason: 第 4 段階の再実行（第 2 段階 7d0cb6d・08c3ee0、第 3 段階 156240c・9c28917）
+- version: 3
+  date: '2026-11-03'
+  change: conditions.workload の「常時稼働し、使うのはデモの回だけ」を「サーバーはデモの回だけ、毎日の処理はデモの期間だけ動く」に直した
+  reason: 設計の連鎖が返した課題（常時稼働の前提）への 2026-11-03 の利用者の回答（docs/quality-chain-answers.md の設計 1-1）

@@ -1,0 +1,55 @@
+id: DEC-64
+title: 画面のテストの道具
+status: draft
+version: 1
+basis: confirmed
+basis_note: ELM-03 の質問 2 で確認済み
+needs_agreement: true
+approver_candidates:
+- 開発の責任者
+stage: detailed-design
+question: 画面のテストをどの道具で行うか
+addresses:
+- DEC-25
+- QR-43
+- IFC-28
+- IFC-29
+options:
+- name: 部品のテストは Vitest と Testing Library と MSW。画面の自動テストは Playwright と @axe-core/playwright と Chromium の仮の認証器
+  effect: 仕様書の例と誤りの応答を速く起こせる。axe とパスキーを本物のブラウザで確かめられる
+  cost: MSW の応答を仕様書に合わせ続ける
+- name: 部品のテストでも手元のサーバーを動かす
+  effect: 本物の応答で確かめる
+  cost: 遅く、誤りの応答を起こしにくい
+- name: Cypress
+  effect: 画面の自動テストの道具としてよく使われる
+  cost: DEC-25 が Playwright を挙げる。仮の認証器の扱いが Playwright の方が直接
+chosen: 部品のテストは Vitest と Testing Library と MSW。画面の自動テストは Playwright と @axe-core/playwright と Chromium の仮の認証器
+rationale: TC-05 の Vitest を使い、仕様書の例と誤りの応答を MSW で返して、エラーの決まりの各行を速く確かめる。画面の自動テストは DEC-25 の Playwright で、手元のサーバーと偽物で動かし、axe と仮の認証器を使う。ELM-03 の質問 2 で確認済み
+rejected:
+- option: 部品のテストでも手元のサーバーを動かす
+  reason: 遅く、誤りの応答を起こしにくい
+- option: Cypress
+  reason: DEC-25 が Playwright を挙げる
+gains:
+- エラーの決まりの各行を速く確かめる
+- パスキーとアクセシビリティを本物のブラウザで確かめる
+costs:
+- MSW の応答を仕様書に合わせ続ける手間
+sensitive_points:
+- MSW の応答と仕様書のずれ（仕様書の例から作る）
+trade_offs: []
+assumptions: []
+depends_on:
+- DEC-25
+- DEC-26
+parameters: []
+debt: 
+deferred: false
+revisit_when: 
+as_is: new
+changelog:
+- version: 1
+  date: '2026-11-08'
+  change: 作成
+  reason: 第 4 段階（ELM-03）の下書き。質問 1〜4 の回答を反映（質問 5 は回答なし）

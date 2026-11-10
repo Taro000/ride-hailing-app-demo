@@ -1,7 +1,7 @@
 id: NFR-23
 title: アクセシビリティの手による確認
 status: draft
-version: 2
+version: 3
 basis: inferred
 basis_note: 時期は提案。指針（A11Y_guideline は WCAG 2.2 レベル AA）は 2026-11-01 の利用者の回答
 needs_agreement: true
@@ -14,7 +14,7 @@ kind: audit
 cuj: null
 statement: デモの期間の前に、A11Y_guideline のうち自動で確かめられない項目を、画面ごとに人が確かめる。
 conditions:
-  workload: 少人数の参加者のデモ。件数は未定（運用の事実）。常時稼働し、使うのはデモの回だけ（質問 1）
+  workload: 少人数の参加者のデモ。件数は未定（運用の事実）。サーバーはデモの回だけ、毎日の処理はデモの期間だけ動く（2026-11-03 の回答、設計 1-1）
   users: デモの参加者（乗客、ドライバー、運営・サポート担当）。エンジニアのテスト用アカウント、合成の監視、負荷試験は除く
   transactions: null
 slo: null
@@ -33,3 +33,7 @@ changelog:
   date: '2026-11-01'
   change: A11Y_guideline を WCAG 2.2 レベル AA にした
   reason: 2026-11-01 の利用者の回答への追随
+- version: 3
+  date: '2026-11-03'
+  change: conditions.workload の「常時稼働し、使うのはデモの回だけ」を「サーバーはデモの回だけ、毎日の処理はデモの期間だけ動く」に直した
+  reason: 設計の連鎖が返した課題（常時稼働の前提）への 2026-11-03 の利用者の回答（docs/quality-chain-answers.md の設計 1-1）

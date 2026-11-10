@@ -1,16 +1,16 @@
 id: QR-40
 title: 保存期間を過ぎた個人情報を残さない
 status: draft
-version: 2
+version: 3
 basis: inferred
-basis_note: 残すことは質問 4 で確認済み。FRP-06 は FR-53 として受け入れられ、記録を残して操作した人と位置を消す形になった（第 2 段階の質問 12）。法令として扱うことは第 1 段階の質問 20・22 で確認済み。法令がそれを求めるかは未確認で推定
+basis_note: 残すことは質問 4 で確認済み。FRP-06 は FR-53 として受け入れられ、記録を残して操作した人と位置を消す形になった（第 2 段階の質問 12）。法令として扱うことは第 1 段階の質問 20・22 で確認済み。法令がそれを求めるかは未確認で推定。現在地の受信の記録（FR-17 版 2）を対象に加えたことは推定（T_log_retention の間だけ残すので T_pii_retention より短い）
 needs_agreement: true
 approver_candidates: [プロダクトオーナー, 開発の責任者, 法令を確かめる担当（推定）]
 model: data
 layer: data-inherent
 characteristic: compliance
 statement: 位置情報と個人情報を含むログとデータは、決めた保存期間（T_pii_retention）を過ぎると残らない。
-applies_to: [FR-37, FR-38, FR-39, FR-53]
+applies_to: [FR-17, FR-37, FR-38, FR-39, FR-53]
 traces_to: []
 entry_point:
   type: law
@@ -43,3 +43,7 @@ changelog:
     date: 2026-10-31
     change: FR-53 を対象に加え、QR-33 との競合を記録した
     reason: 第 3 段階の再実行（第 1 段階 55db34c、第 2 段階 dbb8df9）
+  - version: 3
+    date: '2026-11-03'
+    change: 現在地の受信の記録を対象に加えた（FR-17 を対象に足した）
+    reason: 第 2 段階の再実行（2026-11-03）の FR-17 版 2 への追随

@@ -1,0 +1,56 @@
+id: MOD-18
+title: 画面のエラーの記録
+status: draft
+version: 1
+basis: inferred
+basis_note: 記録に入れないもの（DEC-23、DEC-44、DRV-32）とトレース ID（FR-37 AC3）は入力。誤りの境界、scrub の規則、1 分に一つにまとめることは推定。DRV-32 は ELM-03 の drivers にない（FND-83）
+needs_agreement: false
+approver_candidates: []
+component: ELM-03
+name: 画面のエラーの記録
+responsibility: この画面で起きたエラーを、入力の値を含めずに記録へ渡す
+visibility: internal
+interface:
+- operation: install() -> Unit
+  pre: アプリの始め（MOD-19）
+  post: React の誤りの境界と、window.onerror、unhandledrejection を取り付ける。捕まえた誤りを kind render で WS-REC に渡し、境界は「画面で問題が起きました（問い合わせ番号 …）。読み込み直してください」と読み込み直しのボタンを示す
+  errors: []
+- operation: 'recordRequestProblem(e: ApiError, operation: Text, rideId: RideId?) -> Unit'
+  pre: 403、KeyReused、判断表にない応答を受けた
+  post: kind request、message は「操作の名前 状態の符号 誤りの符号」だけ、traceId は Problem の traceId か控えのトレース ID で WS-REC に渡す
+  errors: []
+- operation: 'scrub(message: Text) -> Text'
+  pre: なし
+  post: 決まった文の外から入りうる値を伏せる（10 文字ちょうどの英大文字と数字の語、メールアドレスの形、小数点以下 5 桁以上の数）。どの記録もこれを通す
+  errors: []
+invariants:
+- 記録の message は決まった文、符号、ID からだけ作り、入力の値、応答の本文、座標、連絡先、名前、符号、秘密を入れない
+- 同じ message と経路の記録は 1 分に一つまで
+depends_on: []
+functions:
+- FR-37
+realizes:
+- IFC-05 POST /api/v1/records/client-errors（WS-REC を通す）
+drivers:
+- DRV-28
+- DRV-32
+- DRV-21
+decisions:
+- DEC-18
+- DEC-23
+- DEC-44
+behaviour: '報告書の節: MOD-18 画面のエラーの記録（4-detailed-design/ELM-03.md）'
+verification:
+- checks: scrub の各規則（符号、メールアドレス、座標。ULID の ID は伏せない）
+  how: 単体テスト
+- checks: 境界が画面を守り、記録を一つ渡す
+  how: 部品のテスト
+- checks: 画面の自動テストの記録に個人情報と符号がない（NFR-40 の画面の側）
+  how: Playwright の実行で WS-REC に渡した記録を集めて調べる CI の確かめ
+parameters: []
+as_is: new
+changelog:
+- version: 1
+  date: '2026-11-08'
+  change: 作成
+  reason: 第 4 段階（ELM-03）の下書き。質問 1〜4 の回答を反映（質問 5 は回答なし）
