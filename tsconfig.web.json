@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "types": ["vite/client"]
+  },
+  "include": [
+    "packages/web-shared/src",
+    "packages/web-shared/test",
+    "apps/web-passenger/src",
+    "apps/web-passenger/test",
+    "packages/contracts/src"
+  ]
+}

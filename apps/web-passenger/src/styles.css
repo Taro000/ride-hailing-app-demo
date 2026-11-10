@@ -1,0 +1,173 @@
+:root {
+  --fg: #1d1d1f;
+  --muted: #5a5a60;
+  --bg: #ffffff;
+  --surface: #f4f4f6;
+  --accent: #0b57d0;
+  --accent-fg: #ffffff;
+  --danger: #b3261e;
+  --border: #c9c9cf;
+  color-scheme: light;
+  font-family: system-ui, -apple-system, "Hiragino Sans", sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+}
+
+.page {
+  max-width: 32rem;
+  margin: 0 auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+h1 {
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+h2 {
+  font-size: 1.1rem;
+  margin: 0 0 0.5rem;
+}
+
+.stack,
+.picker {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-end;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+}
+
+.field input {
+  font-size: 1rem;
+  padding: 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  min-height: 2.75rem;
+  box-sizing: border-box;
+}
+
+.button {
+  font-size: 1rem;
+  min-height: 2.75rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--accent);
+  cursor: pointer;
+}
+
+.button-primary {
+  background: var(--accent);
+  color: var(--accent-fg);
+}
+
+.button-secondary {
+  background: var(--bg);
+  color: var(--accent);
+}
+
+.button[data-disabled] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.button[data-focus-visible] {
+  outline: 3px solid var(--fg);
+  outline-offset: 2px;
+}
+
+.candidates {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.candidates .button {
+  width: 100%;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+}
+
+.candidate-address {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.picked {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  background: var(--surface);
+  border-radius: 0.5rem;
+}
+
+.estimate-values {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.25rem 1rem;
+  margin: 0;
+}
+
+.estimate-values dt {
+  color: var(--muted);
+}
+
+.estimate-values dd {
+  margin: 0;
+}
+
+.fare-total,
+.ride-title {
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.error {
+  color: var(--danger);
+  border: 1px solid var(--danger);
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+}
+
+.trace {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.note {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--surface);
+}

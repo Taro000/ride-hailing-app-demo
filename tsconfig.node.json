@@ -1,0 +1,20 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2023"],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "types": ["node"]
+  },
+  "include": [
+    "packages/domain/src",
+    "packages/application/src",
+    "packages/adapters/src",
+    "packages/contracts/src",
+    "apps/server/src",
+    "apps/server/test",
+    "packages/*/test",
+    "e2e"
+  ],
+  "exclude": ["packages/web-shared"]
+}

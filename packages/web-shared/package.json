@@ -1,0 +1,16 @@
+{
+  "name": "@ride/web-shared",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@ride/contracts": "*",
+    "react": "19.2.9",
+    "react-aria-components": "1.22.1"
+  },
+  "devDependencies": {
+    "@types/react": "19.3.0"
+  }
+}

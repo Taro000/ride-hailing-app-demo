@@ -1,0 +1,8 @@
+# 設計と品質の成果物は書式の道具で触らない
+docs/
+.claude/
+skills-lock.json
+package-lock.json
+apps/web-passenger/dist/
+test-results/
+playwright-report/
