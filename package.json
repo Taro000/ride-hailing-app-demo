@@ -1,0 +1,37 @@
+{
+  "name": "ride-hailing-app-demo",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "type": "module",
+  "scripts": {
+    "dev:server": "node --env-file=apps/server/dev.env --watch apps/server/src/main.ts",
+    "dev:web": "npm run dev -w @ride/web-passenger",
+    "build:web": "npm run build -w @ride/web-passenger",
+    "start": "node --env-file=apps/server/dev.env apps/server/src/main.ts",
+    "typecheck": "tsc -p tsconfig.node.json && tsc -p tsconfig.web.json",
+    "lint": "oxlint",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
+    "deps": "depcruise packages apps --config .dependency-cruiser.cjs",
+    "test": "vitest run",
+    "test:e2e": "VITE_APP_VERSION=e2e npm run build:web && playwright test",
+    "check": "npm run typecheck && npm run lint && npm run format:check && npm run deps && npm run test"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.14.0",
+    "@playwright/test": "1.63.0",
+    "@types/node": "24.19.2",
+    "dependency-cruiser": "17.4.3",
+    "oxfmt": "0.78.0",
+    "oxlint": "1.93.0",
+    "typescript": "5.9.3",
+    "vite": "7.3.8",
+    "vitest": "4.1.12"
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}

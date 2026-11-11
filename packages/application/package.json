@@ -1,0 +1,14 @@
+{
+  "name": "@ride/application",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@libsql/client": "0.18.0",
+    "@ride/contracts": "*",
+    "@ride/domain": "*",
+    "ulid": "3.0.2"
+  }
+}
