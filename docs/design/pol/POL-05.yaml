@@ -2,14 +2,14 @@ id: POL-05
 title: インタフェースの種類ごとの仕様書の作り方
 status: active
 basis: inferred
-basis_note: どのインタフェースも両側を同じ開発者が作ること（TEAM-01）と、ほかの者がこのシステムの決まりに合わせて作るインタフェースがないこと（第 2 段階の外部との関係と実行時の構成のビュー）は入力からの推定。EXT-01、EXT-02、Web Push の配信サービスの文書はそれぞれの持ち主のもの（TC-10、TC-12、DEC-21）。生成の道具は DEC-33、表の形のマイグレーションは DEC-29 による
-premises: [TEAM-01, TC-10, TC-12, EXT-01, EXT-02]
+basis_note: どのインタフェースも両側を同じ開発者が作ること（TEAM-01）と、ほかの者がこのシステムの決まりに合わせて作るインタフェースがないこと（第 2 段階の外部との関係と実行時の構成のビュー）は入力からの推定。EXT-01、EXT-02、Web Push の配信サービスの文書はそれぞれの持ち主のもの（TC-10、TC-12、DEC-21）。想定の本番のアラートを配備せず、本物と照らさないことは TC-09（入力。FND-18 を受けて前提に挙げた）。生成の道具は DEC-33、表の形のマイグレーションは DEC-29 による。Web アプリが起動のときに読む環境ごとの値の操作（DEC-34）を一つ目の項に入れたことは、FND-12 を受けて加えた
+premises: [TEAM-01, TC-09, TC-10, TC-12, EXT-01, EXT-02]
 scope: specs
 addresses: [DRV-12, DRV-13, DRV-16, DRV-18]
-decisions: [DEC-06, DEC-11, DEC-12, DEC-13, DEC-20, DEC-21, DEC-29, DEC-33]
+decisions: [DEC-06, DEC-11, DEC-12, DEC-13, DEC-20, DEC-21, DEC-29, DEC-33, DEC-34]
 rules: []
 specs:
-  - interfaces: ELM-03 が提供する HTTP の操作のすべて（二つの Web アプリが呼ぶもの、日々の呼び出しの入口、外からの生存確認の入口）と、ELM-03 から二つの Web アプリへの流れ（Server-Sent Events）の出来事
+  - interfaces: ELM-03 が提供する HTTP の操作のすべて（二つの Web アプリが呼ぶもの（起動のときに読む環境ごとの値の操作、DEC-34 を含む）、日々の呼び出しの入口、外からの生存確認の入口）と、ELM-03 から二つの Web アプリへの流れ（Server-Sent Events）の出来事
     made: from-code
     how: OpenAPI 3.1 の文書を、ELM-03 の @hono/zod-openapi の経路の定義（Zod のスキーマ）から生成し、流れの出来事のスキーマも同じ文書に入れて、apps/server/generated/openapi.json に置いてコミットする。二つの Web アプリの型は、packages/api-client が openapi-typescript でその文書から生成し（コミットする）、Web アプリはその型と openapi-fetch で呼ぶ。IFC は、利用側が頼る決まり（操作、エラーとその符号、冪等性、結果が分からないときの答え）を持つ。検査の手順は、文書と型を生成し直して違いがあれば失敗し、oasdiff で最後のリリースの文書と比べて、第 3 段階の版の扱いが許さない壊す変更（操作や項目を消す、型を狭める）で失敗する。Web アプリは、生成した型が変わると型の確かめで失敗する
   - interfaces: ELM-03 から ELM-04（配車データベース）の表

@@ -2,8 +2,8 @@ id: DEC-28
 title: 二つの Web アプリは Vite で単一ページのアプリとして作り、React Router、TanStack Query、React Aria Components を使う
 status: active
 basis: assumed
-basis_note: 画面を React で作ることは TC-02（入力）。二つの Web アプリが利用者のブラウザで動き、その静的なファイルを ELM-03 が配ることは DEC-01、DEC-04、ELM-01、ELM-02（入力）。組み立て方の比べ方と選び方は推定。開発者がこれらの主なライブラリを使いこなすか学べることは DAS-07 による仮定。React Router 8 が 2026 年 6 月に出てデータの組み立て方（data mode）を持ち、React 19 を求めることは公開の情報で確かめた（報告の「入力」）。TanStack Query と React Aria Components の今の版と、React Aria Components の部品が iOS の Safari の読み上げで使えることは確かめていない
-premises: [TC-02, TC-13, DAS-07]
+basis_note: 画面を React で作ることは TC-02、サーバーを Hono で作ることは TC-03（入力）。二つの Web アプリが利用者のブラウザで動き、その静的なファイルを ELM-03 が配ることは DEC-01、DEC-04、ELM-01、ELM-02（入力）。組み立て方の比べ方と選び方は推定。開発者がこれらの主なライブラリを使いこなすか学べることは DAS-07 による仮定。React Router 8 が 2026 年 6 月に出てデータの組み立て方（data mode）を持ち、React 19 を求めることと、React Aria の文書が試している支援技術に iOS の VoiceOver を挙げることは、公開の情報で確かめた（報告の「入力」）。その文書はブラウザと iOS の版を書いておらず、ホーム画面に加えた ELM-01 の中で iOS 18.4 以降の VoiceOver で使えることは、NFR-50 の人による確かめと実機の受け入れの層（POL-03）で確かめる。拡大の機能での見え方は、部品ではなく画面の作りによる。TC-03 を前提に挙げ、想定を文書で確かめた範囲に絞ったことは FND-18 を受けた。TanStack Query と React Aria Components の今の版は確かめていない
+premises: [TC-02, TC-03, TC-13, DAS-07]
 stage: technical-policy
 question: 乗客とドライバーの Web アプリ（ELM-01）と担当者とエンジニアの Web アプリ（ELM-02）を、React（TC-02）の上で何で組み立てるか（ビルド、画面の移り変わり、サーバーの状態の持ち方、画面の部品）
 addresses: [DRV-16, DRV-22, DRV-15, DRV-12]
@@ -38,7 +38,7 @@ sensitive_points: []
 trade_offs: []
 assumptions:
   - 開発者は Vite、React Router、TanStack Query、React Aria Components を使いこなすか、学ぶ時間を取れる（DAS-07）
-  - React Aria Components の部品は、iOS 18.4 以降の Safari の読み上げと拡大の機能で使える
+  - React Aria Components の部品は、iOS の VoiceOver で使える（React Aria の文書が、試している支援技術に挙げる）
 depends_on: [DEC-01, DEC-02, DEC-03, DEC-04]
 parameters: []
 debt: null

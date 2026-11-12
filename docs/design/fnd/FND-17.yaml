@@ -1,6 +1,6 @@
 id: FND-17
 title: NFR-28 の修正の期限を保つ記録が、依存の部品の脆弱性にしか開かれない
-status: open
+status: accepted
 basis: inferred
 basis_note: POL-03 の NFR-28 の置き場所、POL-04 の deps-audit、POL-01 の技術の組み合わせは入力。Node.js とイメージのもとの OS の部品の脆弱性を見つける手順がないことは、このレビューの読み取り
 premises: []
@@ -11,4 +11,4 @@ targets: [POL-03, POL-04]
 severity: minor
 evidence: POL-03 の NFR-28 の置き場所は、依存の脆弱性の調べ（deps-audit）が見つけた脆弱性ごとに、見つけた日と期限を書いた記録を開くとし、POL-04 の deps-audit が動かすのは pnpm audit だけ。配備するのは Node.js 26 の上の ELM-03 のコンテナのイメージ（POL-01、POL-04）だが、Node.js そのものとイメージのもとの OS の部品の脆弱性を見つける手順も、それに記録を開く手順もなく、それらには NFR-28 の修正の期限が保たれない
 suggestion: deps-audit に、リリースのイメージ（Node.js とそのもとの OS の部品）の脆弱性の調べを加え、見つけたものに同じ記録を開く。ほかの道で知る（Node.js のセキュリティのリリースを開発者が見るなど）なら、その道と記録の開き方を置き場所に書く
-resolution: null
+resolution: 受け入れ。POL-04 の deps-audit で、リリースの手順ではそのイメージを、週に一度では配備しているイメージを、もとの OS の部品の脆弱性について Trivy で調べ、そのイメージの Node.js の版より後のセキュリティのリリースがあるかを Node.js の公開のリリースの一覧で調べ、見つけたものごとに NFR-28 の記録を開くことにした。POL-03 の NFR-28 の置き場所と監査の規則をそれに合わせた
