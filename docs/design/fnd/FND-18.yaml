@@ -1,0 +1,14 @@
+id: FND-18
+title: DEC-28 の想定の一つに仮定がなく、POL-02、POL-03、POL-05、DEC-28 が頼る設計の与件と共有する事実を前提に挙げていない
+status: open
+basis: inferred
+basis_note: DEC-28 の想定と basis_note、POL-02、POL-03、POL-05 の規則と premises、OPF-03 は入力。前提に欠けがあることは、このレビューの読み取り
+premises: []
+raised_by: design-review
+raised_in: reviews/2b-technical-policy.md
+to: architecture-to-technical-policy
+targets: [DEC-28, POL-02, POL-03, POL-05]
+severity: minor
+evidence: DEC-28 の想定「React Aria Components の部品は、iOS 18.4 以降の Safari の読み上げと拡大の機能で使える」は、basis_note が確かめていないと書くのに、DAS がなく premises にもない。この部品を選んだ主な理由は交渉できない DRV-22 で、違えば部品の作り方を替える。POL-03 の規則は OPF-03 の値（デモの参加者は乗客 1 人とドライバー 1 人）を自身の文で書いて負荷の層を置かない理由にし、OPF-03 を premises に挙げない。POL-02（infra/gcp/ はどこにも当てない）と POL-05（アラートを本物と照らさない）は TC-09 に、DEC-28（Hono の ELM-03 と役割が重なる）は TC-03 に頼るが、premises に挙げない
+suggestion: React Aria Components の文書で読み上げと拡大の対応を確かめて basis_note に引くか、DAS を書いて DEC-28 の premises に挙げる。POL-03 は OPF-03 を値でなく ID で引いて premises に加え、POL-02 と POL-05 に TC-09 を、DEC-28 に TC-03 を加える
+resolution: null

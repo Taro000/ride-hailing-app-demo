@@ -1,0 +1,14 @@
+id: FND-15
+title: NFR-15 の出どころは、iOS と Safari の更新が公開された後に確かめて直し始めるだけで、利用者が更新する前に直すことを保たない
+status: open
+basis: inferred
+basis_note: NFR-15 のしきい値、POL-03 の出どころ、POL-04 の device-acceptance、報告の範囲外の文は入力。公開の後に確かめ始めると参加者が先に更新しうることは、このレビューの推定
+premises: []
+raised_by: design-review
+raised_in: reviews/2b-technical-policy.md
+to: architecture-to-technical-policy
+targets: [POL-03, POL-04]
+severity: minor
+evidence: NFR-15 のしきい値は、通らなければ利用者が更新する前に直すことを求める。POL-03 の出どころは、対応する iOS と Safari の更新が出たときに開発者が実機の受け入れの手順を行い、通らなければ直す変更を始めるとし、POL-04 の device-acceptance も、更新が出たときは何も止めず、通らなければ直す変更を始めるとする。確かめ始めるのは更新が公開された後で、そのときには参加者も更新できるため、通らなかったときに参加者が更新する前に直すことを保つものがない。報告の範囲外は更新に気づくことを開発者の運用とするだけで、参加者に更新を待ってもらうことも書いていない
+suggestion: 実機の受け入れを、対応する iOS と Safari の更新の公開の前に Apple が出すベータ版か公開の候補の版でも行い、通らなければ公開までに直す。前もって出る版のない更新については、開発者が確かめるまで参加者に更新を待ってもらう案内を範囲外の運用として書くか、それでも保てないなら NFR-15 のしきい値について品質チェーンへの要求を出す
+resolution: null

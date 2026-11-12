@@ -1,0 +1,14 @@
+id: FND-14
+title: 依存の規則が、外部のシステムとデータベースのつなぎ口と ELM-01 の差し替え口を迂回する道を残している
+status: open
+basis: inferred
+basis_note: POL-02 の依存の規則と規則、POL-03 の差し替え口、HND-14、報告の「リポジトリとディレクトリ」の文は入力。規則が限らない道は、このレビューの推定
+premises: []
+raised_by: design-review
+raised_in: reviews/2b-technical-policy.md
+to: architecture-to-technical-policy
+targets: [POL-02]
+severity: minor
+evidence: 報告は、外部のシステムの部品を各機能の adapters/ だけが使い、application/ は adapters/ を使わないことなどを「どれも Oxlint の規則で、検査の手順が守る」と書く。しかし POL-02 の依存の規則は、一つ目に大域の fetch を限らず、EXT-01 を HTTP で直接呼ぶ案（HND-14 が第 4 段階に残す）や、実装が決める EXT-02 と Web Push の呼び方が fetch なら、外部の部品の規則は何も限らず、adapters/ の外のコードが ELM-05、ELM-06、ELM-07 を呼べて、POL-03 の偽物の差し替え口（payments、places、notifications のポート）と DEC-10 の試みの記録を通らない。二つ目に、application/ に禁じるのは adapters/ だけで、drizzle-orm、@libsql/client、src/platform/ のデータベースのつなぎを import でき、表を書くのはその機能の adapters/ だけという規則は機能の間でしか確かめられず、NFR-11 の重なりの偽物が差し込む DEC-08 の書き込みのポートを迂回できる。三つ目に、POL-03 は EXT-01 の入力部品と地図を描く部品の偽物を ELM-01 の src/platform/ に差し込むが、その部品（Stripe.js と地図の部品）を src/platform/ だけが import する規則がない
+suggestion: 同じ Oxlint の規則で、ELM-03 では大域の fetch と node:http、node:https を外部のシステムを持つ機能の adapters/ のほかで使わせず、application/ と domain/ には drizzle-orm、@libsql/client、src/platform/ のデータベースのつなぎを import させない。ELM-01 と ELM-02 では、EXT-01 と地図の部品を src/platform/ のほかで import させない
+resolution: null
