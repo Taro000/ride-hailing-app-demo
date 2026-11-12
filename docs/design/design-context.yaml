@@ -1,6 +1,6 @@
 read_from:
   quality_chain: docs/quality/
-  other: [利用者が与えた設計の与件（第 1 段階の最初の実行の依頼）]
+  other: [利用者が与えた設計の与件（第 1 段階の最初の実行の依頼）, 設計の第 2 段階の質問 2 の答え（TC-18）]
 technology_constraints:
   - id: TC-01
     statement: コードは TypeScript で書く
