@@ -1,0 +1,17 @@
+id: ELM-04
+title: 配車データベース
+status: active
+basis: inferred
+basis_note: 本番のデータベースを Turso として設計し、実際にはローカルだけで動かすことは TC-07、TC-09（入力）。置くデータと持ち主は DEC-17 による
+premises: [TC-07, TC-09]
+kind: data-store
+name: 配車データベース
+responsibility: システムのすべてのデータ（アカウントと本人の確かめ、登録と顔写真、依頼と乗車、出来事の記録、位置、お金の操作、評価、苦情、連絡のメッセージ、操作の記録、たどる記録、異常、切り替え、模擬の運賃表、知らせの宛先）を持つ。書くのは ELM-03 だけ。個人の情報は ELM-03 が暗号にしたものを持つ
+functions: []
+drivers: [DRV-01, DRV-02, DRV-07, DRV-13, DRV-15, DRV-21, DRV-27, DRV-29, DRV-30]
+decisions: [DEC-01, DEC-05, DEC-16, DEC-17, DEC-26]
+team: TEAM-01
+technology: Turso（想定の本番、東京）。ローカルでは libSQL のデータベース（DEC-05、DEC-17）
+runs_on: ELM-09
+depends_on: []
+as_is: new

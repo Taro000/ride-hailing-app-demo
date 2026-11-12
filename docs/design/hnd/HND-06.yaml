@@ -1,0 +1,14 @@
+id: HND-06
+title: EXT-01 との照合を行う時刻と読む期間
+status: open
+basis: inferred
+basis_note: DEC-11 の応答を左右する点。お金の道にあるため、第 3 段階に送る
+premises: [EXT-01]
+from: architecture-drivers-to-architecture
+to: architecture-to-high-level-design
+component: null
+origin: [DEC-11]
+what: 日々の照合を行う時刻、一回で EXT-01 から読む期間、確定額が変わって取引が二つ以上ある依頼のまとめ方の値
+bounds: SLI-12 の数え方の規則（結果を返さない処理は翌日の終わりに突き合わせる）、NFR-24、NFR-26、DEC-11、DEC-18（日々の処理）
+trigger: 第 3 段階の次の実行
+resolution: null

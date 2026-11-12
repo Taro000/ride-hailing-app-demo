@@ -1,0 +1,17 @@
+id: ELM-12
+title: 担当者とエンジニアのコンピューター
+status: active
+basis: assumed
+basis_note: 使う端末とブラウザは DAS-04 による仮定（DEC-03）
+premises: [DAS-04]
+kind: node
+name: 担当者とエンジニアのコンピューター
+responsibility: 担当者とエンジニアのコンピューターのブラウザで ELM-02 を動かす
+functions: []
+drivers: []
+decisions: [DEC-03]
+team: null
+technology: コンピューターと、Chrome、Edge、Firefox、Safari の今の版か一つ前の版（DEC-03）
+runs_on: null
+depends_on: []
+as_is: new

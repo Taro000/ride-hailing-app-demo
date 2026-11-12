@@ -1,0 +1,17 @@
+id: ELM-07
+title: Web Push の配信サービス
+status: active
+basis: inferred
+basis_note: DEC-21 が加えた外部のシステム。iOS の Safari の Web アプリの知らせはホーム画面に加えた Web アプリでしか届かないこと（DRV-14、TC-13）は入力。ブラウザの提供元の配信サービスを通ることは Web Push の仕組みによる
+premises: [TC-13]
+kind: external-system
+name: Web Push の配信サービス
+responsibility: 設計は、ELM-03 が暗号にして送った知らせを、宛先の端末のブラウザ（iPhone は Apple、コンピューターはそれぞれのブラウザの提供元）に、中身を読まずに届けると見込む
+functions: []
+drivers: [DRV-03, DRV-24]
+decisions: [DEC-20, DEC-21]
+team: null
+technology: ブラウザの提供元が動かす Web Push の配信サービス
+runs_on: null
+depends_on: []
+as_is: new

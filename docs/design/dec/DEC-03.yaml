@@ -1,0 +1,38 @@
+id: DEC-03
+title: 担当者とエンジニアはコンピューターの主なブラウザで画面を使う
+status: active
+basis: assumed
+basis_note: 担当者とエンジニアの端末は、利用状況が問わないとしている（QIU-21〜QIU-33、入力）。コンピューターの主なブラウザの今の版と一つ前の版で使うことは DAS-04 による仮定
+premises: [DAS-04]
+stage: architecture
+question: 運営・サポートの担当者とエンジニアの画面を、どの端末とブラウザで動かすか
+addresses: [DRV-24, DRV-30, DRV-28]
+options:
+  - name: コンピューターの Chrome、Edge、Firefox、Safari の今の版と一つ前の版
+    effect: 調査の経過、照会、登録の表を広い画面で扱える
+    cost: スマートフォンでの使いやすさは作らず、確かめない
+  - name: コンピューターとスマートフォンの両方
+    effect: 担当者とエンジニアがどこからでも使える
+    cost: 二つの画面の大きさに合わせて作り、試す
+  - name: 乗客とドライバーと同じ iOS の Safari だけ
+    effect: 対応するブラウザが一つで済む
+    cost: 調査の経過や照会の表を小さな画面で扱う
+chosen: コンピューターの Chrome、Edge、Firefox、Safari の今の版と一つ前の版
+rationale: DRV-24 の調査と DRV-30 の操作の記録をたどる作業は、経過と表を見比べるため広い画面に向く。利用状況が端末を問わないため、コンピューターの主なブラウザを広く対象にし、どの担当者とエンジニアも外さない。スマートフォンを加えると作って試すものが増え（DRV-16）、それを求める入力はない。本人の確かめ（DRV-28）はどのブラウザでも同じ
+rejected:
+  - option: コンピューターとスマートフォンの両方
+    reason: 求める入力がなく、作って試すものが増える（DRV-16）
+  - option: 乗客とドライバーと同じ iOS の Safari だけ
+    reason: 調査と照会の作業に向かず、DRV-24 を弱める
+gains:
+  - 調査、照会、登録の作業を広い画面で行える
+costs:
+  - 外出先のスマートフォンから担当者とエンジニアの機能を使うことは考えない
+sensitive_points: []
+trade_offs: []
+assumptions:
+  - 担当者とエンジニアは、主なブラウザの入ったコンピューターを使う（DAS-04）
+depends_on: [DEC-01]
+parameters: []
+debt: null
+as_is: new

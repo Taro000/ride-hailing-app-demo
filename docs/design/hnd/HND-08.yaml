@@ -1,0 +1,14 @@
+id: HND-08
+title: 迎車中と乗車中の着く見込みを求め直す間隔
+status: open
+basis: inferred
+basis_note: DEC-13 の応答を左右する点。乗客に示す着く見込みは QR-19 と NFR-19 の時間のしきい値の道にあるため、第 3 段階に送る
+premises: [EXT-02]
+from: architecture-drivers-to-architecture
+to: architecture-to-high-level-design
+component: null
+origin: [DEC-13]
+what: 迎車中と乗車中に、サーバーが新しい位置から EXT-02 に着く見込みを求め直す間隔の値
+bounds: QR-19 と NFR-19（T_vehicle_location_lag）、NFR-08、DEC-13（着く見込みはサーバーが求める）、HND-03（位置を送る間隔）
+trigger: 第 3 段階の次の実行
+resolution: null

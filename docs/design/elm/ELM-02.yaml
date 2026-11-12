@@ -1,0 +1,17 @@
+id: ELM-02
+title: 担当者とエンジニアの Web アプリ
+status: active
+basis: assumed
+basis_note: 担当者とエンジニアの機能の割り当ては推定。使う端末とブラウザは DAS-04 による仮定
+premises: [DAS-04]
+kind: component
+name: 担当者とエンジニアの Web アプリ
+responsibility: 運営・サポートの担当者の画面（苦情、乗車の照会、返金、アカウントの作成と訂正、試験用の区別、ドライバーと車両の登録、停止と再開、操作の記録の検索）と、エンジニアの画面（異常の一覧、一件の依頼のたどり、理由を示した個人の情報の表示、振る舞いの切り替え）を示し、操作を配車サーバーに送る。異常の知らせを Web Push で受ける。見せる範囲と隠し方は決めず、サーバーが送ったものを示す
+functions: [FR-33, FR-34, FR-35, FR-36, FR-37, FR-38, FR-39, FR-40, FR-41, FR-42, FR-43, FR-44, FR-48, FR-49, FR-50, FR-52]
+drivers: [DRV-24, DRV-28, DRV-29, DRV-30, DRV-12, DRV-17, DRV-19, DRV-20]
+decisions: [DEC-01, DEC-03, DEC-04, DEC-14, DEC-15, DEC-19, DEC-20, DEC-26]
+team: TEAM-01
+technology: コンピューターの Chrome、Edge、Firefox、Safari の今の版と一つ前の版で動く Web アプリ（ランタイムはブラウザ、DEC-03、DEC-04）。静的なファイルは ELM-03 が配る
+runs_on: ELM-12
+depends_on: [ELM-03, ELM-07]
+as_is: new

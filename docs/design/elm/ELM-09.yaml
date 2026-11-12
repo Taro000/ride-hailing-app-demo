@@ -1,0 +1,17 @@
+id: ELM-09
+title: 想定の本番のデータベースの基盤（Turso、東京）
+status: active
+basis: inferred
+basis_note: 本番のデータベースを Turso として設計し、実際には配備しないことは TC-07、TC-09（入力）。東京に置くことは DEC-05 による
+premises: [TC-07]
+kind: node
+name: 想定の本番のデータベースの基盤（Turso、東京）
+responsibility: 想定の本番で ELM-04 を持ち、データの複製と時点を指定した戻しを受け持つ。実際には配備しない
+functions: []
+drivers: [DRV-01, DRV-15]
+decisions: [DEC-05, DEC-17]
+team: TEAM-01
+technology: Turso のマネージドのサービス（東京）
+runs_on: null
+depends_on: []
+as_is: new

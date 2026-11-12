@@ -1,0 +1,17 @@
+id: ELM-11
+title: 乗客とドライバーの iPhone
+status: active
+basis: inferred
+basis_note: 乗客とドライバーが iOS の Safari で使うことは TC-13、CON-05（入力）。対応する iOS の版は質問 1 を待つ（DEC-02）
+premises: [TC-13, CON-05]
+kind: node
+name: 乗客とドライバーの iPhone
+responsibility: 参加者の iPhone で、ELM-01 をホーム画面に加えた Web アプリとして動かし、位置を測る
+functions: []
+drivers: [DRV-14]
+decisions: [DEC-02]
+team: null
+technology: iOS 18.4 以降の iPhone と Safari（DEC-02）
+runs_on: null
+depends_on: []
+as_is: new

@@ -1,0 +1,17 @@
+id: ELM-05
+title: 決済サービス（Stripe のテスト環境）
+status: active
+basis: assumed
+basis_note: EXT-01 の役を担い、製品が Stripe のテスト環境であることは TC-10、CON-03（入力）。使う機能が使い手の国と円で使えることは DAS-06 による仮定
+premises: [EXT-01, TC-10, CON-03, DAS-06]
+kind: external-system
+name: 決済サービス（Stripe のテスト環境）
+responsibility: 設計は、カードの情報を自身の入力部品で受けて支払い方法として登録し、後で確定する押さえ、全額と一部の確定、押さえの取り消し、返金を、冪等キーの送り直しに一度目の結果を返して行い、取引と返金を期間で読み出させると見込む。実際のお金は動かない
+functions: []
+drivers: [DRV-07, DRV-18, DRV-32]
+decisions: [DEC-09, DEC-10, DEC-11, DEC-12]
+team: null
+technology: Stripe のテスト環境（サンドボックス）
+runs_on: null
+depends_on: []
+as_is: new

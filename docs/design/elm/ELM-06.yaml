@@ -1,0 +1,17 @@
+id: ELM-06
+title: 地図のサービス（Google Maps Platform）
+status: active
+basis: inferred
+basis_note: EXT-02 の役を担い、製品が Google Maps Platform であることは TC-12（入力）。使い方は DEC-13 による
+premises: [EXT-02, TC-12]
+kind: external-system
+name: 地図のサービス（Google Maps Platform）
+responsibility: 設計は、場所の候補、住所と位置、二つの場所の間の道の長さと移動時間を ELM-03 に答え、乗客とドライバーの Web アプリには地図を描かせると見込む
+functions: []
+drivers: [DRV-05, DRV-06, DRV-10, DRV-18]
+decisions: [DEC-13]
+team: null
+technology: Google Maps Platform
+runs_on: null
+depends_on: []
+as_is: new

@@ -1,0 +1,17 @@
+id: ELM-01
+title: 乗客とドライバーの Web アプリ
+status: active
+basis: assumed
+basis_note: Web アプリで iOS の Safari だけを対象にすることは TC-13（入力）。参加者がアプリを画面に出したままにすることは設計の第 1 段階の質問 2 の答え（QCR-02）に従い、ドライバーが受付をしている間も出したままにすることは質問 2 と QCR-03 を待つ。対応する iOS の版は質問 1 を待つ。ホーム画面に加えた Web アプリの振る舞いは DAS-03 による仮定。受け持つ機能の割り当ては推定
+premises: [TC-13, CON-05, DAS-03, QCR-02, QCR-03]
+kind: component
+name: 乗客とドライバーの Web アプリ
+responsibility: 乗客とドライバーの画面を示し、利用者の操作を冪等キーとたどる ID とともに配車サーバーに送り、サーバーからの流れと Web Push で変化を示す。画面に出ている間は画面を消さずに保ち、端末が測った位置と速さを送る。カードの情報は EXT-01 の入力部品で直接 EXT-01 に渡し、地図は EXT-02 で描く。端末で起きたエラーと、相手の変化を示した時刻を、つながっていない間はためて送る。使える機能、額、状態、評価は決めず、サーバーが送ったものを示す
+functions: [FR-01, FR-02, FR-03, FR-04, FR-06, FR-07, FR-08, FR-09, FR-10, FR-11, FR-12, FR-13, FR-15, FR-16, FR-17, FR-18, FR-19, FR-20, FR-21, FR-22, FR-23, FR-24, FR-25, FR-26, FR-27, FR-28, FR-29, FR-30, FR-31, FR-32, FR-36, FR-37, FR-39, FR-44, FR-46, FR-47, FR-48, FR-49, FR-52, FR-53, FR-54]
+drivers: [DRV-14, DRV-04, DRV-03, DRV-02, DRV-12, DRV-05, DRV-09, DRV-10, DRV-11, DRV-17, DRV-18, DRV-19, DRV-22, DRV-24, DRV-26, DRV-28, DRV-33]
+decisions: [DEC-01, DEC-02, DEC-04, DEC-06, DEC-07, DEC-08, DEC-12, DEC-13, DEC-14, DEC-19, DEC-21, DEC-22, DEC-23, DEC-25, DEC-26, DEC-27]
+team: TEAM-01
+technology: iOS 18.4 以降の iPhone の Safari で、ホーム画面に加えた Web アプリとして動く（ランタイムは Safari、DEC-02、DEC-04）。静的なファイルは ELM-03 が配る
+runs_on: ELM-11
+depends_on: [ELM-03, ELM-05, ELM-06, ELM-07]
+as_is: new

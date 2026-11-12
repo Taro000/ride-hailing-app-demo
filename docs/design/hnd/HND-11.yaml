@@ -1,0 +1,14 @@
+id: HND-11
+title: 期限の来た処理を拾う間隔
+status: open
+basis: inferred
+basis_note: DEC-18 の応答を左右する点。時間のしきい値の SLO とお金の道にないため、第 4 段階の ELM-03 の実行に送る
+premises: []
+from: architecture-drivers-to-architecture
+to: high-level-design-to-detailed-design
+component: ELM-03
+origin: [DEC-18]
+what: サーバーの中の繰り返しが、期限の来た処理（許諾のない依頼の知らせと終わり、結果が分からないお金の操作の確かめ）を拾う間隔の値
+bounds: FR-04 と FR-23（T_wait_prompt、T_no_accept）、DEC-18（期限はデータベースに書き、一度だけ行う）
+trigger: 第 4 段階の ELM-03 の実行
+resolution: null

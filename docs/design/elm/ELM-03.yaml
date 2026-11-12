@@ -1,0 +1,17 @@
+id: ELM-03
+title: 配車サーバー
+status: active
+basis: inferred
+basis_note: 一つのサーバーにまとめることは DEC-01、ランタイムは DEC-04、置き場所は DEC-05 による。受け持つ機能の割り当ては推定。本人の確かめ方（DEC-14）は質問 3 を待つ
+premises: [TC-01, TC-03, TC-08, TC-09]
+kind: component
+name: 配車サーバー
+responsibility: 二つの Web アプリを配り、利用者の操作を受け、本人の確かめ、使える機能、見せる範囲と隠し方を一か所で決める。依頼の状態、割り当て、確定額、評価、決済と返金の結果を決めて ELM-04 に書く唯一の要素。出来事の記録から変化を流しと Web Push で届け、位置を受けて持つ。EXT-01 と EXT-02 と配信サービスには、それぞれのつなぎ口からだけ話す。期限と日々の処理、照合、異常の見つけ方と知らせ、たどる記録と操作の記録、SLI の出来事の記録を受け持つ
+functions: [FR-01, FR-02, FR-03, FR-04, FR-05, FR-06, FR-07, FR-08, FR-09, FR-10, FR-11, FR-12, FR-13, FR-15, FR-16, FR-17, FR-18, FR-19, FR-20, FR-21, FR-22, FR-23, FR-24, FR-25, FR-26, FR-27, FR-28, FR-29, FR-30, FR-31, FR-32, FR-33, FR-34, FR-35, FR-36, FR-37, FR-38, FR-39, FR-40, FR-41, FR-42, FR-43, FR-44, FR-45, FR-46, FR-47, FR-48, FR-49, FR-50, FR-51, FR-52, FR-53, FR-54]
+drivers: [DRV-01, DRV-02, DRV-03, DRV-04, DRV-07, DRV-12, DRV-15, DRV-16, DRV-24, DRV-28, DRV-29, DRV-05, DRV-06, DRV-08, DRV-10, DRV-11, DRV-13, DRV-17, DRV-18, DRV-19, DRV-20, DRV-21, DRV-23, DRV-25, DRV-26, DRV-27, DRV-30, DRV-31, DRV-32, DRV-33, DRV-34, DRV-35]
+decisions: [DEC-01, DEC-04, DEC-05, DEC-06, DEC-07, DEC-08, DEC-09, DEC-10, DEC-11, DEC-12, DEC-13, DEC-14, DEC-15, DEC-16, DEC-17, DEC-18, DEC-19, DEC-20, DEC-21, DEC-22, DEC-23, DEC-24, DEC-25, DEC-26, DEC-27]
+team: TEAM-01
+technology: Node.js（そのときの Active LTS の版）をコンテナで動かす。想定の本番は ELM-08 の Cloud Run、実際は ELM-10 の開発者のマシン（DEC-04、DEC-05）
+runs_on: ELM-08
+depends_on: [ELM-04, ELM-05, ELM-06, ELM-07]
+as_is: new

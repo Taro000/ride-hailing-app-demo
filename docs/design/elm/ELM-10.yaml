@@ -1,0 +1,17 @@
+id: ELM-10
+title: ローカルの実行環境（開発者のマシン）
+status: active
+basis: inferred
+basis_note: 作ること、試すこと、動かすことをローカルだけで完結させ、同じコードを Turso と Cloud Run の代わりのもので動かすことは TC-09（入力）。置き方は DEC-05 による
+premises: [TC-09]
+kind: node
+name: ローカルの実行環境（開発者のマシン）
+responsibility: 実際に ELM-03 と、ELM-04 の代わりの libSQL のデータベースを動かす。参加者の iPhone は同じネットワークから HTTPS で、または同じマシンの iOS のシミュレーターから使う。インターネットには公開しない
+functions: []
+drivers: [DRV-15, DRV-16]
+decisions: [DEC-05]
+team: TEAM-01
+technology: 開発者のコンピューター（ELM-03 のコンテナか Node.js と、libSQL のデータベース）
+runs_on: null
+depends_on: []
+as_is: new

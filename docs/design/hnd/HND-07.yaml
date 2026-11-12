@@ -1,0 +1,14 @@
+id: HND-07
+title: EXT-02 への呼び出しの時間切れとやり直し
+status: open
+basis: inferred
+basis_note: DEC-13 の応答を左右する点。時間のしきい値の SLO とお金の道にないため、第 4 段階の ELM-03 の実行に送る
+premises: [EXT-02]
+from: architecture-drivers-to-architecture
+to: high-level-design-to-detailed-design
+component: ELM-03
+origin: [DEC-13]
+what: EXT-02 への場所の候補、住所、道と移動時間の呼び出しの時間切れと、やり直しの回数と間隔の値
+bounds: DEC-13（時間切れの順、EXT-02 の失敗は確定した依頼と乗車を止めない）、QR-07 と NFR-17（T_quote_response）、NFR-09、QR-65
+trigger: 第 4 段階の ELM-03 の実行
+resolution: null

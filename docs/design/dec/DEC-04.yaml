@@ -1,0 +1,39 @@
+id: DEC-04
+title: 配車サーバーは Node.js をコンテナで動かし、二つの Web アプリは利用者のブラウザで動く
+status: active
+basis: inferred
+basis_note: TC-01（TypeScript）、TC-03（Hono）、TC-06（Vitest）、TC-08（Cloud Run）、TC-09（ローカル）から推定した。二つの Web アプリのブラウザは DEC-02 と DEC-03 による。各コンポーネントの言語、フレームワーク、ライブラリと、ランタイムの細かい版は、第 2b 段階と実装が決める
+premises: [TC-01, TC-03, TC-06, TC-08, TC-09]
+stage: architecture
+question: 各コンポーネントのコードは何の上で動くか
+addresses: [DRV-17, DRV-15, DRV-16]
+options:
+  - name: 配車サーバーは Node.js（そのときの Active LTS の版）をコンテナで動かし、Web アプリは利用者のブラウザで動く
+    effect: TC-03 のサーバーと TC-06 の試験がそのまま動き、同じコンテナを Cloud Run にもローカルにも置ける
+    cost: 起動と実行の速さは Bun と Deno に劣る
+  - name: 配車サーバーは Bun をコンテナで動かす
+    effect: TypeScript をそのまま動かし、起動が速い
+    cost: 試験の道具と外部のサービスの公式の部品がこの上で動くかを一つずつ確かめる
+  - name: 配車サーバーは Deno をコンテナで動かす
+    effect: TypeScript をそのまま動かし、ファイルや通信の権限を絞れる
+    cost: 外部のサービスの公式の部品と試験の道具の扱いを一つずつ確かめる
+chosen: 配車サーバーは Node.js（そのときの Active LTS の版）をコンテナで動かし、Web アプリは利用者のブラウザで動く
+rationale: TC-03 と TC-06 がこの上で動くことが広く確かめられており、EXT-01、EXT-02 と Web Push の公式の部品もこの上で使える。Cloud Run はコンテナで動かす基盤（TC-08）で、ローカルでも同じコンテナか同じランタイムで動かせる（TC-09、DRV-15）。1 人の開発者が、ランタイムの違いを一つずつ確かめる手間をかけずに済む（DRV-16）。二つの Web アプリは同じ作り方のコンポーネントで、どちらも利用者のブラウザで動き、ブラウザは DEC-02 と DEC-03 が決める
+rejected:
+  - option: 配車サーバーは Bun をコンテナで動かす
+    reason: 起動の速さはこの量では効かず、試験と外部のサービスの部品を確かめる手間が DRV-16 を弱める
+  - option: 配車サーバーは Deno をコンテナで動かす
+    reason: 権限を絞れる利点を求める要求がなく、部品を確かめる手間が DRV-16 を弱める
+gains:
+  - サーバーと試験の技術（TC-03、TC-06）がそのまま動く
+  - 同じコンテナを想定の本番とローカルの両方に置ける
+costs:
+  - Node.js の LTS の版が切れる前に版を上げる手間がかかる（CUJ-13）
+sensitive_points: []
+trade_offs: []
+assumptions:
+  - TC-03 のサーバーと TC-06 の試験は、Node.js の Active LTS の版で動く
+depends_on: [DEC-01, DEC-02, DEC-03]
+parameters: []
+debt: null
+as_is: new
