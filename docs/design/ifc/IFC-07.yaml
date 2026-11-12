@@ -1,0 +1,47 @@
+id: IFC-07
+title: 支払い方法の登録
+status: active
+basis: inferred
+basis_note: カードの情報を EXT-01 の入力部品から直接 EXT-01 に渡し、サーバーが作った登録の取引を端末に確かめさせ、サーバーが結果を EXT-01 から読み直してから使える支払い方法にすることは DEC-12（入力）。カードの情報を受け取らず記録しないこと、受け付けないときは別の支払い方法を求め、分からないときは分かるまで使える支払い方法にしないことは FR-46、TC-11（入力）。結果が分からないときの答えは DEC-45。登録の読み直しの待ちは IFC-17 の値から計算した。カードの番号の下 4 桁や種類も読まず持たないことは、TC-11 と QR-60 のカードの情報を広く取った推定。進んでいる依頼の支払い方法を変えることは IFC-03 の PUT /v1/rides/{rideId}/payment-method
+premises: [TC-11, CON-04]
+kind: http
+name: 支払い方法の登録
+provider: ELM-03
+consumers: [ELM-01]
+functions: [FR-46]
+operations:
+  - name: GET /v1/payment-methods
+    does: 乗客に使える支払い方法があるか、登録の途中か結果が分からない登録があるか、いつ登録したかを返す。カードの情報（番号、下 4 桁、種類、期限）は返さない
+  - name: POST /v1/payment-method-setups
+    does: 登録を始める。EXT-01 に登録の取引（SetupIntent）を作り、入力部品（IFC-18）に渡す client secret と登録の ID を返す
+  - name: POST /v1/payment-method-setups/{setupId}/completion
+    does: 端末が入力部品で確かめた後に呼ぶ。ELM-03 が EXT-01 から登録の取引を読み直し、済んでいれば次の依頼から使う支払い方法にする（FR-46 の 1、5）
+format: JSON（UTF-8）
+protocol: HTTPS の要求と応答
+auth: 乗客のセッション（DEC-40）。乗客のほかは 403 NOT_ALLOWED（DEC-15）。client secret はその登録の取引を確かめることにだけ使え、カードの情報は ELM-03 に届かない（TC-11）
+errors:
+  - case: どの操作にも共通する誤りと、冪等キーの誤り
+    signal: DEC-35 と DEC-42 の符号
+    caller_does: DEC-35 と DEC-42 のとおり
+  - case: EXT-01 が支払い方法を受け付けなかった
+    signal: 402 with code PAYMENT_METHOD_DECLINED and reason
+    caller_does: 登録できなかったことと理由を示し、別の支払い方法を求める（FR-46 の 3）
+  - case: 登録の結果が、最初に読んでから待ちのうちに分からない
+    signal: 202 with code PAYMENT_METHOD_PENDING
+    caller_does: 登録できたかどうか分からないことを示し、流れの payment_method.settled を待つ。分かるまでその支払い方法では依頼させない（FR-46 の 4、DEC-45）
+  - case: 端末がまだ入力部品で確かめていない（取引が確かめを待っている）
+    signal: 409 with code PAYMENT_METHOD_NOT_CONFIRMED
+    caller_does: 入力部品からやり直す
+  - case: 登録を始めるとき、EXT-01 が登録の取引を作れないか答えない
+    signal: 503 with code PAYMENT_SERVICE_UNAVAILABLE
+    caller_does: 登録を始められないことを示す。始め直すと新しい取引を作る（作りかけの取引ではお金は動かない）
+idempotency: GET は繰り返してよい。始める操作と completion は冪等キー（DEC-42）を付け、送り直しには最初の答え（結果が分からないときは、そのときの結果）を返す。completion は EXT-01 の取引を読み直すだけで、何度呼んでも登録は一つ
+timing:
+  timeout: 登録の結果は依頼のときの押さえと押さえ直しに使う支払い方法を決める（FR-54、DEC-09）ため、お金の道の値を決める。completion の ELM-03 の答えの期限は、自身の処理 0.1 秒と、EXT-01 の読み出しとその一回の読み直しの待ち 8.5 秒（IFC-17）と結果を書く取引 0.1 秒の和の 8.7 秒、ELM-01 のタイムアウトは 15 秒（DEC-46）。始める操作も同じ値を使う。値は IFC-17 と DEC-46 による
+  ordering: null
+  delivery: null
+versioning: DEC-41
+observability: 境界の出来事（DAT-19）と、EXT-01 とのやり取りの結果をたどる記録（DAT-18）に残す。client secret とカードの情報はどこにも書かない
+sli_bindings: []
+spec: null
+as_is: new

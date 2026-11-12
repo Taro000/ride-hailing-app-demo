@@ -1,0 +1,38 @@
+id: DEC-36
+title: 公開する ID は種類の接頭辞と ULID で ELM-03 が作り、端末は操作ごとの UUID を作り、サインインの ID は別の短い文字列にする
+status: active
+basis: inferred
+basis_note: インタフェースが見せる ID の形と作り手は、第 3 段階の確定の種類（推定）。アカウントの ID を名前や連絡先でない値にすることは DEC-14（入力）。ID と乱数のもとを src/platform/ の作り手だけが使うことは POL-02（入力）。参加者が手で入れる ID を短くすることは、担当者が設定の符号とともに直接渡すこと（TC-16）からの推定
+premises: [TC-16]
+stage: high-level-design
+question: インタフェースに出す ID をどの形で、誰が作るか。参加者が使い始めに手で入れる ID をどうするか
+addresses: [DRV-28, DRV-29, DRV-02, DRV-24]
+options:
+  - name: 公開する ID は種類の接頭辞と ULID（acc_、ride_ など）で ELM-03 が作り、端末は操作ごとの UUID v4 を作り、サインインの ID はアカウントの ID と別の 8 文字にする
+    effect: ID は推し量れず、種類が読め、作った順に並ぶ。参加者は短い ID を手で入れられる
+    cost: アカウントに ID が二つある
+  - name: UUID v4 だけを使い、サインインの ID もアカウントの ID にする
+    effect: ID の決まりが一つで済む
+    cost: 参加者が 36 文字を手で入れることになり、種類が ID から読めない
+  - name: データベースの通し番号を ID にする
+    effect: 短く作る手間がない
+    cost: 推し量れ、件数が外に漏れる
+chosen: 公開する ID は種類の接頭辞と ULID を _ でつないだもの（acc_、ride_、quo_、chg_、pms_、ref_、cmp_、msg_、ano_、evt_ など）で、ELM-03 の ID の作り手（POL-02 の src/platform/）が作り、データベースの通し番号はどこにも出さない。端末が作るのは、冪等キー（DEC-42）、たどる ID（DEC-43）、端末からの報告の一件ごとの ID（IFC-10）で、どれも UUID v4。参加者が使い始めに入れるサインインの ID は、アカウントの ID とは別に ELM-03 が作る 8 文字（Crockford の Base32 で、I、L、O、U を使わない）で、名前と連絡先を含まず、秘密ではない。流れのつなぎ直しの印（IFC-11）と一覧の cursor（DEC-39）は利用側が解かない不透明な文字列。EXT-01 と EXT-02 の ID は、入力部品に渡す登録の取引の client secret と場所の候補の ID のほかは利用側に出さない
+rationale: 三つ目は推し量れて件数が漏れ、DRV-29 と QR-18 の推し量れないことに反する。二つ目は参加者に 36 文字を入れさせ、TC-16 の手で渡す使い始め（DRV-28、DRV-14）を重くする。一つ目は、ULID の 80 ビットの乱数で推し量れず、作った順に並ぶため一覧と照合が ID で並べられ（DRV-24）、接頭辞で誤った種類の ID を入口で退けられる。サインインの ID は秘密ではなく、本人の確かめはパスワードが担う（DEC-14）ため、短くしてよい
+rejected:
+  - option: UUID v4 だけを使い、サインインの ID もアカウントの ID にする
+    reason: 参加者が 36 文字を手で入れることになり、TC-16 の使い始めを重くする（DRV-14）
+  - option: データベースの通し番号を ID にする
+    reason: 推し量れ、件数が漏れ、DRV-29 と QR-18 に反する
+gains:
+  - ID は推し量れず、種類が読め、作った順に並ぶ
+  - 参加者は短いサインインの ID を手で入れられる
+costs:
+  - アカウントにアカウントの ID とサインインの ID の二つがある
+sensitive_points: []
+trade_offs: []
+assumptions: []
+depends_on: [DEC-14]
+parameters: []
+debt: null
+as_is: new

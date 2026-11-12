@@ -1,0 +1,19 @@
+id: DAT-09
+title: 依頼の経過の出来事
+status: active
+basis: inferred
+basis_note: 状態の変化を同じ取引で出来事の記録に書き、その記録から流れで届け、つなぎ直したら続きから届けることは DEC-06（入力）。依頼ごとに各段階をその時刻とともに記録することと、記録する段階は FR-45 と QR-15（入力）。届けた先と条件と停止、選んだことと許諾とそのときの評価と閾値は FR-45 の 2、3（入力）、許諾したときの速さは FR-22 の 4（入力）、ドライバーに示した金額と乗客に示した支払った額を残すことは SLI-11 の数え方の規則からの推定
+premises: []
+entity: 出来事の記録（依頼の経過の段階と、流れで届ける出来事）
+owner: ELM-03
+store: ELM-04
+key_attributes: [eventId, sequence, rideId, kind, occurredAt, actorAccountId, payload, audience, testAccount]
+relations:
+  - {to: DAT-07, kind: many-to-one, note: 依頼と乗車（依頼に結び付く出来事）}
+  - {to: DAT-20, kind: one-to-many, note: 相手ごとの届けと示した時刻}
+consistency: 状態の変化と同じ取引で書き（DEC-06）、足すだけで直さない。流れ（IFC-11）はこの記録の順に届け、つなぎ直しは sequence の続きから届ける。届ける相手と中身は送るときに DEC-15 の決まりを通す。依頼の経過の段階（場所を決め始めたこと、依頼とそのときの料金と到着予定時刻、届けた先とそのときの条件と停止、選んだこととそのとき示した金額、許諾とそのときの評価と閾値と速さ、迎車の到着、乗車の開始、降りる場所の変更と承認した料金、到着の確認とその場所、決済とその額と乗客に示した額、評価、取り消しと不在と許諾のない終わりとそれを行った人）を持つ（FR-45、QR-15）。操作した人と中身の個人の情報は記録した日の鍵で暗号にする
+retention: 依頼の経過の段階は依頼と同じ（QR-15、QR-42、FR-51）。依頼に結び付かない出来事（異常、苦情の知らせ、切り替え、停止）は N_trace_retention_days
+classification: personal
+drivers: [DRV-03, DRV-02, DRV-27, DRV-24]
+sli_bindings: []
+as_is: new

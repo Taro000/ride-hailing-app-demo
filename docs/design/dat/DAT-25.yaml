@@ -1,0 +1,18 @@
+id: DAT-25
+title: 知らせの宛先
+status: active
+basis: inferred
+basis_note: 端末ごとの Web Push の宛先をデータベースに置き、届かなくなった宛先を外すことは DEC-21（入力）。宛先の URL が端末を識別するため個人の情報とし、鍵を秘密として扱うことは推定
+premises: []
+entity: Web Push の宛先（端末ごと）
+owner: ELM-03
+store: ELM-04
+key_attributes: [subscriptionId, accountId, endpoint, p256dh, auth, createdAt, lastSucceededAt]
+relations:
+  - {to: DAT-01, kind: many-to-one, note: アカウント}
+consistency: 端末ごとに一つで、登録し直すと置き換える。配信サービスが 404 か 410 を返したら消す（DEC-21）。使い終える操作で消す（IFC-01）。宛先と鍵はログに書かない
+retention: 消すまで（使い終える、宛先がなくなる、アカウントが使えなくなる）
+classification: personal
+drivers: [DRV-03, DRV-24]
+sli_bindings: []
+as_is: new

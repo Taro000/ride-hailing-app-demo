@@ -1,0 +1,19 @@
+id: DAT-22
+title: 異常
+status: active
+basis: inferred
+basis_note: サーバーが操作の失敗、外部のサービスの失敗、監視の条件、SLO のアラートを自身の記録から見つけて異常として記録し、同じ異常が続くときは続いていることが分かるようにまとめ、知らせの中身の個人の情報を伏せることは DEC-20 と FR-33（入力）。異常とみなす条件とまとめ方の値は HND-10 で第 4 段階。保持期間は、調べるのに要る記録として QR-37 の N_trace_retention_days に合わせた推定
+premises: []
+entity: 異常（見つけた異常とエラー）
+owner: ELM-03
+store: ELM-04
+key_attributes: [anomalyId, kind, function, firstOccurredAt, lastOccurredAt, count, rideId, traceId, notifiedAt]
+relations:
+  - {to: DAT-18, kind: one-to-many, note: その異常のたどる記録}
+  - {to: DAT-07, kind: many-to-one, note: 起きた依頼（あるとき）}
+consistency: ELM-03 が見つけて書き、同じ異常が続くときは一行にまとめて件数と最後の時刻を書き直す（FR-33 の 2）。知らせた時刻を書く。個人の情報を持たない（DEC-15）
+retention: N_trace_retention_days を過ぎたら日々の処理が消す
+classification: internal
+drivers: [DRV-24, DRV-25]
+sli_bindings: []
+as_is: new

@@ -1,0 +1,14 @@
+id: HND-18
+title: ELM-02 の呼び出しのうち、時間のしきい値の SLO とお金の道にないもののタイムアウト
+status: open
+basis: inferred
+basis_note: 時間のしきい値の SLO とお金の道にない呼び出しは、第 3 段階が枠だけを決め、値は呼ぶ側のコンポーネントを設計する第 4 段階が決める（DEC-46）。ELM-02 の返金の呼び出しの値は IFC-13 にある
+premises: []
+from: architecture-to-high-level-design
+to: high-level-design-to-detailed-design
+component: ELM-02
+origin: [IFC-01, IFC-10, IFC-12, IFC-14, IFC-24, IFC-25]
+what: ELM-02 が ELM-03 の操作（IFC-01、IFC-10、IFC-12、IFC-14）を待つタイムアウトの値と、画面の細部の時間（IFC-24、IFC-25）
+bounds: DEC-46（呼ぶ側のタイムアウトは、呼ばれる側の答えの期限に通信の余裕を足したものより長い）、DEC-08、HND-19（ELM-03 の答えの期限）、各 IFC の timing の枠
+trigger: 第 4 段階の ELM-02 の実行
+resolution: null

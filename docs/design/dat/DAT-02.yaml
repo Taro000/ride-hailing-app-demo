@@ -1,0 +1,18 @@
+id: DAT-02
+title: 本人の確かめの秘密とセッション
+status: active
+basis: inferred
+basis_note: 担当者が渡す設定の符号で本人がパスワードを決め、サーバーがセッションを持ち、失敗が続くとアカウントを止めることは DEC-14（入力）。パスワードを scrypt で持ち、セッションをデータベースに置くことは DEC-30（入力）。セッションの印の形は DEC-40。回数、長さ、有効期間の値は HND-12 で第 4 段階。属性と整合の取り方は推定
+premises: [TC-16]
+entity: パスワード、設定の符号、セッション、続けて失敗した回数
+owner: ELM-03
+store: ELM-04
+key_attributes: [accountId, passwordHash, setupCodeHash, setupCodeExpiresAt, sessionIdHash, sessionExpiresAt, failedAttempts, lockedUntil]
+relations:
+  - {to: DAT-01, kind: many-to-one, note: アカウント}
+consistency: ELM-03 だけが書く。パスワードは scrypt のハッシュ（DEC-30）、設定の符号とセッションの ID はハッシュだけを持つ（DEC-40）。設定の符号を使うときは、パスワードを置き、符号を使ったことにし、そのアカウントのほかのセッションを消すことを一つの取引で行う
+retention: セッションと設定の符号は期限か使い終える操作まで（値は HND-12）。パスワードのハッシュは、アカウントが使えなくなるまで（FR-51 の 4 で消す）
+classification: "other: 本人の確かめの秘密（ハッシュだけ）"
+drivers: [DRV-28, DRV-19]
+sli_bindings: []
+as_is: new

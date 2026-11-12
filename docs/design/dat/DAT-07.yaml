@@ -1,0 +1,35 @@
+id: DAT-07
+title: 依頼と乗車
+status: active
+basis: inferred
+basis_note: 依頼の状態と割り当てを ELM-03 だけが今の状態を条件にした書き込みで変え、状態の変化と出来事を一つの取引で書くことは DEC-06、DEC-08（入力）。お金の操作の試みを EXT-01 に送る前に書き、呼び出しをまたぐ取引を作らないことは DEC-10（入力）。確定額が見積もりか承認した料金からだけ変わることは CON-01、FR-49 の 3（入力）。乗車と料金を請求した依頼を N_ride_record_days の間取り出せ、3 年で個人を特定できない形に変えることは QR-42、QR-59、FR-51（入力）。乗車を始めた位置を乗車の開始の要求が持つドライバーの端末の位置から記録し、乗る場所の位置と同じ WGS84 の緯度と経度で比べられることを確かめて HND-02 を決めた（EXT-02 の場所の位置も端末の測った位置も WGS84）。属性、状態、整合の取り方は推定
+premises: [CON-01, CON-06]
+entity: 依頼と乗車（依頼から決済とお金の精算までの一件）
+owner: ELM-03
+store: ELM-04
+key_attributes: [rideId, passengerAccountId, driverAccountId, state, pickup, dropoff, confirmedFare, quoteId, etaAtRequest, confirmationCodeHash, requestedAt, acceptedAt, pickupArrivedAt, boardedAt, boardingVehiclePosition, destinationArrivedAt, arrivalConfirmedPosition, endedAt, endReason, endedBy, moneySettled, testAccount]
+relations:
+  - {to: DAT-01, kind: many-to-one, note: 乗客とドライバー}
+  - {to: DAT-06, kind: many-to-one, note: 名指した見積もり}
+  - {to: DAT-08, kind: one-to-many, note: 降りる場所の変更}
+  - {to: DAT-09, kind: one-to-many, note: 依頼の経過の出来事}
+  - {to: DAT-11, kind: one-to-many, note: お金の操作の試み}
+  - {to: DAT-12, kind: one-to-many, note: 返金}
+  - {to: DAT-14, kind: one-to-one, note: 評価}
+  - {to: DAT-15, kind: one-to-many, note: 連絡のメッセージ}
+  - {to: DAT-16, kind: one-to-many, note: 苦情と返金の求め}
+  - {to: DAT-20, kind: one-to-many, note: 届けと示した時刻の記録}
+consistency: ELM-03 だけが書き、状態は今の状態を条件にした書き込みで変え、状態の変化と出来事（DAT-09）と届けと示した時刻の記録（DAT-20）を一つの取引で書く（DEC-06、DEC-08）。押さえの試み（DAT-11）は EXT-01 に送る前の取引で、結果は答えを受けた後の取引で書く（DEC-10）。乗客ごとに進んでいる依頼は一つ、ドライバーごとに迎車中か乗車中の依頼は一つ。確定額は見積もり（DAT-06）か承認した降りる場所の変更（DAT-08）からだけ変わる（FR-49 の 3）。確認コードはハッシュだけを持つ。乗る場所、降りる場所、位置は記録した日の鍵で暗号にする（DEC-16）。お金の試みがどれも済むか拒否で終わるまで moneySettled は偽。状態は報告の「要素をまたぐ状態」
+retention: 乗車と料金を請求した依頼は N_ride_record_days の間取り出せ（QR-42）、記録してから 3 年を過ぎたら、状態の変化の種類と時刻を残して操作した人と位置を日々の処理が消す（FR-51、QR-59）。変えた後の行は消さない
+classification: personal
+drivers: [DRV-02, DRV-07, DRV-05, DRV-06, DRV-27, DRV-21]
+sli_bindings:
+  - sli: SLI-09
+    events: 乗車を始めた依頼（boardedAt がある）一件ごと
+    fields: [rideId, pickup, boardingVehiclePosition, boardedAt, testAccount, environment]
+    method: 依頼の記録を乗車を始めた日（Asia/Tokyo）ごとに、本番の環境のデモの回の間のものに絞って問い合わせ、乗る場所の位置と乗車を始めた位置の大圏の距離を D_pickup_position_gap と比べる。二つの位置はどちらも WGS84 の緯度と経度で、そのまま比べられる（HND-02）。乗車を始めた位置は乗車の開始の要求（IFC-03）が持つドライバーの端末の測った位置で、ないときは記録されていないとして GOOD でない。試験用のアカウントの依頼は外す
+  - sli: SLI-08
+    events: 到着を確認した乗車のうち、乗車中に降りる場所を変えて乗客が承認したもの一件ごと
+    fields: [rideId, destinationArrivedAt, lastApprovedEta, endReason, testAccount, environment]
+    method: 依頼の記録と降りる場所の変更（DAT-08）を到着を確認した日ごとに問い合わせ、最後に承認した到着予定の時刻と到着を確認した時刻の差を T_arrival_estimate_gap と比べる。試験用のアカウントの乗車と、取り消しと不在で終えた依頼は外す
+as_is: new

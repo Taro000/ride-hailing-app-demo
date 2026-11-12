@@ -1,0 +1,22 @@
+id: DAT-21
+title: 現在地の確かめ
+status: active
+basis: inferred
+basis_note: SLI-10 は、受付をしている、迎車中、乗車中のドライバーと迎車を待つ乗客について 1 分ごとに確かめ、システムが持つ位置が端末で測ってから T_vehicle_location_lag のうちかを数える（入力）。データの SLI を保存した記録から数えることは DEC-23（入力）。ELM-03 が 1 分ごとに最新の位置（人が見て判断に使うもの）を確かめて書くことと、端末の時刻を DEC-37 で直して古さを求めることは推定
+premises: []
+entity: 現在地の新しさの 1 分ごとの確かめ
+owner: ELM-03
+store: ELM-04
+key_attributes: [checkId, checkedAt, accountId, role, positionMeasuredAt, ageSeconds, positionMissing, testAccount, environment]
+relations:
+  - {to: DAT-10, kind: many-to-one, note: 確かめた最新の位置}
+consistency: ELM-03 がデモの回の間 1 分ごとに、受付をしている、迎車中、乗車中のドライバーと、配車が確定してから乗車が始まるまでの乗客について、その時点の最新の位置（DAT-10）の測った時刻（DEC-37 で直したもの）を写して書く。インスタンスが二つ以上でも、同じ分と同じ人は一行だけ書く
+retention: SLO のウィンドウ（直近 28 日、NFR-19）を過ぎたら日々の処理が消す
+classification: internal
+drivers: [DRV-04, DRV-27]
+sli_bindings:
+  - sli: SLI-10
+    events: 1 分ごとの一人の確かめ一つ（一人のドライバーが受付をしながら迎車中でも一つ）
+    fields: [checkId, checkedAt, accountId, role, positionMeasuredAt, ageSeconds, positionMissing, testAccount, environment]
+    method: ELM-03 がデモの回の間 1 分ごとに書いた確かめを、確かめた日（Asia/Tokyo）ごとに本番の環境のものに絞って問い合わせ、ageSeconds（確かめた時刻と直した測った時刻の差。DEC-37 の直し方で通信の片道を含む）を T_vehicle_location_lag と比べる。位置を一つも持っていない確かめは GOOD でない。試験用のアカウントは外す
+as_is: new

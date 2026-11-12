@@ -1,0 +1,65 @@
+id: IFC-01
+title: Web アプリの起動と本人の確かめ
+status: active
+basis: inferred
+basis_note: 担当者が渡す設定の符号で本人がパスワードを決め、サーバーのセッションで使わせることは DEC-14（入力、設計の第 2 段階の質問 3 で確認済み）、認証のライブラリを使わないことは DEC-30（入力）。Web アプリが環境ごとの値を起動のときに ELM-03 の一つの操作から読み、ELM-03 は自身の確かめた設定から公開してよい値と偽物の選び方だけを渡すことは DEC-34 と POL-04（入力）で、その操作を GET /v1/client-config としてこの IFC に入れて HND-15 を決めた。操作、誤りの符号、冪等性、版の扱いは共通の約束事（DEC-35〜DEC-44）からの推定。サインインの ID の形は DEC-36。SLI-01 と SLI-04 の出どころは DEC-23 の入口の記録による推定
+premises: [TC-16]
+kind: http
+name: Web アプリの起動と本人の確かめ
+provider: ELM-03
+consumers: [ELM-01, ELM-02]
+functions: [FR-48, FR-49, FR-51]
+operations:
+  - name: GET /v1/client-config
+    does: Web アプリが起動のときに読む環境ごとの値（EXT-01 の公開の鍵、ブラウザ用の地図の鍵、Web Push の公開の鍵、ブラウザの側の偽物を使うかどうか）と、ELM-03 の版の印 buildId を返す。秘密の値は入れない（DEC-34、POL-04、HND-15）
+  - name: POST /v1/account-setups
+    does: 担当者が渡したサインインの ID と設定の符号で、本人が新しいパスワードを決める。符号は一度だけ使え、使うとそのアカウントのほかのセッションを消す（TC-16、DEC-14）
+  - name: POST /v1/sessions
+    does: サインインの ID とパスワードで本人を確かめ、セッションの印（DEC-40）を渡す。続けて失敗したアカウントは止める（DEC-14、HND-12）
+  - name: DELETE /v1/sessions/current
+    does: 使い終える操作。そのセッションをその場で消し、この端末の知らせの宛先も外す（FR-48 の 4、IFC-10）
+  - name: GET /v1/me
+    does: 本人のアカウントの種類、本人の名前、使える機能の一覧（FR-49、DEC-15）、試験用かどうか、止めた機能（切り替え、DEC-26）を返す
+format: JSON（UTF-8）
+protocol: HTTPS の要求と応答。ELM-03 が ELM-01、ELM-02 の静的なファイルと同じ origin で受ける
+auth: GET /v1/client-config、POST /v1/account-setups、POST /v1/sessions は本人の確かめなしで受け、入口で回数を限る（DEC-35 の 429）。ほかはセッションの印（DEC-40）。状態を変える要求は Origin を確かめる（DEC-40）。GET /v1/me が返す機能の一覧は DEC-15 の一か所の決まりが決め、Web アプリは許されない機能を隠すだけで、許すかどうかは ELM-03 が操作のたびに決める
+errors:
+  - case: どの操作にも共通する誤り（形の誤り、サインインしていない、許されていない、多すぎる要求、システム自身の誤り、依存先の失敗）
+    signal: DEC-35 の共通の符号
+    caller_does: DEC-35 のとおり
+  - case: サインインの ID かパスワードが合わない（どちらが違うかは明かさない）
+    signal: 401 with code AUTH_FAILED
+    caller_does: 確かめられなかったことを示し、入れ直させる（FR-48 の 2）
+  - case: 続けて失敗したため、そのアカウントを止めている
+    signal: 423 with code ACCOUNT_LOCKED and retryAfterSeconds
+    caller_does: 止めていることと待つ時間を示す（値は HND-12）
+  - case: アカウントが個人を特定できない形に変わって使えない（FR-51 の 4）
+    signal: 403 with code ACCOUNT_RETIRED
+    caller_does: 担当者に新しいアカウントを頼むよう示す（FR-51 の 4、FR-41）
+  - case: 設定の符号が合わないか、使ったか、期限が過ぎた（どれに当たるかは明かさない）
+    signal: 422 with code SETUP_CODE_INVALID
+    caller_does: 担当者に符号を出し直してもらうよう示す（DEC-14）
+  - case: 新しいパスワードが決まり（長さ）に合わない
+    signal: 400 with code VALIDATION_FAILED (details password TOO_SHORT または TOO_LONG)
+    caller_does: 決まりを示して入れ直させる
+  - case: セッションがないか、切れているか、消された
+    signal: 401 with code NOT_SIGNED_IN
+    caller_does: サインインの画面に移り、使い始めた操作は確かめ直した後に新しく行わせる（FR-48 の 3）
+idempotency: GET は繰り返してよい。POST /v1/account-setups は冪等キー（DEC-42）を付け、送り直しには最初の答えを返す。POST /v1/sessions は送り直してもセッションが一つ増えるだけで害がなく、DELETE /v1/sessions/current は繰り返してもよいため、どちらもキーを付けない（DEC-42）
+timing:
+  timeout: 枠だけを決める。Web アプリのタイムアウトは ELM-03 がその操作に答える期限より長く、ELM-03 の期限は自身の取引とパスワードの照らし合わせ（scrypt、DEC-30）の最悪より長い（DEC-46 の決め方）。どの操作も時間のしきい値の SLO とお金の道になく、値は第 4 段階が決める（ELM-01 は HND-17、ELM-02 は HND-18、ELM-03 の期限は HND-19）
+  ordering: null
+  delivery: null
+versioning: DEC-41（経路の /v1、足すだけ）。Web アプリは起動のときと流れをつなぎ直すときに buildId を自身の版と比べ、違えば読み直す
+observability: 境界の出来事（DAT-19）と、本人の確かめの成否と止めたことをたどる記録（DAT-18）に残す。サインインの ID とアカウントは仮の名で残し、パスワードと設定の符号は書かない（DEC-15、QR-58）
+sli_bindings:
+  - sli: SLI-01
+    events: 乗客のアカウントのサインインの ID で ELM-03 の入口に届いた POST /v1/sessions（システムの境界）。同じたどる ID の送り直しは一つと数え、その操作に最後に返した答えで数える。存在しないサインインの ID の試みは乗客の操作と分からないため数えない
+    fields: [traceId, route, actorKind, testAccount, environment, receivedAt, respondedAt, httpStatus, errorCode, failureOrigin]
+    method: ELM-03 の入口が要求ごとに書く境界の出来事（DAT-19。受けたときに書き、答えたときに結果を足し、結果のない記録は応えなかったものとする）を、本番の環境のデモの回の間のものに絞って数える。AUTH_FAILED と ACCOUNT_LOCKED は確かめられなかった知らせとして GOOD、500 と答えのないものは GOOD でない。testAccount が真のものと、本番でない環境のものは外す
+  - sli: SLI-04
+    events: ドライバーのアカウントのサインインの ID で ELM-03 の入口に届いた POST /v1/sessions。数え方は SLI-01 と同じ
+    fields: [traceId, route, actorKind, testAccount, environment, receivedAt, respondedAt, httpStatus, errorCode, failureOrigin]
+    method: SLI-01 と同じく境界の出来事（DAT-19）から数える
+spec: null
+as_is: new

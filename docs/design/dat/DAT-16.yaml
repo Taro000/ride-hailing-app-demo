@@ -1,0 +1,18 @@
+id: DAT-16
+title: 苦情と返金の求め
+status: active
+basis: inferred
+basis_note: 乗客が自分の乗車について苦情か返金の求めを寄せ、乗車と結び付けて受け付け、担当者が対応を終えるまでの状態を記録することは FR-37 と QR-41（入力）。担当者の対応を行った担当者とともに記録することは FR-50（入力）。保持期間は、苦情と返金を扱う間に取り出せる乗車の記録（QR-42）と同じにした推定
+premises: [CON-06]
+entity: 苦情と返金の求め
+owner: ELM-03
+store: ELM-04
+key_attributes: [complaintId, rideId, passengerAccountId, kind, body, receivedAt, status, resolvedBy, resolvedAt, testAccount]
+relations:
+  - {to: DAT-07, kind: many-to-one, note: 寄せた乗車}
+consistency: 乗客の自分の乗車にだけ結び付けて書き（FR-37 の 3）、対応を終えたことは操作の記録（DAT-17）と一つの取引で書く。中身は記録した日の鍵で暗号にする（DEC-16）
+retention: 乗車の記録と同じ（N_ride_record_days の間取り出せ、記録してから 3 年を過ぎたら個人を特定できない形に変える、QR-42、QR-59）
+classification: personal
+drivers: [DRV-24, DRV-30, DRV-27]
+sli_bindings: []
+as_is: new

@@ -1,0 +1,47 @@
+id: IFC-08
+title: 乗客の閾値とドライバーの条件
+status: active
+basis: inferred
+basis_note: 乗客が評価の閾値を 1〜5 で設定、変更、解除し、ドライバーが最低の金額と最大の距離を設定、変更、解除することは FR-16 と FR-32（入力）。設定がその後の依頼に使われることは DEC-24（入力）。距離が直線か道のりかは QCR-01 を待ち、今は直線（DEC-24）。操作と誤りの符号は DEC-35、DEC-42 による推定
+premises: [QCR-01]
+kind: http
+name: 乗客の閾値とドライバーの条件
+provider: ELM-03
+consumers: [ELM-01]
+functions: [FR-16, FR-32]
+operations:
+  - name: GET /v1/passengers/me/rating-threshold
+    does: 乗客の今の評価の閾値（なければ null）を返す
+  - name: PUT /v1/passengers/me/rating-threshold
+    does: 乗客の評価の閾値を 1〜5 の値で設定するか変える。その後の依頼に使う（FR-16 の 1、3）
+  - name: DELETE /v1/passengers/me/rating-threshold
+    does: 閾値を解除する。その後の依頼で評価によってドライバーを除かない（FR-16 の 2）
+  - name: GET /v1/drivers/me/conditions
+    does: ドライバーの今の条件（最低の金額と、現在地から乗車場所までの最大の距離。なければ null）を返す
+  - name: PUT /v1/drivers/me/conditions
+    does: ドライバーの条件を設定するか変える。その後に届ける依頼に使う（FR-32 の 1、3）
+  - name: DELETE /v1/drivers/me/conditions
+    does: 条件を解除する。その後は金額と距離で依頼を除かない（FR-32 の 2）
+format: JSON（UTF-8）。金額は DEC-38、距離は m の整数
+protocol: HTTPS の要求と応答
+auth: 閾値は乗客の、条件はドライバーのセッション（DEC-40）。ほかは 403 NOT_ALLOWED（DEC-15）
+errors:
+  - case: どの操作にも共通する誤りと、冪等キーの誤り
+    signal: DEC-35 と DEC-42 の符号
+    caller_does: DEC-35 と DEC-42 のとおり
+  - case: 閾値が 1〜5 の範囲にない
+    signal: 400 with code VALIDATION_FAILED (details threshold OUT_OF_RANGE)
+    caller_does: 設定できる範囲を示す（FR-16 の 3）
+  - case: 金額か距離が 0 より小さいか数でない
+    signal: 400 with code VALIDATION_FAILED (details minFare または maxPickupDistance の OUT_OF_RANGE か INVALID_FORMAT)
+    caller_does: 正しい値を求める（FR-32 の 3）
+idempotency: GET は繰り返してよい。PUT と DELETE は値を置くか消すだけで自然に冪等だが、状態を変える要求として冪等キー（DEC-42）を付ける
+timing:
+  timeout: 枠だけを決める。ELM-03 の答えの期限は自身の取引の最悪より長く、ELM-01 のタイムアウトはその期限に通信の余裕を足したものより長い（DEC-46 の決め方）。時間のしきい値の SLO とお金の道になく、値は第 4 段階が決める（ELM-01 は HND-17、ELM-03 の期限は HND-19）
+  ordering: null
+  delivery: null
+versioning: DEC-41
+observability: 境界の出来事（DAT-19）に残す。設定を変えたことは依頼の経過で、届けたときに当てた値として残る（DAT-09）
+sli_bindings: []
+spec: null
+as_is: new

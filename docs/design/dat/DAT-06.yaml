@@ -1,0 +1,19 @@
+id: DAT-06
+title: 見積もり
+status: active
+basis: inferred
+basis_note: 依頼の前に到着予定時刻と料金を示し、示した料金が確定額になることは FR-03、CON-01（入力）。料金を模擬の運賃表で ELM-03 が求めることは QR-61、DEC-13（入力）。見積もりを依頼と降りる場所の変更が名指すことは推定。有効期限の値は第 4 段階が料金を求めるモジュールで決める
+premises: [CON-01]
+entity: 見積もり（到着予定時刻と料金）
+owner: ELM-03
+store: ELM-04
+key_attributes: [quoteId, passengerAccountId, pickup, dropoff, distanceMeters, durationSeconds, fare, etaAtDestination, fareTableVersion, expiresAt]
+relations:
+  - {to: DAT-24, kind: many-to-one, note: 料金を求めた運賃表の版}
+  - {to: DAT-07, kind: one-to-many, note: この見積もりを名指した依頼}
+consistency: 作ったら変えない。依頼（DAT-07）と降りる場所の変更（DAT-08）はこの見積もりを名指し、その料金を確定額にする（CON-01、FR-04 の 1）。乗る場所と降りる場所は記録した日の鍵で暗号にする（DEC-16）
+retention: 依頼か降りる場所の変更が名指した見積もりは、その依頼と同じ。名指されなかったものは有効期限を過ぎたら日々の処理が消す
+classification: personal
+drivers: [DRV-06, DRV-07, DRV-20]
+sli_bindings: []
+as_is: new

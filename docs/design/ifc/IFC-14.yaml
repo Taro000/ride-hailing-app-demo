@@ -1,0 +1,56 @@
+id: IFC-14
+title: エンジニアの調査と振る舞いの切り替え
+status: active
+basis: inferred
+basis_note: 異常を見つけて記録し一覧に示し、同じ異常が続くときはまとめることは DEC-20 と FR-33（入力）。一件の依頼の経過を端末のエラーと外部とのやり取りまで依頼に結び付けてたどることは DEC-19、FR-34、FR-52（入力）。個人の情報を隠して鍵を使った仮の名で示し、理由を示したときだけその依頼の分を示して記録することは DEC-15、FR-35（入力）。切り替えをデータベースに置いてエンジニアの画面から変え、その時から効かせ、Web アプリに流れで伝えることは DEC-26、FR-36（入力）。個人を特定できない形に変えた記録を誰も見られないことは FR-51 の 2（入力）。操作と誤りの符号は DEC-35、DEC-39、DEC-42 による推定
+premises: []
+kind: http
+name: エンジニアの調査と振る舞いの切り替え
+provider: ELM-03
+consumers: [ELM-02]
+functions: [FR-33, FR-34, FR-35, FR-36, FR-45, FR-51, FR-52]
+operations:
+  - name: GET /v1/console/anomalies
+    does: 異常の一覧（どの機能で、いつ、何が起きたか、関わる依頼。続いている異常はまとめ、件数と最初と最後の時刻）を新しい順に返す（FR-33）
+  - name: POST /v1/console/trace-searches
+    does: 期間、異常、依頼の ID で依頼を探し、乗客とドライバーを仮の名で返す（FR-34 の 1、FR-35 の 2）
+  - name: GET /v1/console/rides/{rideId}/trace
+    does: その依頼でシステムが行ったこととそれぞれの結果を、端末で起きたエラーと EXT-01、EXT-02、ELM-07 とのやり取りを含めて時刻の順に返す。どの部分で起きたかを示し、名前、連絡先、乗る場所と降りる場所は隠し、同じ人は同じ仮の名で示す（FR-34、FR-35 の 1、2、FR-52 の 2、5）
+  - name: POST /v1/console/rides/{rideId}/disclosures
+    does: エンジニアが理由を示して、その依頼の隠した情報を見る。誰が、いつ、どの依頼の、どの情報を、どの理由で見たかを操作の記録に残す（FR-35 の 3、4）
+  - name: GET /v1/console/switches
+    does: 振る舞いの切り替えの一覧と、それぞれが動いているか止めているかを返す（FR-36）
+  - name: PUT /v1/console/switches/{switchName}
+    does: 切り替えを止めるか有効にする。その時から効き、流れ（IFC-11 の switch.changed）で Web アプリに伝える（FR-36 の 1〜3）
+format: JSON（UTF-8）。時刻は DEC-37、一覧は DEC-39
+protocol: HTTPS の要求と応答
+auth: エンジニアのセッション（DEC-40）。エンジニアのほかは 403 NOT_ALLOWED（DEC-15、FR-49 の 4）。隠した情報は disclosures の答えでだけ示す
+errors:
+  - case: どの操作にも共通する誤りと、冪等キーの誤り
+    signal: DEC-35 と DEC-42 の符号
+    caller_does: DEC-35 と DEC-42 のとおり
+  - case: 存在しない依頼を探した
+    signal: 404 with code NOT_FOUND
+    caller_does: 見つからないことを示す（FR-34 の 4）
+  - case: 理由を示さずに隠した情報を見ようとした
+    signal: 400 with code VALIDATION_FAILED (details reason REQUIRED)
+    caller_does: 隠した情報を示さない（FR-35 の 4）
+  - case: 依頼の経過をたどる記録が保持期間を過ぎて消えている
+    signal: 200 で traceRetained が偽の答え
+    caller_does: 残っている記録だけを示し、たどる記録が保持期間を過ぎたことを示す
+  - case: 個人を特定できない形に変えた記録の隠した情報を見ようとした
+    signal: 409 with code RECORD_ANONYMIZED
+    caller_does: 見られないことを示す（FR-51 の 2）
+  - case: 知らない切り替えを変えようとした
+    signal: 404 with code NOT_FOUND
+    caller_does: 一覧を読み直す
+idempotency: GET と search は読むだけで繰り返してよい（DEC-42）。disclosures は冪等キーを付け、送り直しても見た記録は一つ。切り替えは値を置くだけで自然に冪等だが、冪等キーを付ける
+timing:
+  timeout: 枠だけを決める。ELM-03 の答えの期限は自身の取引と読み解きの最悪より長く、ELM-02 のタイムアウトはその期限に通信の余裕を足したものより長い（DEC-46 の決め方）。調査と切り替えは時間のしきい値の SLO とお金の道になく、値は第 4 段階が決める（ELM-02 は HND-18、ELM-03 の期限は HND-19）
+  ordering: null
+  delivery: null
+versioning: DEC-41
+observability: 隠した情報を見た操作と切り替えを変えた操作を、誰が、いつ、何を、どの理由で行ったかとともに操作の記録（DAT-17）に残す（FR-35 の 3、QR-35）。境界の出来事（DAT-19）にも残す
+sli_bindings: []
+spec: null
+as_is: new

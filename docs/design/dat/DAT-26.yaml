@@ -1,0 +1,18 @@
+id: DAT-26
+title: 冪等キーの記録
+status: active
+basis: inferred
+basis_note: 端末の状態を変える操作に一回の操作ごとのキーを付け、同じキーの二度目に一度目の結果を返すことは DEC-08（入力）。キーの範囲、答え方、持つ期間は DEC-42（その期間は DEC-42 の parameters）。最初の答えが個人の情報を含みうるため個人の情報とすることは推定
+premises: []
+entity: 冪等キーと最初の答え
+owner: ELM-03
+store: ELM-04
+key_attributes: [accountId, route, idempotencyKey, requestHash, status, response, firstReceivedAt]
+relations:
+  - {to: DAT-01, kind: many-to-one, note: キーを送ったアカウント}
+consistency: 要求を処理する前に動いているとして書き、答えたときに答えを書く（DEC-42）。操作の結果と同じ取引で書けるものは同じ取引で書く。お金の操作で結果が分からないと答えたものは、送り直しにそのときの結果を答える（DEC-45）
+retention: 最初に受けてから 24 時間（DEC-42）
+classification: personal
+drivers: [DRV-02, DRV-32]
+sli_bindings: []
+as_is: new

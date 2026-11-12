@@ -1,0 +1,31 @@
+id: IFC-20
+title: 地図を描く部品（EXT-02 の Maps JavaScript API）
+status: active
+basis: inferred
+basis_note: 端末は地図を描くためだけに EXT-02 を使い、送るのは表示の範囲だけであることは DEC-13（入力）。地図を描けないときも状態と位置の文字は示すことは脅威のモデルの F8（入力）。地図を描く部品とブラウザ用の鍵を src/platform/ だけが扱い、偽物の設定では地図のない部品に替えることは POL-02、POL-03、DEC-34（入力）。部品の使い方は Google Maps Platform の文書による（POL-05、報告の「入力」）
+premises: [EXT-02, TC-12]
+kind: http
+name: 地図を描く部品（Google Maps Platform の Maps JavaScript API）
+provider: ELM-06
+consumers: [ELM-01]
+functions: [FR-01, FR-08, FR-13, FR-24]
+operations:
+  - name: 地図の表示
+    does: ELM-01 が Maps JavaScript API を読み込み、表示の範囲と、乗る場所、降りる場所、迎車と乗車中の車、迎車中の乗客の印を描く（FR-01 の選んだ場所の位置、FR-08、FR-13、FR-24、QR-09）。印の位置は ELM-03 から受けたもので、EXT-02 には表示の範囲だけが渡る
+format: Maps JavaScript API（EXT-02 が配る JavaScript）
+protocol: ブラウザが EXT-02 から HTTPS で読み込む
+auth: ブラウザ用の鍵（IFC-01 の client-config で受け、HTTP の出どころで絞る、脅威のモデルの F8）
+errors:
+  - case: 部品を読み込めないか、地図を描けない
+    signal: 読み込みか描画の失敗
+    caller_does: 地図なしで、位置と状態と時刻を文字で示す（F8）。失敗を端末のエラーとして送る（FR-52）
+idempotency: 読むだけで繰り返してよい
+timing:
+  timeout: 枠だけを決める。地図の読み込みは画面の表示を待たせず、読み込めなければ文字だけで示す。お金を動かさず、時間のしきい値の SLO の道にもなく（位置は IFC-11 で届く）、値は第 4 段階が決める（HND-17）
+  ordering: null
+  delivery: null
+versioning: Maps JavaScript API の版を読み込む URL で決める
+observability: 読み込めなかったことを端末のエラーとして ELM-03 に送る（IFC-10）
+sli_bindings: []
+spec: null
+as_is: new

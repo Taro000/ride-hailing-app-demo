@@ -1,0 +1,33 @@
+id: DEC-43
+title: 端末は操作ごとのたどる ID を X-Trace-Id で、ELM-03 は要求ごとの ID を X-Request-Id で渡し、ログのどの行も SLI と調べに要る項目を持つ
+status: active
+basis: inferred
+basis_note: 端末が操作ごとにたどるための ID を作り、サーバーがそれを各段階と EXT-01、EXT-02 への呼び出しに引き継ぐことは DEC-19（入力）。ログを pino で一行に一つの JSON で標準出力に書き、どの行もたどる ID と第 3 段階の約束事が求める項目を持つことは POL-04（入力）。ヘッダーの名前とログの項目は第 3 段階の確定の種類（推定）。ログに個人の情報を書かないことは QR-58 と DEC-15（入力）
+premises: []
+stage: high-level-design
+question: 一件の操作をたどる ID と要求の ID をどのヘッダーで渡し、ELM-03 のログのどの行がどの項目を持つか
+addresses: [DRV-24, DRV-25, DRV-29, FR-34, FR-52, SLI-01]
+options:
+  - name: 端末が操作ごとに作るたどる ID を X-Trace-Id で、ELM-03 が要求ごとに作る ID を X-Request-Id で渡し、ログのどの行も決めた項目を持つ
+    effect: 送り直しを含む一つの操作を一つの ID でたどり、要求ごとの違いも見分けられる
+    cost: 端末も操作ごとに ID を作って持つ
+  - name: W3C Trace Context の traceparent を使う
+    effect: 分散トレースの道具と同じ形
+    cost: 親の span の決まりが要るが、このシステムには分散トレースの道具がなく（DEC-19 が退けた）、端末の送り直しを一つにする決まりは別に要る
+chosen: 端末（ELM-01、ELM-02）は利用者の一回の操作ごとに UUID v4 のたどる ID を作り、その操作のどの要求（送り直しを含む）にも X-Trace-Id のヘッダーで付ける。ない要求（日々の呼び出し、生存確認、期限の処理）には ELM-03 が作る。ELM-03 は HTTP の要求ごとに要求の ID（ULID）を作り、X-Request-Id の応答のヘッダーと誤りの本文（DEC-35）に返す。たどる ID は、ELM-03 の中のどの段階、境界の出来事（DAT-19）、たどる記録（DAT-18）、ログ、EXT-01 に作る取引の metadata（traceId と attemptId）に引き継ぐ。ELM-03 のログのどの行も、time、level、msg、env（環境の名前）、buildId、requestId、traceId、route（操作の名前で、OpenAPI の operationId）、actorKind（passenger、driver、operator、engineer、system、anonymous）、testAccount、outcome（ok、refused、client_error、dependency_failed、system_error、pending、unconfirmed）、errorCode、failureOrigin（none、system、EXT-01、EXT-02、ELM-07、ELM-04）、durationMs、rideId（依頼にかかわるとき）を持ち、名前、連絡先、場所、位置、メッセージと苦情の中身は持たない（DEC-15 の決まりを通す、QR-58）
+rationale: 二つ目は分散トレースの道具のための形で、DEC-19 がその道具を持たないと決めており、端末の送り直しを一つにまとめる決まりは結局別に要る。一つ目は、送り直しても変わらないたどる ID で SLI-01〜SLI-06 の「応えを待たずに送り直したものは一つ」を数え、要求の ID で要求ごとの答えを見分け、どちらもログとたどる記録で一件の依頼を端末から EXT-01 までたどらせる（DRV-24、FR-34）。outcome と failureOrigin は、SLI-01〜SLI-06 の GOOD がシステム自身の誤りと EXT-01、EXT-02 の失敗を分けて数えるために持つ。testAccount は試験用のアカウントを数えから外すため（FR-42、QR-47）
+rejected:
+  - option: W3C Trace Context の traceparent を使う
+    reason: 分散トレースの道具を持たない（DEC-19）ため形だけが増え、端末の送り直しをまとめる決まりは別に要る
+gains:
+  - 送り直しを含む一つの操作を一つの ID でたどれる
+  - ログの行から SLI の数え方に要る項目が分かる
+costs:
+  - 端末が操作ごとにたどる ID を作り、送り直しまで持つ
+sensitive_points: []
+trade_offs: []
+assumptions: []
+depends_on: [DEC-19, DEC-23, DEC-15]
+parameters: []
+debt: null
+as_is: new

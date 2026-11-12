@@ -1,0 +1,98 @@
+id: IFC-11
+title: 変化の流れ
+status: active
+basis: assumed
+basis_note: 状態の変化を同じ取引で出来事の記録に書き、その記録から開いたままの HTTPS の流れ（Server-Sent Events）で届け、つなぎ直したら最後に受けた出来事の続きから届けることと、相手の位置は記録に残す出来事ではなく最新の値として流すことは DEC-06（入力）。画面に出ていない相手には Web Push で知らせることは DEC-21、届ける相手と中身が DEC-15 の決まりを通ることは DEC-15（入力）。乗客とドライバーがアプリを画面に出したままにすることは TC-13 と TC-18（入力）、iOS の Safari のホーム画面に加えた Web アプリが画面に出ている間に流れを保つことは DAS-03（設計の第 2 段階の質問 6 で確認済み）。流れの生存の確かめ、つなぎ直しの待ち、ほかのインスタンスの出来事を読む間隔を決めて HND-04 を DEC-46 とともに決めた。その値は DAS-11 による暫定の決定。出来事の種類と中身、届けと示した時刻の記録の作り方は推定。切り替えを流れで Web アプリに伝えることは DEC-26（入力）
+premises: [TC-13, TC-18, DAS-03, DAS-11, QCR-02, QCR-03]
+kind: event
+name: 変化の流れ
+provider: ELM-03
+consumers: [ELM-01, ELM-02]
+functions: [FR-04, FR-05, FR-06, FR-07, FR-08, FR-10, FR-11, FR-13, FR-18, FR-20, FR-21, FR-23, FR-24, FR-26, FR-27, FR-29, FR-31, FR-33, FR-36, FR-37, FR-39, FR-44, FR-46, FR-47]
+operations:
+  - name: ride.accepted
+    does: 乗客へ。配車が確定したことと、ドライバーの名前と車の手がかり（FR-06 の 1、FR-09）。着く見込みは続く ride.eta_updated で届く
+  - name: ride.eta_updated
+    does: 乗客へ。乗車場所に着く見込みの時刻か、目的地への到着予定の時刻。示せないときはそのこと（FR-06、FR-08、FR-13、DEC-13）
+  - name: position.updated
+    does: 相手の最新の位置と測った時刻。乗客へは迎車と乗車中の車の位置、ドライバーへは迎車中の乗客の現在地（FR-08、FR-13、FR-24）。記録に残す出来事ではなく、続きから届けない
+  - name: ride.pickup_arrived
+    does: 乗客へ。迎車が乗車場所に着いたこと（FR-10）
+  - name: ride.wait_prompted
+    does: 乗客へ。依頼してか届け直してから T_wait_prompt の間どのドライバーも許諾していないことと、待ち続けるか取り消すかの問い（FR-04 の 2、FR-23 の 2）
+  - name: ride.expired
+    does: 乗客へ。T_no_accept の間に許諾がなく依頼を終えたことと、閾値を満たすドライバーが見つからなかったのか（FR-04 の 3、FR-05 の 4、FR-23 の 3）
+  - name: ride.cancelled
+    does: 許諾したドライバーへ。乗客が取り消し、迎車を終えたこと（FR-07 の 3）
+  - name: ride.driver_cancelled
+    does: 乗客へ。ドライバーが取り消し、同じ内容でほかのドライバーに届け直していること（FR-23 の 1）
+  - name: ride.no_show
+    does: 乗客へ。乗客の不在として依頼を終えたこと（FR-26 の 1）。料金の結果は ride.charge_settled で届く
+  - name: ride.started
+    does: 乗客とドライバーへ。乗車が始まり、画面を乗車中に変えること（FR-27 の 1）
+  - name: ride.destination_changed
+    does: ドライバーへ。乗客が承認した新しい降りる場所（FR-24 の 4、FR-47 の 2）
+  - name: ride.destination_arrived
+    does: 乗客へ。ドライバーが到着を確認したことと、確認した場所（FR-13 の 2）
+  - name: ride.charge_settled
+    does: 乗客とドライバーへ。決済、キャンセル料、不在の料金の結果（済んだ額と種類、拒否とその理由、済んだかどうか分からないこと）（FR-26 の 1、FR-29、FR-31 の 1）
+  - name: payment_method.settled
+    does: 乗客へ。結果が分からなかった支払い方法の登録の結果（FR-46 の 4）
+  - name: message.received
+    does: 相手へ。連絡のメッセージ。走っているドライバーには、届いたことだけ（FR-11、DEC-27）
+  - name: offer.added
+    does: ドライバーへ。届いた依頼を一覧に加える（FR-18 の 1）
+  - name: offer.removed
+    does: ドライバーへ。一覧から除く依頼と理由（ほかのドライバーの許諾、乗客の取り消し、規則に合わなくなった、許諾のないまま終わった、停止）（FR-18 の 2、FR-20 の 3、FR-21 の 2、FR-44 の 1）
+  - name: driver.suspended
+    does: ドライバーへ。停止されたこと。進んでいる迎車と乗車は続く（FR-44 の 1、4）
+  - name: driver.resumed
+    does: ドライバーへ。停止が解かれたこと（FR-44 の 7）
+  - name: refund.settled
+    does: 乗客と担当者へ。返金が済んだことと額、または結果が分からなかった返金の結果（FR-39 の 1、2）
+  - name: complaint.received
+    does: 担当者へ。乗客が寄せた苦情か返金の求め（FR-37 の 1）
+  - name: anomaly.detected
+    does: エンジニアへ。どの機能で、いつ、何が起きたかと、続いている異常の件数（FR-33）
+  - name: switch.changed
+    does: 両方の Web アプリへ。振る舞いの切り替えが変わったこと。止めた機能は示さない（FR-36）
+  - name: stream.resync
+    does: つなぎ直しの続きを出せないときに、今の状態を読み直すよう求める
+format: text/event-stream（Server-Sent Events）。出来事ごとに id（つなぎ直しの続きの印。不透明な文字列、DEC-36）、event（上の種類）、data（JSON。v、type、eventId、rideId（依頼にかかわるとき）、occurredAt と種類ごとの中身）。中身は DEC-15 の決まりを相手ごとに通したものだけで、額は DEC-38、時刻は DEC-37
+protocol: GET /v1/events で開く HTTPS の流れ（Server-Sent Events、DEC-06）。ELM-03 は変化を書いた取引の直後にその変化を流し、ほかのインスタンスが書いた出来事は出来事の記録（DAT-09）を読んで流す。相手の流れが開いていなければ Web Push（IFC-21）で知らせる
+auth: セッション（DEC-40）。届ける相手と中身は DEC-15 の一か所の決まりを通す。流れを開いた後にセッションが消されたら流れを閉じる
+errors:
+  - case: 流れを開くときにサインインしていない
+    signal: 401 with code NOT_SIGNED_IN
+    caller_does: サインインの画面に移る
+  - case: つなぎ直しの印が古く、続きを出せない
+    signal: stream.resync の出来事
+    caller_does: 今の状態（IFC-03 の GET /v1/rides/current、IFC-04 の GET /v1/offers など）を読み直して示す
+  - case: 流れが切れたか、生存の確かめが決まった時間届かない
+    signal: 流れの終わりか、何も受けない時間
+    caller_does: 最後に受けた id でつなぎ直し、つなぎ直したら今の状態を読み直す（QR-02、DEC-06）
+  - case: 一つのアカウントで開いた流れが多すぎる
+    signal: 429 with code TOO_MANY_REQUESTS
+    caller_does: ほかの画面の流れを閉じる
+idempotency: 出来事ごとの eventId を持ち、端末は受けた eventId の出来事を二度示さない。端末はつなぎ直しで最後に受けた id を送り、ELM-03 はその後の出来事から送る
+timing:
+  timeout: ELM-03 は 15 秒ごとに生存の確かめ（コメントの行）を送る。端末は 35 秒何も受けなければ流れを閉じてつなぎ直す。つなぎ直しの待ちは 1 秒（retry の値）で、続けて失敗すると 1、2、4、8、16、30 秒まで延ばす。ほかのインスタンスが書いた出来事は 1 秒ごとに出来事の記録を読む（HND-04）。相手の流れが開いていなければ、ELM-03 はその組を示せなかったと記録して Web Push で知らせる（FR-53 の 2）。流れで送った出来事の示した時刻が決まった待ちのうちに届かないときも Web Push で知らせる（待ちの値は第 4 段階、HND-19。その組は示せなかったとはしない）。値は DAS-11 による。NFR-07 の予算は報告の「遅延の予算とタイムアウト」
+  ordering: 一つの依頼の出来事は書いた順。依頼をまたぐ順は保たず、出来事の記録の順に流す
+  delivery: at-least-once（つなぎ直すと続きから届き、重なりは eventId で捨てる）。position.updated は最新の値だけで、つなぎ直したときと画面に戻ったときは今の状態の読み直しで受け直す
+versioning: 出来事の data に種類ごとの版 v を持ち、足すだけで変える。端末は知らない種類を捨てる（DEC-41）
+observability: 流れを開いたことと閉じたこと、送った出来事の eventId と相手、示せなかった記録を、たどる記録（DAT-18）と届けと示した時刻の記録（DAT-20）に残す。ログに中身を書かない（DEC-15）
+sli_bindings:
+  - sli: SLI-01
+    events: ELM-03 が乗客に送る配車の確定の知らせ（ride.accepted。流れか Web Push のどちらで届けても一つ）
+    fields: [eventId, rideId, recipientAccount, recipientTestAccount, environment, createdAt, deliveredVia, deliveryOutcome, failureOrigin]
+    method: 届けと示した時刻の記録（DAT-20）を、本番の環境のデモの回の間の知らせに絞って数える。ELM-03 が開いた流れに書けたか、Web Push の配信サービスが受け付けた（IFC-21）ものが GOOD で、ELM-03 自身の誤りと配信サービスの失敗で届けられなかったもの、流れも宛先もなく送れなかったものは GOOD でない。試験用のアカウントの乗客への知らせは外す
+  - sli: SLI-02
+    events: ELM-03 が乗客に送る迎車の到着の知らせ（ride.pickup_arrived）
+    fields: [eventId, rideId, recipientAccount, recipientTestAccount, environment, createdAt, deliveredVia, deliveryOutcome, failureOrigin]
+    method: SLI-01 の知らせと同じく DAT-20 から数える
+  - sli: SLI-03
+    events: ELM-03 が乗客に送る到着の知らせ（ride.destination_arrived）
+    fields: [eventId, rideId, recipientAccount, recipientTestAccount, environment, createdAt, deliveredVia, deliveryOutcome, failureOrigin]
+    method: SLI-01 の知らせと同じく DAT-20 から数える
+spec: null
+as_is: new

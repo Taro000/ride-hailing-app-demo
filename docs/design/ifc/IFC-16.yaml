@@ -1,0 +1,31 @@
+id: IFC-16
+title: 生存確認
+status: active
+basis: inferred
+basis_note: 想定の本番のデモの回の間、Cloud Monitoring の外からの生存確認がサーバーの停止を見て、ELM-03 を通らずにメールで知らせ、生存確認が呼ぶ入口は生きていることだけを返し何も変えないことは DEC-20 と脅威のモデルの F13（入力）。生存確認の仕様書をコードから生成することは POL-05（入力）。操作の形は推定
+premises: [TC-08]
+kind: http
+name: 生存確認
+provider: ELM-03
+consumers: [ELM-08]
+functions: [FR-33]
+operations:
+  - name: GET /healthz
+    does: ELM-03 が要求に答えられることだけを返す。何も変えず、状態、依頼、個人の情報を返さない（DEC-20、F13）
+format: JSON（UTF-8）。status だけを持つ
+protocol: HTTPS の要求と応答。想定の本番のデモの回の間だけ Cloud Monitoring の外からの生存確認が呼ぶ（回を開く手順で入れ、閉じる手順で止める、POL-04）
+auth: なし。入口で回数を限る（DEC-35 の 429）
+errors:
+  - case: ELM-03 が答えないか 5xx を返す
+    signal: 生存確認の失敗
+    caller_does: 決まった回数続くと、Cloud Monitoring が開発者にメールで知らせる（DEC-20）
+idempotency: 読むだけで繰り返してよい
+timing:
+  timeout: 枠だけを決める。生存確認のタイムアウトは入口の最悪の答えより長く、確かめの間隔と知らせるまでの続けて失敗する回数は、停止から T_alert_delay のうちに知らせられる長さにする。時間のしきい値の SLO とお金の道になく、値は第 4 段階が決める（HND-19。異常とみなす条件と監視の間隔は HND-10）
+  ordering: null
+  delivery: null
+versioning: DEC-41
+observability: 呼ばれたことは境界の出来事にもログにも残さない（SLI の数えに入れない）
+sli_bindings: []
+spec: null
+as_is: new

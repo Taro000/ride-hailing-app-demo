@@ -1,0 +1,45 @@
+id: IFC-10
+title: 端末からの報告と知らせの宛先
+status: active
+basis: assumed
+basis_note: 端末で起きたエラーをどの依頼のどの画面で起きたかとともに記録し、つながらない間はためて後で送ることは FR-52 と DEC-19（入力）。相手の画面に示した時刻と示せなかったことを記録することは FR-53 と DEC-23（入力）で、FR-53 を今期作ることは QAS-54 による品質チェーンの暫定の決定。SLI-14 の数える区間を、ELM-03 が操作を受けた時刻から相手の端末が示した時刻までとし、端末の時刻を DEC-37 でサーバーの時刻に直して数えることは推定。示せなかったと記録するのは、相手の流れ（IFC-11）が開いていなかったときだけとし、流れで送ったのに示した時刻が届かない変化は示せなかったとはしない（数えから外さない）。Web Push の宛先を端末ごとに持ち、届かなくなった宛先を外すことは DEC-21（入力）
+premises: [QAS-54]
+kind: http
+name: 端末からの報告と知らせの宛先
+provider: ELM-03
+consumers: [ELM-01, ELM-02]
+functions: [FR-52, FR-53]
+operations:
+  - name: POST /v1/device-reports
+    does: 端末がためた報告をまとめて送る。報告は、端末で起きたエラー（起きた時刻、画面、関わる依頼、エラーの種類、たどる ID、FR-52）と、相手の変化を示した記録（出来事の ID、示した所が画面か一覧か知らせか、示した時刻、FR-53）で、どれも端末が作った一件ごとの ID を持つ。ELM-03 はエラーをたどる記録（DAT-18）に、示した時刻を届けと示した時刻の記録（DAT-20）に書く
+  - name: PUT /v1/push-subscriptions/current
+    does: この端末の Web Push の宛先（RFC 8030 の宛先の URL と、RFC 8291 の鍵）を登録するか更新する（DEC-21）
+  - name: DELETE /v1/push-subscriptions/current
+    does: この端末の宛先を外す（使い終えるとき、知らせの許しをやめたとき）
+format: JSON（UTF-8）。時刻は DEC-37 の端末の時刻の添え方（どの報告にも sentAt と lastRoundTripMs）
+protocol: HTTPS の要求と応答
+auth: セッション（DEC-40）。サインインの前の画面で起きたエラーは、サインインした後に送る
+errors:
+  - case: どの操作にも共通する誤り
+    signal: DEC-35 の共通の符号
+    caller_does: DEC-35 のとおり。報告は持ったまま、つながったら送り直す
+  - case: まとめた報告の一部の形が誤っている
+    signal: 200 で受けた報告の ID と退けた報告の ID の並び
+    caller_does: 受けた報告と退けた報告を消し、残りを送り直す
+  - case: まとめた報告が大きすぎる
+    signal: 413 with code PAYLOAD_TOO_LARGE
+    caller_does: 分けて送る
+idempotency: 報告は端末が作った一件ごとの ID で一度だけ受け、同じ ID の送り直しは受けたものとして答える。示した時刻は出来事と相手の組ごとに最初のものを残す。宛先の登録と外すことは値を置くか消すだけで、どれも冪等キーを付けない（DEC-42）
+timing:
+  timeout: 枠だけを決める。端末の報告は SLI-14 の区間を数えるもとだが区間の中の呼び出しではなく（区間は示した時刻で終わる）、時間のしきい値の SLO とお金の道にない。ELM-03 の答えの期限は自身の取引の最悪より長く、端末のタイムアウトはその期限に通信の余裕を足したものより長い（DEC-46 の決め方）。値と、端末が報告をためる長さは第 4 段階が決める（ELM-01 は HND-17、ELM-02 は HND-18、ELM-03 の期限は HND-19）
+  ordering: 端末は報告を起きた順に送る。ELM-03 は起きた時刻（直した時刻）で並べる
+  delivery: at-least-once（端末は受けたと答えられるまで送り直し、ELM-03 は一件ごとの ID で重なりを捨てる）
+versioning: DEC-41
+observability: 受けた報告の数、退けた報告の数、端末の時計の差の見積もりをたどる記録（DAT-18）に残す。エラーの中身と画面の名前に個人の情報を入れさせず、ELM-03 は DEC-15 の決まりで伏せてから書く（FR-52 の 5、QR-58）
+sli_bindings:
+  - sli: SLI-14
+    events: 依頼、乗客の取り消し、ドライバーの許諾と取り消し、ほかのドライバーの許諾、迎車の到着の一つの変化を、一人の相手（依頼を届けたドライバー、依頼の乗客、依頼を見ているほかのドライバー）の画面、一覧、知らせに示すこと（利用者の側）。ELM-03 は変化を書く取引で、出来事と相手の組ごとに届けと示した時刻の記録（DAT-20）を作り、相手の端末がこの操作で示した時刻を送る。同じ組を何度示しても一つと数え、最初に示した時刻を使う
+    fields: [eventId, changeKind, rideId, recipientAccount, recipientTestAccount, requestTestAccount, environment, changeReceivedAt, displayedAt, displayedWhere, notDisplayed, deliveredVia]
+    method: DAT-20 を本番の環境のデモの回の間の組に絞って数える。区間は changeReceivedAt（操作による変化は ELM-03 の入口がその操作を受けた時刻、境界の出来事 DAT-19 から。迎車の到着は ELM-03 が乗る場所から D_pickup_position_gap のうちの迎車の位置を受けた時刻）から displayedAt（端末の時刻を DEC-37 で直したもの）まで。notDisplayed は、ELM-03 がその相手に届けるとき相手の流れが開いていなかったときに ELM-03 が真にするもの（FR-53 の 2）で、真の組は数えから外す。示した時刻も notDisplayed もない組は GOOD でない。試験用のアカウントの依頼の組は外す
+spec: null
+as_is: new

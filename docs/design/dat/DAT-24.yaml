@@ -1,0 +1,18 @@
+id: DAT-24
+title: 模擬の運賃表
+status: active
+basis: inferred
+basis_note: 料金を模擬の運賃表に従って求めることは QR-61（入力）。運賃表はエンジニアが開発の作業として版をつけて入れ、利用者の操作では変わらないことは DEC-17（入力）。見積もりが使った版を持ち、どの版も消さないことは推定。運賃表の中身と照らし合わせは品質チェーンの未解決の点（QR-62、NFR-48）
+premises: []
+entity: 模擬の運賃表（版ごと）
+owner: ELM-03
+store: ELM-04
+key_attributes: [fareTableVersion, effectiveFrom, rules]
+relations:
+  - {to: DAT-06, kind: one-to-many, note: その版で求めた見積もり}
+consistency: エンジニアが開発の作業として版をつけて入れ（マイグレーションか種の台本、実装）、利用者の操作では変わらない（DEC-17、QR-61、QR-62）。見積もりは使った版を持つ
+retention: どの版も消さない（過去の料金を説明するため）
+classification: internal
+drivers: [DRV-20, DRV-06]
+sli_bindings: []
+as_is: new

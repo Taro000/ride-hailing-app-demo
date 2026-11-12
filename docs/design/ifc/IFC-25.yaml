@@ -1,0 +1,49 @@
+id: IFC-25
+title: エンジニアの画面
+status: active
+basis: inferred
+basis_note: 画面の機能と、受け入れ基準が挙げる誤りと空の状態は FR-33〜FR-36、FR-48、FR-49、FR-52（入力）。エンジニアが異常の知らせを Web アプリへの Web Push とその一覧で受けることは DEC-20、コンピューターの主なブラウザで使うことは DEC-03（入力）。見せる範囲と隠し方は決めず ELM-03 が送ったものを示すことは ELM-02 と DEC-15（入力）
+premises: []
+kind: screen
+name: エンジニアの画面（ELM-02）
+provider: ELM-02
+consumers: [USR-03]
+functions: [FR-33, FR-34, FR-35, FR-36, FR-48, FR-49, FR-52]
+operations:
+  - name: 使い始め
+    does: サインインし、使い終える（FR-48）。異常の知らせを受ける許しを求める（DEC-20）
+  - name: 異常の一覧と知らせ
+    does: 異常の一覧（続いているものはまとめて件数と時刻）と、Web Push で示す異常の知らせ。押すとその異常の依頼のたどりを開く（FR-33、FR-34 の 2）
+  - name: 依頼の経過のたどり
+    does: 依頼を探し、システムが行ったことと結果、端末で起きたエラー、外部とのやり取りを時刻の順に、個人の情報を隠して仮の名で示し、どの部分で起きたかを示す。理由を入れてその依頼の隠した情報を見る（FR-34、FR-35、FR-52）
+  - name: 振る舞いの切り替え
+    does: 切り替えの一覧と、止めることと有効にすること（FR-36）
+format: HTML と CSS。文言は日本語で文言のファイルから引く（POL-04）
+protocol: コンピューターの Chrome、Edge、Firefox、Safari の今の版と一つ前の版（DEC-03）。ELM-03 とは IFC-01、IFC-10、IFC-11、IFC-14 で話す
+auth: エンジニアのセッション（DEC-40）。隠した情報は理由を入れたときだけ示す（FR-35、FR-49 の 4）
+errors:
+  - case: 存在しない依頼
+    signal: IFC-14 の NOT_FOUND
+    caller_does: 見つからないことを示す（FR-34 の 4）
+  - case: 理由を入れずに見ようとした
+    signal: IFC-14 の VALIDATION_FAILED
+    caller_does: 隠した情報を示さず、理由を求める（FR-35 の 4）
+  - case: たどる記録が保持期間を過ぎた、個人を特定できない形に変えた記録
+    signal: IFC-14 の traceRetained と RECORD_ANONYMIZED
+    caller_does: 残っている記録だけを示し、そのことを示す
+  - case: 異常がない
+    signal: IFC-14 の空の items
+    caller_does: 異常がないことを示す
+  - case: 本人を確かめられない、使えない機能
+    signal: IFC-01 の答え、DEC-35 の 401 と 403
+    caller_does: 確かめられなかったことを示す、その機能を使えないことを示す（FR-48 の 2、FR-49 の 1）
+idempotency: 画面は操作ごとに冪等キーとたどる ID を作り、答えを受けるまで同じもので送り直す（DEC-42、DEC-43）
+timing:
+  timeout: 画面の時間は第 4 段階が決める（HND-18）。呼び出しのタイムアウトは各 IFC
+  ordering: null
+  delivery: null
+versioning: 起動の値の buildId が自身の版と違えば読み直す（DEC-41）
+observability: 予期しない失敗を ELM-03 に送る（IFC-10）
+sli_bindings: []
+spec: null
+as_is: new

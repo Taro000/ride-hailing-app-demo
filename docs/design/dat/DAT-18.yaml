@@ -1,0 +1,19 @@
+id: DAT-18
+title: たどる記録
+status: active
+basis: inferred
+basis_note: 端末が作ったたどる ID を各段階と EXT-01、EXT-02 への呼び出しに引き継ぎ、行ったことと結果を依頼に結び付けたたどる記録としてデータベースに書き、端末のエラーをつながったら依頼と画面とともに送り、個人の情報を伏せてから書くことは DEC-19（入力）。N_trace_retention_days の間取り出せることは QR-37（入力）。隠したままでも同じ人と分かる仮の名は DEC-15、FR-35 の 2（入力）。属性は推定
+premises: [CON-06]
+entity: たどる記録（システムが一件の操作で行ったことと、端末で起きたエラー）
+owner: ELM-03
+store: ELM-04
+key_attributes: [traceRecordId, traceId, rideId, component, step, result, failureOrigin, startedAt, durationMs, deviceErrorId, pseudonyms]
+relations:
+  - {to: DAT-07, kind: many-to-one, note: 依頼と乗車（依頼にかかわるとき）}
+  - {to: DAT-22, kind: many-to-one, note: 異常（見つけたとき）}
+consistency: ELM-03 だけが書き、足すだけ。個人の情報は DEC-15 の決まりで伏せてから書き（QR-58）、乗客とドライバーは鍵を使った仮の名で持つ（FR-35 の 2）。端末のエラーは端末の一件ごとの ID で一度だけ書く（IFC-10）
+retention: N_trace_retention_days（QR-37）を過ぎたら日々の処理が消す
+classification: personal
+drivers: [DRV-24, DRV-29]
+sli_bindings: []
+as_is: new

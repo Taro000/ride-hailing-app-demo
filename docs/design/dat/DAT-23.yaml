@@ -1,0 +1,17 @@
+id: DAT-23
+title: 振る舞いの切り替え
+status: active
+basis: inferred
+basis_note: 切り替えをデータベースに置いてエンジニアの画面から変え、サーバーは操作ごとに読み、Web アプリには流れで伝えることは DEC-26 と FR-36（入力）。切り替えを読むのはその機能の application/ の入口の一か所であることは POL-04（入力）
+premises: []
+entity: 振る舞いの切り替え
+owner: ELM-03
+store: ELM-04
+key_attributes: [switchName, enabled, changedAt, changedBy]
+relations: []
+consistency: エンジニアだけが変え、変えたことは操作の記録（DAT-17）と一つの取引で書き、流れ（IFC-11 の switch.changed）で伝える（DEC-26）。ELM-03 は操作のたびに読む
+retention: 切り替えがある間。変えた履歴は操作の記録（DAT-17）に残る
+classification: internal
+drivers: [DRV-13, DRV-12]
+sli_bindings: []
+as_is: new

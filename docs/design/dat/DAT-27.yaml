@@ -1,0 +1,17 @@
+id: DAT-27
+title: 日々の処理の記録
+status: active
+basis: inferred
+basis_note: 日々の処理を一日一度だけ行い、取ったことを書いてから行うことは DEC-18（入力）。すべての仕事を終えたら終えた記録をログに書くことは DEC-20（入力）で、その項目は IFC-15。属性と保持期間は推定
+premises: []
+entity: 日々の処理の実行（日ごと）
+owner: ELM-03
+store: ELM-04
+key_attributes: [jobDate, startedAt, finishedAt, state, steps]
+relations: []
+consistency: その日の処理を取ったことを書いてから行い、一日一度だけ行う（DEC-18）。仕事ごとの結果を書き、すべて済んだら終えた記録をログに書く（IFC-15）
+retention: N_trace_retention_days を過ぎたら日々の処理が消す
+classification: internal
+drivers: [DRV-23, DRV-21, DRV-24]
+sli_bindings: []
+as_is: new

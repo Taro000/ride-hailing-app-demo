@@ -1,0 +1,18 @@
+id: DAT-04
+title: 受付の状態と、乗客の閾値とドライバーの条件
+status: active
+basis: inferred
+basis_note: ドライバーの受付（FR-17）、乗客の評価の閾値（FR-16）、ドライバーの条件（FR-32）は入力。届けるとき、示すとき、許諾を受けるときにその時点の値で規則に当てることは DEC-24（入力。距離が直線か道のりかは QCR-01 を待つ）。属性と扱いの区分は推定
+premises: [QCR-01]
+entity: ドライバーの受付の状態と、マッチに使う設定
+owner: ELM-03
+store: ELM-04
+key_attributes: [accountId, accepting, ratingThreshold, minFare, maxPickupDistanceMeters, updatedAt]
+relations:
+  - {to: DAT-01, kind: one-to-one, note: アカウント}
+consistency: ELM-03 だけが書き、届けるとき、一覧と内容を示すとき、許諾を受けるときに、その時点の値を読む（DEC-24）。受付をやめても許諾した依頼は続く（FR-17 の 2）
+retention: アカウントが使えなくなるまで（FR-51 の 4 で消す）
+classification: internal
+drivers: [DRV-08, DRV-35]
+sli_bindings: []
+as_is: new

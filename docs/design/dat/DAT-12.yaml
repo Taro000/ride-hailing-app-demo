@@ -1,0 +1,19 @@
+id: DAT-12
+title: 返金
+status: active
+basis: inferred
+basis_note: 担当者が認めた額を、その乗車か依頼の支払いに対して返金し、合計を支払われた額までに限り、返金ごとに乗車、額、済んだかどうかを記録することは FR-39、FR-40（入力）。合計を済んだか結果が分からない返金で数えることは DEC-10（入力）。属性と整合の取り方は推定
+premises: []
+entity: 担当者が認めた返金
+owner: ELM-03
+store: ELM-04
+key_attributes: [refundId, rideId, amount, approvedBy, approvedAt, state]
+relations:
+  - {to: DAT-07, kind: many-to-one, note: 乗車か料金を請求した依頼}
+  - {to: DAT-11, kind: one-to-many, note: 返金の試み}
+consistency: 認めた返金を書く取引で、支払われた額から済んだか結果が分からない返金の合計を引いた残りを確かめる（FR-40 の 1、DEC-10）。認めたことは操作の記録（DAT-17）と一つの取引で書く。状態は報告の「要素をまたぐ状態」
+retention: 依頼と同じ
+classification: payment
+drivers: [DRV-07, DRV-30, DRV-32]
+sli_bindings: []
+as_is: new

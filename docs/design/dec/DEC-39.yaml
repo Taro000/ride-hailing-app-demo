@@ -1,0 +1,32 @@
+id: DEC-39
+title: 一覧はどれも不透明な cursor と limit で区切り、並べ方を一覧ごとに一つに決め、個人の情報で探す一覧は本文で条件を送る
+status: active
+basis: inferred
+basis_note: インタフェースが見せる一覧の区切り方と並べ方は、第 3 段階の確定の種類（推定）。量は小さい（OPF-02、OPF-03）が、履歴、照会、操作の記録、たどる記録は増え続けるため区切る（推定）。個人の情報を経路と問い合わせの文字列に入れないことは DEC-44
+premises: [OPF-02]
+stage: high-level-design
+question: 一覧をどう区切り、どう並べ、条件をどう送るか
+addresses: [DRV-24, DRV-29, FR-31, FR-38, FR-50]
+options:
+  - name: limit と不透明な cursor で区切り、{ items, nextCursor } を返す
+    effect: 区切りの間に記録が増えても重なりと抜けがない
+    cost: 何ページ目かへは飛べない
+  - name: page と pageSize で区切る
+    effect: ページの番号で飛べる
+    cost: 区切りの間に記録が増えると重なりと抜けが出る
+chosen: 一覧はどれも limit（既定 50、最大 100）と cursor で区切り、{ items, nextCursor } を返す（終わりは nextCursor が null）。cursor は利用側が解かない不透明な文字列。並べ方は一覧ごとに一つに決め、既定は時刻の新しい順で、同じ時刻は ID の順。個人の情報で探す一覧（乗車の照会、操作の記録の検索、たどる記録の検索）は、条件を POST の本文で送る search の操作にし（DEC-44）、limit と cursor も本文で送る
+rationale: 二つ目は、乗車の履歴や操作の記録が区切りの間に増えると重なりと抜けが出て、担当者とエンジニアが記録を見落とす（DRV-24、FR-50 の 2）。一つ目は時刻と ID で続きを決めるので、増えても重ならない。条件を本文で送るのは、乗客やドライバーで探す条件がログと URL に残らないため（DRV-29）
+rejected:
+  - option: page と pageSize で区切る
+    reason: 区切りの間に記録が増えると重なりと抜けが出て、DRV-24 と FR-50 の探し漏れを生む
+gains:
+  - 一覧が増えても重なりと抜けがない
+costs:
+  - ページの番号で飛べない
+sensitive_points: []
+trade_offs: []
+assumptions: []
+depends_on: [DEC-44]
+parameters: []
+debt: null
+as_is: new

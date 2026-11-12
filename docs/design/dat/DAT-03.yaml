@@ -1,0 +1,18 @@
+id: DAT-03
+title: ドライバーと車両の登録
+status: active
+basis: inferred
+basis_note: 審査を通ったドライバーと車両を名前、顔写真、連絡先と車種、色、ナンバーで登録し、訂正し、審査の日付と手がかりを記録しないことは FR-43 と TC-17（入力）。停止と再開は FR-44（入力）。顔写真をデータベースに置くことは DEC-17、個人の情報を記録した日の鍵で暗号にすることは DEC-16（入力）。属性と整合の取り方は推定
+premises: [TC-17, CON-06]
+entity: ドライバーと車両の登録と停止
+owner: ELM-03
+store: ELM-04
+key_attributes: [accountId, driverName, facePhoto, contact, vehicleModel, vehicleColor, plateNumber, registeredAt, suspended, suspendedAt]
+relations:
+  - {to: DAT-01, kind: one-to-one, note: ドライバーのアカウント}
+consistency: ELM-03 だけが書く。登録、訂正、停止、再開は操作の記録（DAT-17）と一つの取引で書く（FR-43 の 4、FR-44、FR-50）。ナンバーはドライバーの間で一つ（FR-43 の 3）。停止は書いた時から届ける相手の規則（DEC-24）と一覧と許諾に効く（QR-49）。審査の日付と手がかりの項目を持たない（TC-17）。名前、顔写真、連絡先、ナンバーは記録した日の鍵で暗号にする（DEC-16）
+retention: 登録している間。記録してから 3 年を過ぎた内容は日々の処理が個人を特定できない形に変える（QR-59、FR-51）
+classification: personal
+drivers: [DRV-20, DRV-08, DRV-29, DRV-30]
+sli_bindings: []
+as_is: new

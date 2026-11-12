@@ -1,0 +1,19 @@
+id: DAT-05
+title: 支払い方法と登録の取引
+status: active
+basis: inferred
+basis_note: 支払い方法を EXT-01 に登録し、システムは EXT-01 が返す登録の結果だけを受け、分かるまで使える支払い方法にしないことは FR-46（入力）。登録の取引を作り、結果を EXT-01 から読み直すことは DEC-12（入力）。カードの情報を受けず持たないことは TC-11（入力）で、番号の下 4 桁と種類も持たないことは推定。使える支払い方法を乗客ごとに一つにすることは推定
+premises: [TC-11, EXT-01]
+entity: 乗客の支払い方法と、その登録の取引
+owner: ELM-03
+store: ELM-04
+key_attributes: [accountId, ext01CustomerId, paymentMethodId, setupId, setupIntentId, setupState, registeredAt, isDefault]
+relations:
+  - {to: DAT-01, kind: many-to-one, note: 乗客のアカウント}
+  - {to: DAT-11, kind: one-to-many, note: その支払い方法で押さえた試み}
+consistency: 登録の取引を EXT-01 に作る前に登録の記録を書き（始めた）、結果を EXT-01 から読み直してから使える支払い方法にする（DEC-12、FR-46 の 4）。使える支払い方法は乗客ごとに一つ（最後に登録できたもの）。カードの情報（番号、下 4 桁、種類、期限）は持たない（TC-11）。状態は報告の「要素をまたぐ状態」
+retention: アカウントが使えなくなるまで。結果が分からない登録は分かるまで
+classification: payment
+drivers: [DRV-07, DRV-18]
+sli_bindings: []
+as_is: new

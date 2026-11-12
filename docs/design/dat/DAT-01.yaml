@@ -1,0 +1,23 @@
+id: DAT-01
+title: アカウント
+status: active
+basis: inferred
+basis_note: アカウントの作成と訂正、試験用の区別、本人の確かめ、3 年を過ぎた情報の扱いは FR-41、FR-42、FR-48、FR-51 の 4（入力）。システムのデータを一つのデータベースに置いて ELM-03 だけが書き、個人の情報を記録した日ごとの鍵で暗号にすることは DEC-16、DEC-17（入力）。サインインの ID は DEC-36。属性、整合の取り方、扱いの区分は推定
+premises: [CON-06]
+entity: アカウント（乗客、ドライバー、運営・サポートの担当者、エンジニア）
+owner: ELM-03
+store: ELM-04
+key_attributes: [accountId, loginId, kind, displayName, contact, testAccount, status, createdAt]
+relations:
+  - {to: DAT-02, kind: one-to-many, note: 本人の確かめの秘密とセッション}
+  - {to: DAT-03, kind: one-to-one, note: ドライバーと車両の登録（ドライバーだけ）}
+  - {to: DAT-04, kind: one-to-one, note: 受付の状態と、閾値か条件}
+  - {to: DAT-05, kind: one-to-many, note: 支払い方法と登録の取引（乗客だけ）}
+  - {to: DAT-07, kind: one-to-many, note: 乗客かドライバーとしての依頼と乗車}
+  - {to: DAT-25, kind: one-to-many, note: 端末ごとの知らせの宛先}
+consistency: ELM-03 だけが書く（DEC-17）。作成、訂正、試験用の区別の変更は、操作の記録（DAT-17）と一つの取引で書く（FR-41 の 4、FR-42 の 3、FR-50）。名前と連絡先は記録した日の鍵で暗号にし（DEC-16）、同じ人のアカウントがすでにあるかはサーバーが読み解いて比べる（FR-41 の 3）。試験用の区別は、その時点の値を依頼、評価、決済、苦情、SLI の記録に写す（FR-42 の 2、QR-47）
+retention: 使っている間。記録してから 3 年（QR-59、FR-51）を過ぎた内容は日々の処理が個人を特定できない形に変え、そのアカウントは使えなくなる（FR-51 の 4）。変えた後の行は消さない
+classification: personal
+drivers: [DRV-28, DRV-29, DRV-21, DRV-25]
+sli_bindings: []
+as_is: new

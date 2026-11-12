@@ -1,0 +1,46 @@
+id: IFC-06
+title: 連絡のメッセージ
+status: active
+basis: inferred
+basis_note: 乗客とドライバーの連絡を、配車が確定してから乗車が始まるまでサーバーを通るアプリの中のメッセージで行い、車が走っている間はドライバーから送らせず中身も示さないことは DEC-27（入力。走っている間の扱いは設計の第 2 段階の質問 4 で確認済みで、QCR-04 は回答済み）。走っているかの判断は DEC-22 と同じ（入力）。操作と誤りの符号は DEC-35、DEC-42 による推定
+premises: [QCR-04]
+kind: http
+name: 連絡のメッセージ
+provider: ELM-03
+consumers: [ELM-01]
+functions: [FR-11]
+operations:
+  - name: GET /v1/rides/{rideId}/messages
+    does: その依頼のメッセージを時刻の順に返す。走っているドライバーには、届いたことと時刻だけを返し、中身は止まってから返す（DEC-27）
+  - name: POST /v1/rides/{rideId}/messages
+    does: その依頼の相手にメッセージ（決まった短い文か自由な文）を送る。相手には流れ（IFC-11 の message.received）で届く
+format: JSON（UTF-8）。中身は日本語の文
+protocol: HTTPS の要求と応答
+auth: その依頼の乗客と、割り当てたドライバーのセッション（DEC-40）。ほかの人には存在を明かさず 404 NOT_FOUND
+errors:
+  - case: どの操作にも共通する誤りと、冪等キーの誤り
+    signal: DEC-35 と DEC-42 の符号
+    caller_does: DEC-35 と DEC-42 のとおり
+  - case: 配車が確定する前か、乗車が始まった後か、取り消された後
+    signal: 409 with code MESSAGING_CLOSED
+    caller_does: 連絡できないことを示す（FR-11 の 1、2）
+  - case: 車が走っている間か速さが分からないときに、ドライバーが送ろうとした
+    signal: 409 with code DRIVER_MOVING
+    caller_does: 止まってから送るよう示す（DEC-27）
+  - case: 中身が長すぎる
+    signal: 400 with code VALIDATION_FAILED (details body TOO_LONG)
+    caller_does: 短くして送る
+idempotency: GET は繰り返してよい。送る操作は冪等キー（DEC-42）を付け、送り直しても一通だけになる
+timing:
+  timeout: 枠だけを決める。ELM-03 の答えの期限は自身の取引の最悪より長く、ELM-01 のタイムアウトはその期限に通信の余裕を足したものより長い（DEC-46 の決め方）。メッセージは時間のしきい値の SLO とお金の道になく、値は第 4 段階が決める（ELM-01 は HND-17、ELM-03 の期限は HND-19）
+  ordering: 一つの依頼のメッセージは ELM-03 が受けた順
+  delivery: null
+versioning: DEC-41
+observability: 境界の出来事（DAT-19）に残す。メッセージの中身は暗号にして持ち（DEC-16）、ログ、たどる記録、知らせには書かない（DEC-15、DEC-21）
+sli_bindings:
+  - sli: SLI-02
+    events: 迎車中の依頼の乗客が ELM-03 の入口に送った GET /v1/rides/{rideId}/messages と POST /v1/rides/{rideId}/messages（ドライバーへの連絡、システムの境界）。同じたどる ID の送り直しは一つと数え、その操作に最後に返した答えで数える
+    fields: [traceId, idempotencyKey, route, actorKind, ridePhase, testAccount, environment, receivedAt, respondedAt, httpStatus, errorCode, failureOrigin]
+    method: 境界の出来事（DAT-19）を、本番の環境のデモの回の間のものに絞って数える。MESSAGING_CLOSED は受け付けない入力の知らせとして GOOD
+spec: null
+as_is: new

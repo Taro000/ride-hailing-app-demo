@@ -1,0 +1,19 @@
+id: DAT-08
+title: 降りる場所の変更
+status: active
+basis: inferred
+basis_note: 乗車中に乗客が降りる場所を変えて料金と到着予定の時刻を承認し、承認すると確定額が更新されることは FR-47、CON-01（入力）。新しい額で押さえ直してから前の押さえを解き、押さえ直せないか分からなければ変えないことは DEC-09、DEC-10、FR-54 の 4（入力）。属性と整合の取り方は推定
+premises: [CON-01]
+entity: 降りる場所の変更
+owner: ELM-03
+store: ELM-04
+key_attributes: [changeId, rideId, newDropoff, newFare, newEta, quoteId, state, reholdAttemptId, approvedAt]
+relations:
+  - {to: DAT-07, kind: many-to-one, note: 依頼と乗車}
+  - {to: DAT-11, kind: one-to-one, note: 押さえ直しの試み}
+consistency: 承認のとき押さえ直しの試み（DAT-11）を書き、押さえ直しが済んでから、依頼の降りる場所と確定額の更新と前の押さえを解く試みを一つの取引で書く（DEC-09）。押さえ直しが拒否されたか分からなければ依頼を変えない。新しい降りる場所は記録した日の鍵で暗号にする。状態は報告の「要素をまたぐ状態」
+retention: 依頼と同じ
+classification: personal
+drivers: [DRV-07, DRV-06, DRV-05]
+sli_bindings: []
+as_is: new

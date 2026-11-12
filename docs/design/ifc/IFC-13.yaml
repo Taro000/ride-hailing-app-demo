@@ -1,0 +1,50 @@
+id: IFC-13
+title: 返金
+status: active
+basis: inferred
+basis_note: 担当者が認めた額を、その乗車か依頼の支払いに対して EXT-01 に処理させ、済むと乗客に知らせ、受け付けなかったか答えなかったときにやり直せるようにし、合計を支払われた額までに限り、同じ返金を二度行わないことは FR-39、FR-40（入力）。返金を試みごとに記録してその試みだけを覆うキーで送り、拒否された返金のやり直しは新しいキーにし、合計を済んだか結果が分からない返金で数えることは DEC-10（入力）。結果が分からないときの答えは DEC-45、待ちは IFC-17 の値から計算した（HND-05 を IFC-17 とともに決める）。操作と誤りの符号は DEC-35、DEC-42 による推定
+premises: []
+kind: http
+name: 返金
+provider: ELM-03
+consumers: [ELM-02]
+functions: [FR-39, FR-40, FR-50]
+operations:
+  - name: GET /v1/console/rides/{rideId}/refunds
+    does: その乗車か依頼の返金（認めた担当者、額、済んだか、済まなかったか、結果が分からないか）と、返金できる残りの額（支払われた額から、済んだか結果が分からない返金の合計を引いた額）を返す（FR-39 の 5、FR-40 の 1）
+  - name: POST /v1/console/rides/{rideId}/refunds
+    does: 担当者が認めた額の返金を作り、EXT-01 に送って、済んだこと、拒否とその理由、または結果が分からないことを答える。済むと乗客に知らせる（FR-39 の 1、3、FR-40）
+  - name: POST /v1/console/refunds/{refundId}/retry
+    does: 返金のやり直し。済んでいれば最初の結果を、結果が分からなければ同じ試みを確かめた結果を答え、はっきり拒否されていれば新しい試みを作って送る（FR-39 の 2、FR-40 の 2、3）
+format: JSON（UTF-8）。額は DEC-38
+protocol: HTTPS の要求と応答
+auth: 運営・サポートの担当者のセッション（DEC-40）。担当者のほかは 403 NOT_ALLOWED（DEC-15）
+errors:
+  - case: どの操作にも共通する誤りと、冪等キーの誤り
+    signal: DEC-35 と DEC-42 の符号
+    caller_does: DEC-35 と DEC-42 のとおり
+  - case: 決済が済んでいない乗車か、料金を請求していない依頼を返金しようとした
+    signal: 409 with code NOTHING_TO_REFUND
+    caller_does: 受け付けないことを示す（FR-39 の 4）
+  - case: 返金する額とすでに返金した額（結果が分からないものを含む）の合計が、支払われた額を超える
+    signal: 422 with code REFUND_EXCEEDS_PAID and refundableAmount
+    caller_does: 返金せず、返金できる残りの額を示す（FR-40 の 1）
+  - case: EXT-01 が返金をはっきり拒否した
+    signal: 402 with code REFUND_DECLINED and reason
+    caller_does: 済んでいないことと理由を示し、やり直せるようにする（FR-39 の 2）
+  - case: 返金の結果が、最初に送ってから待ちのうちに分からない
+    signal: 202 with code REFUND_PENDING
+    caller_does: 済んだかどうか分からないことを示し、流れの refund.settled を待つ。やり直すと同じ試みを確かめる（FR-39 の 2、FR-40 の 3、DEC-45）
+  - case: 済んだ返金をやり直した
+    signal: 200 で最初の結果
+    caller_does: 最初の結果を示す（FR-40 の 2）
+idempotency: GET は繰り返してよい。返金を作る操作とやり直しは冪等キー（DEC-42）を付ける。担当者が認めた一つの返金は、済んだか結果が分からない試みを一つまでしか持たず、新しい試みははっきり拒否の後のやり直しでだけ作る（DEC-45）。同じ乗車に別に認めた二つ目の返金は、合計が支払われた額を超えない限り別の返金として作る（FR-40 の 4）
+timing:
+  timeout: ELM-03 の答えの期限は、自身の処理と取引の 0.2 秒と、最初に EXT-01 に送ってからの待ち 8.5 秒（IFC-17）と結果を書く取引 0.1 秒の和の 8.8 秒、ELM-02 のタイムアウトは 15 秒（8.8 秒と余裕 5 秒の和より長い、DEC-46）。タイムアウトしたら同じ冪等キーで送り直す。値は IFC-17 と DEC-46 による
+  ordering: 一つの返金の試みは、前の試みがはっきり拒否で終わってから次を送る
+  delivery: null
+versioning: DEC-41
+observability: 認めた担当者、時刻、乗車、額、済んだかどうか（済まなかったものも）を操作の記録（DAT-17、FR-39 の 5、FR-50）に、EXT-01 とのやり取りをたどる記録（DAT-18）に残す
+sli_bindings: []
+spec: null
+as_is: new

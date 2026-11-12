@@ -1,0 +1,19 @@
+id: DAT-17
+title: 操作の記録
+status: active
+basis: inferred
+basis_note: 担当者とエンジニアの特別な操作と料金にかかわる操作を、足すだけで直しも消しもしない記録に残し、一つ前の記録のハッシュを含めて書き換えれば分かるようにすることは DEC-19（入力）。記録する操作は FR-35 の 3、FR-41 の 4、FR-42 の 3、FR-43 の 4、FR-50、QR-12（入力）。操作した人を記録した日の鍵で暗号にし、保存期間を過ぎた日の鍵を捨てることは DEC-16（入力）。ハッシュを暗号にした値から求めて、鍵を捨てても鎖が保たれるようにすることは推定
+premises: [CON-06]
+entity: 操作の記録（担当者とエンジニアの特別な操作と、料金にかかわる操作）
+owner: ELM-03
+store: ELM-04
+key_attributes: [auditId, sequence, actorAccountId, actorKind, occurredAt, operationKind, target, content, result, reason, previousHash, hash]
+relations:
+  - {to: DAT-01, kind: many-to-one, note: 操作した人}
+  - {to: DAT-07, kind: many-to-one, note: 対象の乗車か依頼（あるとき）}
+consistency: 足すだけで直しも消しもせず、前の記録のハッシュを含めて書き換えれば分かるようにする（DEC-19）。記録する操作と一つの取引で書き、済まなかった操作は結果とともに書く（FR-50 の 3）。操作した人と内容の個人の情報は記録した日の鍵で暗号にし、ハッシュは暗号にした値から求める
+retention: 消さない。記録してから 3 年を過ぎたものは、その日の鍵を捨てて操作した人と個人の情報を読めなくする（DEC-16、QR-59、FR-51）。ハッシュの鎖は暗号にした値のまま保たれる
+classification: personal
+drivers: [DRV-30, DRV-24, DRV-21]
+sli_bindings: []
+as_is: new

@@ -1,0 +1,59 @@
+id: IFC-02
+title: 場所と見積もり
+status: active
+basis: inferred
+basis_note: 場所の候補、住所と位置、道と移動時間を ELM-03 の EXT-02 のつなぎ口だけが求め、到着予定時刻と料金を ELM-03 が求めることと、EXT-02 が失敗するか答えないときは場所の検索と見積もりを止めて依頼させないことは DEC-13（入力）。料金を模擬の運賃表で求め、示した料金を確定額にすることは QR-61、CON-01、FR-03 の 2（入力）。同じ名前の候補を所在地で区別し、選んだ場所の位置を示すことは QR-09（入力）。見積もりを依頼が名指して、示した料金のまま依頼を受け付けることは FR-04 の 1 からの推定。見積もりの有効期限の値は第 4 段階が ELM-03 の料金を求めるモジュールで決める
+premises: [EXT-02, TC-12]
+kind: http
+name: 場所と見積もり
+provider: ELM-03
+consumers: [ELM-01]
+functions: [FR-01, FR-02, FR-03, FR-47]
+operations:
+  - name: POST /v1/places/search
+    does: 乗客が入れた名前か住所から場所の候補を返す。同じ名前と似た名前の候補は所在地で区別して返す（FR-01 の 1、QR-09）。探す文字は本文で送る（DEC-44）
+  - name: GET /v1/places/{placeId}
+    does: 選んだ候補の位置と住所を返し、乗客が地図で位置を確かめられるようにする（FR-01 の 1、QR-09）
+  - name: POST /v1/places/reverse-geocode
+    does: 端末が測った現在地（DEC-37 の時刻の添え方）から、乗る場所に示す住所と位置を返す（FR-02）
+  - name: POST /v1/quotes
+    does: 乗る場所と降りる場所（位置と住所）から、ドライバーが見つかるまでの時間と迎車の時間を含めた目的地への到着予定時刻と、模擬の運賃表で求めた料金の見積もりを作り、見積もりの ID と有効期限とともに返す。依頼（IFC-03）と降りる場所の変更はこの見積もりを名指す（FR-03、FR-47 の 1）
+format: JSON（UTF-8）。額は DEC-38、時刻は DEC-37
+protocol: HTTPS の要求と応答
+auth: 乗客のセッション（DEC-40）。乗客のほかは 403 NOT_ALLOWED（DEC-15）
+errors:
+  - case: どの操作にも共通する誤り
+    signal: DEC-35 の共通の符号
+    caller_does: DEC-35 のとおり
+  - case: 入れた名前か住所に当てはまる場所がない
+    signal: 200 で空の candidates
+    caller_does: 見つからないことを示してほかの場所を求め、決めてあったもう一方の場所は残す（FR-01 の 3）
+  - case: 乗る場所と降りる場所が同じ
+    signal: 422 with code SAME_PICKUP_AND_DROPOFF
+    caller_does: そのことを示し、どちらかを変えるよう求める（FR-01 の 4）
+  - case: 二つの場所の間を車で行く道がない
+    signal: 422 with code ROUTE_NOT_FOUND
+    caller_does: 到着予定時刻と料金を示せないことを示し、依頼させない（FR-03 の 4）
+  - case: 現在地に当てはまる住所がない
+    signal: 422 with code PLACE_NOT_FOUND_AT_LOCATION
+    caller_does: 現在地を示せないことを伝え、乗る場所を入れるよう求める（FR-02 の 3）
+  - case: 選んだ候補がもうない
+    signal: 404 with code NOT_FOUND
+    caller_does: 探し直させる
+  - case: EXT-02 が失敗したか答えない
+    signal: 503 with code MAP_SERVICE_UNAVAILABLE
+    caller_does: 場所を探せないこと、または到着予定時刻と料金を示せないことを示し、決めてあった場所は残し、依頼させない。乗客が改めて操作したときに送る（FR-01 の 5、FR-03 の 5）
+idempotency: どの操作も状態を変えない。見積もりは作るが、送り直すと別の見積もりができるだけで、依頼が名指すのは一つだけのため、冪等キーを付けない（DEC-42）
+timing:
+  timeout: 枠だけを決める。ELM-03 の答えの期限は EXT-02 への呼び出しのタイムアウトとやり直しの和（HND-07）より長く、ELM-01 のタイムアウトはその期限に通信の余裕を足したものより長い（DEC-46 の決め方）。時間のしきい値の SLO とお金の道になく（NFR-17 の T_quote_response は監視）、値は第 4 段階が決める（ELM-01 は HND-17、ELM-03 の期限は HND-19、EXT-02 の呼び出しは HND-07）
+  ordering: null
+  delivery: null
+versioning: DEC-41
+observability: 境界の出来事（DAT-19）と、EXT-02 への呼び出しごとの結果と時間をたどる記録（DAT-18）に残す。探す文字、場所、位置は伏せる（DEC-15）
+sli_bindings:
+  - sli: SLI-01
+    events: 乗客が ELM-03 の入口に送った POST /v1/places/search、GET /v1/places/{placeId}、POST /v1/places/reverse-geocode、POST /v1/quotes（システムの境界）。同じたどる ID の送り直しは一つと数え、その操作に最後に返した答えで数える
+    fields: [traceId, route, actorKind, testAccount, environment, receivedAt, respondedAt, httpStatus, errorCode, failureOrigin]
+    method: 境界の出来事（DAT-19）を、本番の環境のデモの回の間のものに絞って数える。見つからない、同じ場所、道がないの答えは GOOD、MAP_SERVICE_UNAVAILABLE（failureOrigin が EXT-02）と 500 と答えのないものは GOOD でない。testAccount が真のものは外す
+spec: null
+as_is: new

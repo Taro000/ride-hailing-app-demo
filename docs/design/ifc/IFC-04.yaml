@@ -1,0 +1,62 @@
+id: IFC-04
+title: ドライバーの受付と依頼の一覧
+status: active
+basis: inferred
+basis_note: 依頼を届ける相手の規則を、届けるとき、示すとき、許諾を受けるときのどれでもその時点の値でサーバーが当てることと、距離をドライバーの新しい現在地から乗車場所までの直線の距離にすることは DEC-24（入力。直線か道のりかは QCR-01 を待つ）。走っているかを端末の速さと位置からサーバーが決め、分からなければ受け付けないことは DEC-22（入力）。許諾を今の状態を条件に書き、先に書けた一つだけが通すことは DEC-08（入力）。停止がその時から効くことは FR-44 と QR-49（入力）。ドライバーが進んでいる依頼を持つ間に二つ目を許諾させないことは推定。操作と誤りの符号は DEC-35、DEC-42 による推定
+premises: [QCR-01]
+kind: http
+name: ドライバーの受付と依頼の一覧
+provider: ELM-03
+consumers: [ELM-01]
+functions: [FR-05, FR-17, FR-18, FR-19, FR-20, FR-21, FR-22, FR-43, FR-44, FR-45]
+operations:
+  - name: PUT /v1/drivers/me/availability
+    does: 受付を始めるかやめる。やめても許諾した依頼は続く（FR-17）
+  - name: GET /v1/offers
+    does: 受付をしているドライバーに今届いている依頼の一覧を、届ける相手の規則（受付、停止、登録、評価と件数と乗客の閾値、ドライバーの条件と新しい現在地）をその時点の値で当てて返す。現在地が分からないときはそのことを返し、距離の条件のある依頼を除く（FR-18、FR-05、FR-19、DEC-24）
+  - name: GET /v1/offers/{rideId}
+    does: 依頼を選ぶ操作。車が走っていなければ、その依頼の金額、乗車場所、現在地から乗車場所までの直線の距離、降りる場所、移動時間の見込みを返し、示した金額を依頼の経過に記録する（FR-20、FR-22、SLI-11）
+  - name: POST /v1/offers/{rideId}/acceptance
+    does: 許諾。規則と走っているかを当て直し、今の状態を条件に割り当て、許諾したときの速さ、ドライバーの評価、乗客の閾値を記録する（FR-21、FR-22 の 4、FR-44 の 2、FR-45 の 3）
+format: JSON（UTF-8）。額は DEC-38、時刻は DEC-37
+protocol: HTTPS の要求と応答。一覧の変化は流れ（IFC-11 の offer.added と offer.removed）で届く
+auth: ドライバーのセッション（DEC-40）。ドライバーのほかは 403 NOT_ALLOWED（DEC-15）
+errors:
+  - case: どの操作にも共通する誤りと、冪等キーの誤り
+    signal: DEC-35 と DEC-42 の符号
+    caller_does: DEC-35 と DEC-42 のとおり
+  - case: 停止されているドライバーが受付を始めるか、許諾しようとした
+    signal: 403 with code DRIVER_SUSPENDED
+    caller_does: 停止されていることを示し、受付と許諾をさせない（FR-17 の 3、FR-44 の 2、3）
+  - case: 登録が済んでいないドライバーが受付を始めようとした
+    signal: 403 with code DRIVER_NOT_REGISTERED
+    caller_does: 受付を始められないことを示す（FR-43 の 5、QR-63）
+  - case: 受付をしていないドライバーが一覧か依頼を求めた
+    signal: 409 with code NOT_ACCEPTING_REQUESTS
+    caller_does: 受付を始めるよう示す
+  - case: ドライバーの現在地が分からない
+    signal: 200 で positionUnknown が真の一覧（距離の条件のある依頼を除く）
+    caller_does: 現在地が分からないことを示す（FR-19 の 4）
+  - case: 車が V_moving_lock 以上の速さで動いているか、速さが分からないときに、依頼を選ぶか許諾しようとした
+    signal: 409 with code DRIVER_MOVING
+    caller_does: 受け付けなかったことと、止まってから操作するよう示す（FR-22 の 2、DEC-22）
+  - case: 選んだか許諾しようとした依頼が、もう受けられない（ほかのドライバーが許諾した、乗客が取り消した、規則に合わなくなった、許諾のないまま終わった）
+    signal: 409 with code OFFER_NO_LONGER_AVAILABLE and reason（taken、cancelled、not_eligible、ended）
+    caller_does: その依頼がもう受けられないことを示し（取り消しなら取り消されたことを示し）、一覧から除く（FR-18 の 3、FR-20 の 3、FR-21 の 2、3）
+  - case: 迎車中か乗車中の依頼を持つドライバーが、ほかの依頼を許諾しようとした
+    signal: 409 with code DRIVER_ALREADY_ASSIGNED
+    caller_does: 進んでいる依頼を終えてから許諾するよう示す
+idempotency: GET は繰り返してよい。受付の切り替えと許諾は冪等キー（DEC-42）を付ける。許諾は今の状態を条件に書くので、同じ依頼へのほぼ同時の許諾は先に書けた一つだけが割り当てられ、ほかは OFFER_NO_LONGER_AVAILABLE を受ける（DEC-08、FR-21 の 2）
+timing:
+  timeout: 許諾は NFR-07 の道（許諾を乗客に、ほかのドライバーの許諾を一覧に示す）にあり、外部を呼ばないため ELM-03 の答えの期限は 2 秒、ELM-01 のタイムアウトは 10 秒（2 秒と通信の余裕 5 秒の和より長い、DEC-46）で、タイムアウトしたら同じ冪等キーで送り直す。受付の切り替え、一覧、依頼の選択は時間のしきい値の SLO とお金の道になく（一覧に届いた依頼は流れの offer.added で示す）、枠だけを決める。ELM-03 の答えの期限は自身の取引の最悪より長く、ELM-01 のタイムアウトはその期限に通信の余裕を足したものより長い。値は第 4 段階が決める（ELM-01 は HND-17、ELM-03 の期限は HND-19）
+  ordering: null
+  delivery: null
+versioning: DEC-41
+observability: 境界の出来事（DAT-19）と、依頼の経過（DAT-09。依頼を届けたドライバーと、そのときドライバーが条件に合っていたか停止されていたか、選んだことと許諾したこととそのときの評価、閾値、速さ、示した金額、FR-45 の 2、3、FR-22 の 4）に残す
+sli_bindings:
+  - sli: SLI-04
+    events: ドライバーが ELM-03 の入口に送った PUT /v1/drivers/me/availability、GET /v1/offers、GET /v1/offers/{rideId}、POST /v1/offers/{rideId}/acceptance（システムの境界）。同じたどる ID の送り直しは一つと数え、その操作に最後に返した答えで数える
+    fields: [traceId, idempotencyKey, route, actorKind, testAccount, environment, receivedAt, respondedAt, httpStatus, errorCode, failureOrigin]
+    method: 境界の出来事（DAT-19）を、本番の環境のデモの回の間のものに絞って数える。DRIVER_MOVING、OFFER_NO_LONGER_AVAILABLE、DRIVER_SUSPENDED などの受け付けない知らせは GOOD、500 と答えのないものは GOOD でない。testAccount が真のものは外す
+spec: null
+as_is: new

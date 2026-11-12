@@ -1,0 +1,46 @@
+id: IFC-19
+title: 地図のサービスの API（EXT-02）
+status: active
+basis: assumed
+basis_note: 場所の候補、住所と位置、二つの場所の間の道の長さと移動時間をサーバーの一つのつなぎ口から求め、EXT-02 が失敗するか答えないときは場所の検索と見積もりを止め、確定した依頼と乗車は止めず、迎車中と乗車中の着く見込みをサーバーが新しい位置から決まった間隔で求め直すことは DEC-13（入力）。製品が Google Maps Platform であることは TC-12（入力）。使う API と項目（Places API (New) の Autocomplete と Place Details、Geocoding API の逆の検索、Routes API の computeRoutes）は Google Maps Platform の文書による（POL-05、報告の「入力」）。名前と連絡先を渡さないことは DEC-13 と脅威のモデルの F7（入力）。着く見込みを求め直す間隔を決めて HND-08 を決めた。間隔の値は DAS-11 による暫定の決定で、着く見込みの遅れが T_vehicle_location_lag に収まることは報告の「遅延の予算とタイムアウト」で計算した。呼び出しのタイムアウトとやり直しは HND-07 で第 4 段階
+premises: [EXT-02, TC-12, DAS-11]
+kind: http
+name: 地図のサービスの API（Google Maps Platform）
+provider: ELM-06
+consumers: [ELM-03]
+functions: [FR-01, FR-02, FR-03, FR-06, FR-08, FR-13, FR-20, FR-47]
+operations:
+  - name: POST https://places.googleapis.com/v1/places:autocomplete
+    does: 入れた文字から場所の候補を求める。候補の所在地（secondaryText）で同じ名前と似た名前を区別する（FR-01、QR-09）
+  - name: GET https://places.googleapis.com/v1/places/{placeId}
+    does: 選んだ候補の位置と住所を求める（FieldMask で location と formattedAddress だけ、FR-01、QR-09）
+  - name: GET https://maps.googleapis.com/maps/api/geocode/json
+    does: 端末が測った現在地から住所を求める（逆の検索、FR-02）
+  - name: POST https://routes.googleapis.com/directions/v2:computeRoutes
+    does: 二つの場所の間の車の道の長さと時間を求める（FieldMask で distanceMeters と duration だけ。見積もり、迎車と乗車中の着く見込み、依頼の内容の移動時間、降りる場所の変更、FR-03、FR-06、FR-08、FR-13、FR-20、FR-47）
+format: JSON。言語は日本語、地域は日本。位置は WGS84 の緯度と経度
+protocol: HTTPS の要求と応答。ELM-03 の places の機能の adapters/ だけが呼ぶ（POL-02）
+auth: サーバー用の API の鍵（ELM-03 だけが持つ、POL-04）。鍵は使う API に絞る
+errors:
+  - case: 当てはまる場所がない（候補がない、ZERO_RESULTS）
+    signal: 結果なし
+    caller_does: 見つからないことを答える（FR-01 の 3、FR-02 の 3）
+  - case: 二つの場所の間を車で行く道がない（routes が空）
+    signal: 道なし
+    caller_does: ROUTE_NOT_FOUND で答える（FR-03 の 4、FR-47 の 4）
+  - case: タイムアウト、つながらない、5xx、429、OVER_QUERY_LIMIT
+    signal: 失敗か答えない
+    caller_does: MAP_SERVICE_UNAVAILABLE で答え、着く見込みは示せないとする。確定した依頼と乗車は止めない（FR-01 の 5、FR-03 の 5、FR-47 の 5、DEC-13、QR-65）
+  - case: 鍵の誤りか権限（403、REQUEST_DENIED）
+    signal: システムの誤り
+    caller_does: 異常として記録し、上と同じに答える
+idempotency: どの呼び出しも読むだけで繰り返してよい
+timing:
+  timeout: 呼び出しのタイムアウトとやり直しの回数と間隔は第 4 段階が決める（HND-07。DEC-13 のタイムアウトの順を守る）。迎車中と乗車中の着く見込みは、新しい位置を受けたときに、前に求めてから 10 秒以上たっていれば求め直す（HND-08）。求め直しに使う位置が T_vehicle_location_lag より古ければ求めず、着く見込みを示せないとする。値は DAS-11
+  ordering: null
+  delivery: null
+versioning: Places API (New) の v1、Geocoding API、Routes API の v2 の端点（EXT-02 の文書）。項目は FieldMask で決めたものだけを求める
+observability: 呼び出しごとの結果と時間をたどる記録（DAT-18）に残す。位置と探す文字は伏せる（DEC-15）
+sli_bindings: []
+spec: null
+as_is: new

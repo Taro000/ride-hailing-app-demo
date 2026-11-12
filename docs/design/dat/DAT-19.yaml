@@ -1,0 +1,18 @@
+id: DAT-19
+title: 境界の出来事
+status: active
+basis: inferred
+basis_note: サーバーが入口で操作ごとに結果、失敗の出どころ、端末の冪等キー、試験用のアカウントかを記録し、境界の SLI はそこから数えることは DEC-23（入力）。受けたときに書いて答えたときに結果を足し、結果のない記録を応えなかったものとすることは、SLI-01〜SLI-06 がシステムの応えなかった操作を数えることからの推定。保持期間は SLO のウィンドウ（NFR-01〜NFR-06 の直近 28 日）と N_trace_retention_days（QR-37）からの推定
+premises: []
+entity: 境界の出来事（ELM-03 の入口に届いた要求ごとの記録）
+owner: ELM-03
+store: ELM-04
+key_attributes: [requestId, traceId, idempotencyKey, route, actorKind, testAccount, environment, receivedAt, respondedAt, httpStatus, errorCode, outcome, failureOrigin, rideId, ridePhase]
+relations:
+  - {to: DAT-07, kind: many-to-one, note: 依頼と乗車（依頼にかかわるとき）}
+consistency: ELM-03 の入口が要求を受けたときに書き、答えたときに結果を足す。結果のない記録は応えなかったものとする（DEC-23）。ridePhase と testAccount は受けたときの値を写す。位置の報告、端末からの報告、生存確認は書かない
+retention: SLO のウィンドウ（直近 28 日、NFR-01〜NFR-06）と N_trace_retention_days の長い方を過ぎたら日々の処理が消す
+classification: internal
+drivers: [DRV-25, DRV-01, DRV-24]
+sli_bindings: []
+as_is: new

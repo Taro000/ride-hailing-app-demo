@@ -1,0 +1,18 @@
+id: DAT-15
+title: 連絡のメッセージ
+status: active
+basis: inferred
+basis_note: 配車が確定してから乗車が始まるまで、その依頼の乗客とドライバーがシステムを通じて連絡できることは FR-11（入力）。サーバーを通るアプリの中のメッセージで、走っている間はドライバーに送らせず中身も示さず、保存では暗号にすることは DEC-27（入力）。保持期間はどの入力も与えないため未定の値 N_message_retention_days とした
+premises: [CON-06]
+entity: 連絡のメッセージ
+owner: ELM-03
+store: ELM-04
+key_attributes: [messageId, rideId, senderAccountId, body, sentAt, withheldWhileMoving]
+relations:
+  - {to: DAT-07, kind: many-to-one, note: 依頼と乗車}
+consistency: 配車が確定してから乗車が始まるまでだけ書く（FR-11）。中身は記録した日の鍵で暗号にする（DEC-16、DEC-27）
+retention: N_message_retention_days（未定の値。記録してから 3 年を超えない、QR-59）
+classification: personal
+drivers: [DRV-29, DRV-34]
+sli_bindings: []
+as_is: new

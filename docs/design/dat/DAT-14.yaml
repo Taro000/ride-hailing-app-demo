@@ -1,0 +1,23 @@
+id: DAT-14
+title: 評価とまとめた評価
+status: active
+basis: inferred
+basis_note: 乗客が 1〜5 で評価し、ドライバーの振る舞いと車の状態を含められ、一つの乗車に一つだけで、ドライバーの評価をすべての評価の平均とすることは FR-15（入力）。評価を受けた取引でまとめた評価も書き直し、新しい評価をその時から規則に使うことは DEC-24（入力）。評価の件数を N_rating_count_min と比べることは FR-05（入力）。属性と扱いの区分は推定
+premises: []
+entity: 評価と、ドライバーのまとめた評価
+owner: ELM-03
+store: ELM-04
+key_attributes: [ratingId, rideId, driverAccountId, passengerAccountId, score, aspects, comment, receivedAt, driverAverage, driverRatingCount, aggregateUpdatedAt, testAccount]
+relations:
+  - {to: DAT-07, kind: one-to-one, note: 評価した乗車}
+  - {to: DAT-01, kind: many-to-one, note: 評価されたドライバー}
+consistency: 評価を書く取引で、ドライバーのまとめた評価（すべての評価の平均と件数）を書き直す（DEC-24、FR-15 の 3）。一つの乗車に評価は一つ（FR-15 の 5）。任意の文は記録した日の鍵で暗号にする（DEC-16）
+retention: 評価は依頼と同じ（FR-38 の 2 で示す）。任意の文は記録してから 3 年を過ぎたら日々の処理が消す（QR-59）。まとめた評価はドライバーのアカウントが使えなくなるまで
+classification: personal
+drivers: [DRV-08, DRV-09, DRV-27]
+sli_bindings:
+  - sli: SLI-13
+    events: 乗客が送り、ELM-03 が受けた評価一つごと（一つの乗車に一つ）
+    fields: [ratingId, receivedAt, aggregateUpdatedAt, testAccount, environment]
+    method: 評価の記録を受けた日（Asia/Tokyo）ごとに問い合わせ、まとめた評価を書き直した時刻と受けた時刻の差を T_rating_reflect と比べる。同じ取引で書くため差はその取引の時間で、まとめた評価に一度も入らなかった評価はない。試験用のアカウントの評価は外す
+as_is: new

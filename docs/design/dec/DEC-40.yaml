@@ -1,0 +1,34 @@
+id: DEC-40
+title: 本人の確かめの印は ELM-03 が持つセッションの ID を入れた __Host- のクッキーだけにし、状態を変える要求は Origin を確かめる
+status: active
+basis: inferred
+basis_note: インタフェースが見せる本人の確かめの印の種類と受け渡しは、第 3 段階の確定の種類（DEC-30 が受け渡しの形を第 3 段階の約束事とした、入力）。サーバーがセッションを持つことは DEC-14（入力、設計の第 2 段階の質問 3 で確認済み）。二つの Web アプリの静的なファイルを ELM-03 が配り、同じ origin で話すことは DEC-01、DEC-04（入力）。セッションの長さと続けて失敗したときの値は HND-12 で第 4 段階。印の形と受け渡しは推定
+premises: []
+stage: high-level-design
+question: 本人を確かめた後の要求と流れに、どの印をどう付けて受け渡し、いつ無効にするか
+addresses: [DRV-28, DRV-29, FR-48, FR-49]
+options:
+  - name: ELM-03 が持つセッションの ID を、HttpOnly、Secure、SameSite=Strict の __Host- のクッキーで受け渡し、状態を変える要求は Origin を確かめる
+    effect: Web アプリの JavaScript は印を読めず、同じ origin の要求と流れに自動で付き、ELM-03 がその場で無効にできる
+    cost: ELM-03 は要求のたびにセッションを読む
+  - name: ELM-03 が署名した短い期間の印（JWT）を Authorization のヘッダーで渡し、更新の印で延ばす
+    effect: ELM-03 はセッションを読まずに確かめられる
+    cost: 印を Web アプリの JavaScript が持ち、流れ（EventSource）にはヘッダーを付けられず、使い終えた印をその場で無効にするには別の一覧が要る
+chosen: 本人の確かめの印は、ELM-03 が持つセッションの ID を入れたクッキー __Host-session（HttpOnly、Secure、SameSite=Strict、Path=/）だけにする。値は推し量れない 128 ビット以上の乱数で、ELM-04 にはそのハッシュを持つ（DAT-02）。Web アプリはこの印を読まず、同じ origin の要求と流れ（IFC-11）に自動で付く。状態を変える要求は、Origin のヘッダーが ELM-03 自身の origin でなければ 403 NOT_ALLOWED で受け付けない。セッションは使い終える操作でその場で消し、アカウントを止めたとき、設定の符号を出し直したとき、アカウントが個人を特定できない形に変わったときは、そのアカウントのすべてのセッションを消す。セッションの長さ、使っている間に延ばすか、続けて失敗したときに止める回数と時間の値は第 4 段階（HND-12）。日々の処理の呼び出しは、想定の本番は Cloud Scheduler の OIDC の印、ローカルは秘密の値の置き場所の共有の秘密で確かめる（IFC-15）
+rationale: 二つ目は印を JavaScript が持つため盗まれやすく、EventSource は Authorization のヘッダーを付けられず流れ（DEC-06）に別の受け渡しが要り、使い終える操作（FR-48 の 4）でその場で無効にするには無効の一覧を持つことになる。一つ目は、HttpOnly で JavaScript から読めず、SameSite=Strict と Origin の確かめで他のサイトからの要求を退け、サーバーがセッションを消せばその場で使えなくなる（DRV-28）。__Host- の接頭辞は Secure、Path=/、Domain なしを強いる。ローカルでも mkcert の証明書の HTTPS で動く（POL-01）ので Secure のクッキーが使える
+rejected:
+  - option: ELM-03 が署名した短い期間の印（JWT）を Authorization のヘッダーで渡し、更新の印で延ばす
+    reason: 印を JavaScript が持ち、流れに付けられず、使い終えた印をその場で無効にするには別の一覧が要り、DRV-28 を弱め DRV-16 で劣る
+gains:
+  - 印が JavaScript から読めず、使い終える操作でその場で無効になる
+  - 要求と流れに同じ印が自動で付く
+costs:
+  - ELM-03 は要求のたびにセッションを読む
+sensitive_points: []
+trade_offs: []
+assumptions:
+  - ELM-01 と ELM-02 は ELM-03 と同じ origin から配られる（DEC-01、DEC-04）
+depends_on: [DEC-14, DEC-30]
+parameters: []
+debt: null
+as_is: new

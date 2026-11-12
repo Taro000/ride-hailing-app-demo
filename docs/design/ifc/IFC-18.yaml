@@ -1,0 +1,42 @@
+id: IFC-18
+title: 決済サービスの入力部品（EXT-01 の Stripe.js）
+status: active
+basis: inferred
+basis_note: 乗客の Web アプリの中に EXT-01 のドメインから読み込みその枠の中で動く入力部品を置き、サーバーが作った登録の取引を端末から EXT-01 に直接確かめさせ、サーバーは結果を EXT-01 から読み直してから使える支払い方法にすることは DEC-12（入力）。カードの情報がこのシステムのサーバー、ログ、データを通らないことは TC-11 と CON-04（入力）。入力部品と公開の鍵を src/platform/ だけが扱い、起動のときに ELM-03 から読む値で偽物を選ぶことは POL-02、DEC-34（入力）。入力部品の形と読み込み方は Stripe.js の文書による（POL-05、報告の「入力」）。待ちの値は第 4 段階
+premises: [EXT-01, TC-11, CON-04]
+kind: http
+name: 決済サービスの入力部品（Stripe.js の Payment Element）
+provider: ELM-05
+consumers: [ELM-01]
+functions: [FR-46]
+operations:
+  - name: Payment Element の表示
+    does: ELM-01 が js.stripe.com から Stripe.js を読み込み、IFC-07 が返した client secret と公開の鍵（IFC-01 の client-config）で入力部品を EXT-01 の枠の中に示す
+  - name: stripe.confirmSetup
+    does: 乗客が入れたカードの情報を、入力部品が EXT-01 に直接送り、登録の取引を確かめる。ELM-01 はその後に IFC-07 の completion を呼び、結果は ELM-03 が EXT-01 から読み直して決める（FR-46 の 1）
+format: Stripe.js（EXT-01 が配る JavaScript）。ELM-01 が入力部品に渡すのは client secret と公開の鍵だけ
+protocol: 入力部品が EXT-01 の枠（iframe）から EXT-01 に HTTPS で送る。カードの情報は ELM-01 のコードにも ELM-03 にも触れない（TC-11）
+auth: EXT-01 の公開の鍵と、その登録の取引の client secret
+errors:
+  - case: 入れた番号や期限の誤り
+    signal: 入力部品が示す誤り
+    caller_does: 乗客が入れ直す
+  - case: confirmSetup がカードを使えないと答えた
+    signal: confirmSetup の誤り
+    caller_does: IFC-07 の completion を呼び、ELM-03 が読み直した結果（PAYMENT_METHOD_DECLINED）を示す
+  - case: confirmSetup が答えないか、読み込めない
+    signal: タイムアウトか読み込みの失敗
+    caller_does: 確かめたかどうか分からないとして IFC-07 の completion を呼ぶ（ELM-03 が読み直す）。読み込めなければ登録を始められないことを示す
+  - case: 追加の本人確認を求められた
+    signal: 入力部品の確かめの画面
+    caller_does: 入力部品の画面に従う（DAS-06 はテスト用のカードで求めないと見込む）
+idempotency: 同じ client secret の confirmSetup は、何度呼んでも一つの登録の取引のまま（EXT-01 が持つ）
+timing:
+  timeout: 枠だけを決める。ELM-01 が confirmSetup を待つ時間は、それを過ぎても結果を ELM-03 の completion で決めるため、登録を二重にしない。お金を動かさず、時間のしきい値の SLO の道にもなく、値は第 4 段階が決める（HND-17）
+  ordering: null
+  delivery: null
+versioning: Stripe.js は EXT-01 が配る版を読み込む（js.stripe.com の決まった URL）
+observability: ELM-01 は入力部品の結果の種類だけをたどる記録に送り（FR-52）、カードの情報と client secret は送らない
+sli_bindings: []
+spec: null
+as_is: new
