@@ -2,8 +2,8 @@ id: IFC-04
 title: ドライバーの受付と依頼の一覧
 status: active
 basis: inferred
-basis_note: 依頼を届ける相手の規則を、届けるとき、示すとき、許諾を受けるときのどれでもその時点の値でサーバーが当てることと、距離をドライバーの新しい現在地から乗車場所までの直線の距離にすることは DEC-24（入力。直線か道のりかは QCR-01 を待つ）。走っているかを端末の速さと位置からサーバーが決め、分からなければ受け付けないことは DEC-22（入力）。許諾を今の状態を条件に書き、先に書けた一つだけが通すことは DEC-08（入力）。停止がその時から効くことは FR-44 と QR-49（入力）。ドライバーが進んでいる依頼を持つ間に二つ目を許諾させないことは推定。操作と誤りの符号は DEC-35、DEC-42 による推定
-premises: [QCR-01]
+basis_note: 依頼を届ける相手の規則を、届けるとき、示すとき、許諾を受けるときのどれでもその時点の値でサーバーが当てることと、距離をドライバーの新しい現在地から乗車場所までの直線の距離にすることは DEC-24（入力。直線か道のりかは QCR-01 を待つ）。走っているかを端末の速さと位置からサーバーが決め、分からなければ受け付けないことは DEC-22（入力）。許諾を今の状態を条件に書き、先に書けた一つだけが通すことは DEC-08（入力）。停止がその時から効くことは FR-44 と QR-49（入力）。ドライバーが進んでいる依頼を持つ間に二つ目を許諾させないことは推定。操作と誤りの符号は DEC-35、DEC-42 による推定。SLI-04 の出どころを DEC-43 の操作のまとめ方にそろえたことは FND-23 を受けた（その読み方は QCR-07 で品質チェーンに確かめる）
+premises: [QCR-01, QCR-07]
 kind: http
 name: ドライバーの受付と依頼の一覧
 provider: ELM-03
@@ -55,8 +55,8 @@ versioning: DEC-41
 observability: 境界の出来事（DAT-19）と、依頼の経過（DAT-09。依頼を届けたドライバーと、そのときドライバーが条件に合っていたか停止されていたか、選んだことと許諾したこととそのときの評価、閾値、速さ、示した金額、FR-45 の 2、3、FR-22 の 4）に残す
 sli_bindings:
   - sli: SLI-04
-    events: ドライバーが ELM-03 の入口に送った PUT /v1/drivers/me/availability、GET /v1/offers、GET /v1/offers/{rideId}、POST /v1/offers/{rideId}/acceptance（システムの境界）。同じたどる ID の送り直しは一つと数え、その操作に最後に返した答えで数える
-    fields: [traceId, idempotencyKey, route, actorKind, testAccount, environment, receivedAt, respondedAt, httpStatus, errorCode, failureOrigin]
-    method: 境界の出来事（DAT-19）を、本番の環境のデモの回の間のものに絞って数える。DRIVER_MOVING、OFFER_NO_LONGER_AVAILABLE、DRIVER_SUSPENDED などの受け付けない知らせは GOOD、500 と答えのないものは GOOD でない。testAccount が真のものは外す
+    events: ドライバーが ELM-03 の入口に送った PUT /v1/drivers/me/availability、GET /v1/offers、GET /v1/offers/{rideId}、POST /v1/offers/{rideId}/acceptance（システムの境界）。同じたどる ID の要求を、DEC-43 の決まりで一つの操作にまとめる
+    fields: [traceId, resend, idempotencyKey, route, actorKind, testAccount, environment, receivedAt, respondedAt, httpStatus, errorCode, outcome, failureOrigin]
+    method: 境界の出来事（DAT-19）を、本番の環境のデモの回の間のものに絞り、DEC-43 の決まりで操作にまとめて、最初の要求を受けた日に数える。DRIVER_MOVING、OFFER_NO_LONGER_AVAILABLE、DRIVER_SUSPENDED、DRIVER_NOT_REGISTERED などの受け付けない知らせは GOOD。500 か答えのない要求を一つでも含む操作は GOOD でない（QCR-07）。testAccount が真のものは外す
 spec: null
 as_is: new

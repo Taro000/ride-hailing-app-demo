@@ -1,6 +1,6 @@
 id: FND-33
 title: DEC-39 の一覧の大きさと DEC-42 の待つ時間が、parameters にも仮定にもない暫定の値になっている
-status: open
+status: accepted
 basis: inferred
 basis_note: DEC-39 と DEC-42 の chosen と parameters は入力。それが仮定のない暫定の値であることは、このレビューの推定
 premises: []
@@ -11,4 +11,4 @@ targets: [DEC-39, DEC-42]
 severity: minor
 evidence: DEC-39 は一覧の limit を既定 50、最大 100 とし、DEC-42 は動いている要求への 409 OPERATION_IN_PROGRESS に Retry-After 1 秒を返すが、どちらの値も parameters に挙げず（DEC-39 は空、DEC-42 はキーを持つ 24 時間だけ）、もとも DAS もない。暫定の設計上の値は事業の判断で、尋ねるか kind が decision の DAS にするもの
 suggestion: 二つの値をもととともに各 DEC の parameters に書き、暫定の決定として DAS に入れ、依存する項目の premises に挙げる
-resolution: null
+resolution: DEC-39 の limit の既定 50 と最大 100 と、DEC-42 の Retry-After 1 秒を、もととともに各 DEC の parameters に書き、暫定の決定として DAS-14 に入れ、DEC-39 と DEC-42 の premises に挙げた

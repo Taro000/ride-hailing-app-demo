@@ -1,6 +1,6 @@
 id: FND-26
 title: 流れで送った変化を Web Push でも知らせるまでの待ちは NFR-07 の道の上にあるが、仮定なしに第 4 段階に送っている
-status: open
+status: accepted
 basis: inferred
 basis_note: IFC-11、IFC-21、HND-19、SLI-14 の文と報告の「遅延の予算とタイムアウト」は入力。その待ちが NFR-07 の道の上にあることは、このレビューの推定
 premises: []
@@ -11,4 +11,4 @@ targets: [IFC-11, HND-19]
 severity: minor
 evidence: IFC-11 は、流れで送った出来事の示した時刻が決まった待ちのうちに届かないときも Web Push で知らせ、その組を示せなかったとはしない（SLI-14 の数えに残る）とし、待ちの値を HND-19 で第 4 段階に送る。相手が知らせを示した時刻が T_dispatch_propagation のうちならその組は GOOD になるため、この待ちは NFR-07 の道の上の待ちで、第 3 段階が確定の深さで決めるもの。HND-19 と IFC-21 は Web Push を SLI-14 の数えから外れる知らせとして道の外に置くが、それは流れが開いていない相手の場合だけで、予算もこの道を 1 件の悪いイベントに数えるだけ。先送りを事業の判断とする仮定もない
 suggestion: 待ちの値を IFC-11 で暫定に決め（DAS-11 に加える）、その道（待ち、Web Push の配信、示すまで）が T_dispatch_propagation に収まるかを予算に書き、HND-19 からこの待ちを外す
-resolution: null
+resolution: 流れで送った出来事の示した時刻が、流れに書いてから 2 秒のうちに届かないときに Web Push でも知らせる待ちを IFC-11 で決め、Web Push を送る呼び出しのタイムアウト 5 秒と一度だけの送り直しを IFC-21 で、配信のホップ 1.0 秒を DEC-46 で決めた（どれも DAS-15）。その道が 4.5 秒と余裕 0.5 秒で T_dispatch_propagation に収まることを報告の予算に加えた。ふだんの示した時刻の報告が待ちのうちに届くよう、流れで受けた変化を示した時刻の報告はためずに送ることにした（IFC-10、HND-17 の bounds）。HND-19 からこの待ちと Web Push を送る呼び出しの値を外した

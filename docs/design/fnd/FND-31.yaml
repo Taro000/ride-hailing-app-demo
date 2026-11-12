@@ -1,6 +1,6 @@
 id: FND-31
 title: いくつかの経路と ACCOUNT_RETIRED の状態の組が、共通の約束事に合っていない
-status: open
+status: accepted
 basis: inferred
 basis_note: DEC-35、DEC-39、DEC-41、DEC-44 と各 IFC の操作と誤りは入力。照らし合わせはこのレビュー
 premises: []
@@ -11,4 +11,4 @@ targets: [IFC-01, IFC-02, IFC-09, IFC-12, IFC-14]
 severity: minor
 evidence: DEC-44 は経路を /v1/ の後の複数形の名詞とし、動詞の操作も名詞の資源で名付けるが、GET /v1/ride-history（IFC-09）、GET /v1/me と GET /v1/client-config（IFC-01）は単数で、POST /v1/places/reverse-geocode（IFC-02）は動詞。DEC-39 は個人の情報で探す一覧を search の操作にし、IFC-12 は POST /v1/console/rides/search と POST /v1/console/audit-records/search と名付けるが、たどる記録の検索を IFC-14 は POST /v1/console/trace-searches と名付ける。同じ符号 ACCOUNT_RETIRED を IFC-01 は 403、IFC-12 は 409 で返し、状態の組で動き方を決める DEC-35 の決まりでは、同じ場面に違う扱いになる。v1 のうちは足す変更だけ（DEC-41）のため、実装の後は直しにくい
 suggestion: 経路と符号を DEC-44、DEC-39、DEC-35 に合わせるか、DEC-44 に許す単数の資源の名前を書き、ACCOUNT_RETIRED の状態の組を一つにする
-resolution: null
+resolution: DEC-44 に、呼んだ人かその端末にとって一つしかない資源（/v1/me、/v1/client-config、…/current）だけを単数にし、探す操作は資源の下の search にすることを書いた。GET /v1/ride-history を GET /v1/past-rides に（IFC-09）、POST /v1/places/reverse-geocode を POST /v1/places/reverse-geocoding に（IFC-02）、POST /v1/console/trace-searches を POST /v1/console/traces/search に（IFC-14）改め、ACCOUNT_RETIRED を IFC-01 でも 409 にして状態の組を一つにした

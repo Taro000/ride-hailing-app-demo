@@ -2,8 +2,8 @@ id: IFC-02
 title: 場所と見積もり
 status: active
 basis: inferred
-basis_note: 場所の候補、住所と位置、道と移動時間を ELM-03 の EXT-02 のつなぎ口だけが求め、到着予定時刻と料金を ELM-03 が求めることと、EXT-02 が失敗するか答えないときは場所の検索と見積もりを止めて依頼させないことは DEC-13（入力）。料金を模擬の運賃表で求め、示した料金を確定額にすることは QR-61、CON-01、FR-03 の 2（入力）。同じ名前の候補を所在地で区別し、選んだ場所の位置を示すことは QR-09（入力）。見積もりを依頼が名指して、示した料金のまま依頼を受け付けることは FR-04 の 1 からの推定。見積もりの有効期限の値は第 4 段階が ELM-03 の料金を求めるモジュールで決める
-premises: [EXT-02, TC-12]
+basis_note: 場所の候補、住所と位置、道と移動時間を ELM-03 の EXT-02 のつなぎ口だけが求め、到着予定時刻と料金を ELM-03 が求めることと、EXT-02 が失敗するか答えないときは場所の検索と見積もりを止めて依頼させないことは DEC-13（入力）。料金を模擬の運賃表で求め、示した料金を確定額にすることは QR-61、CON-01、FR-03 の 2（入力）。同じ名前の候補を所在地で区別し、選んだ場所の位置を示すことは QR-09（入力）。見積もりを依頼が名指して、示した料金のまま依頼を受け付けることは FR-04 の 1 からの推定。見積もりの有効期限の値は第 4 段階が ELM-03 の料金を求めるモジュールで決める。示した料金を確定額にすることに頼るため CON-01 を前提に挙げたことは FND-32、位置で探す住所の経路を DEC-44 の名詞にしたことは FND-31、SLI-01 の出どころを DEC-43 の操作のまとめ方にそろえたことは FND-23 を受けた（その読み方は QCR-07 で品質チェーンに確かめる）
+premises: [EXT-02, TC-12, CON-01, QCR-07]
 kind: http
 name: 場所と見積もり
 provider: ELM-03
@@ -14,7 +14,7 @@ operations:
     does: 乗客が入れた名前か住所から場所の候補を返す。同じ名前と似た名前の候補は所在地で区別して返す（FR-01 の 1、QR-09）。探す文字は本文で送る（DEC-44）
   - name: GET /v1/places/{placeId}
     does: 選んだ候補の位置と住所を返し、乗客が地図で位置を確かめられるようにする（FR-01 の 1、QR-09）
-  - name: POST /v1/places/reverse-geocode
+  - name: POST /v1/places/reverse-geocoding
     does: 端末が測った現在地（DEC-37 の時刻の添え方）から、乗る場所に示す住所と位置を返す（FR-02）
   - name: POST /v1/quotes
     does: 乗る場所と降りる場所（位置と住所）から、ドライバーが見つかるまでの時間と迎車の時間を含めた目的地への到着予定時刻と、模擬の運賃表で求めた料金の見積もりを作り、見積もりの ID と有効期限とともに返す。依頼（IFC-03）と降りる場所の変更はこの見積もりを名指す（FR-03、FR-47 の 1）
@@ -52,8 +52,8 @@ versioning: DEC-41
 observability: 境界の出来事（DAT-19）と、EXT-02 への呼び出しごとの結果と時間をたどる記録（DAT-18）に残す。探す文字、場所、位置は伏せる（DEC-15）
 sli_bindings:
   - sli: SLI-01
-    events: 乗客が ELM-03 の入口に送った POST /v1/places/search、GET /v1/places/{placeId}、POST /v1/places/reverse-geocode、POST /v1/quotes（システムの境界）。同じたどる ID の送り直しは一つと数え、その操作に最後に返した答えで数える
-    fields: [traceId, route, actorKind, testAccount, environment, receivedAt, respondedAt, httpStatus, errorCode, failureOrigin]
-    method: 境界の出来事（DAT-19）を、本番の環境のデモの回の間のものに絞って数える。見つからない、同じ場所、道がないの答えは GOOD、MAP_SERVICE_UNAVAILABLE（failureOrigin が EXT-02）と 500 と答えのないものは GOOD でない。testAccount が真のものは外す
+    events: 乗客が ELM-03 の入口に送った POST /v1/places/search、GET /v1/places/{placeId}、POST /v1/places/reverse-geocoding、POST /v1/quotes（システムの境界）。同じたどる ID の要求を、DEC-43 の決まりで一つの操作にまとめる
+    fields: [traceId, resend, route, actorKind, testAccount, environment, receivedAt, respondedAt, httpStatus, errorCode, outcome, failureOrigin]
+    method: 境界の出来事（DAT-19）を、本番の環境のデモの回の間のものに絞り、DEC-43 の決まりで操作にまとめて数える。見つからない、同じ場所、道がない、現在地に住所がないの答えは GOOD。MAP_SERVICE_UNAVAILABLE（failureOrigin が EXT-02）か 500 か答えのない要求を一つでも含む操作は GOOD でない（QCR-07）。testAccount が真のものは外す
 spec: null
 as_is: new

@@ -2,8 +2,8 @@ id: IFC-03
 title: 依頼と乗車の操作
 status: active
 basis: assumed
-basis_note: 依頼の状態を ELM-03 だけが今の状態を条件にした書き込みで変え、端末の状態を変える操作を一回の操作ごとのキーで冪等にすることは DEC-08、押さえ、押さえ直し、全額と一部の確定、取り消しを EXT-01 で行うことは DEC-09、お金の操作の試みとキーと結果が分からないときの扱いは DEC-10、確認コードは DEC-25（どれも入力）。操作、誤りの符号、答え方は DEC-35、DEC-42、DEC-45 による推定。押さえと決済と押さえ直しの答えの期限は IFC-17 の待ちから計算し（HND-05、HND-01 を IFC-17 とともに決める）、決済の期限 8.8 秒が T_payment_response（NFR-29 がシステムの境界で数える 10 秒）のうちにあることで、EXT-01 のテスト環境の速さによらず QR-24 の時間のうちに結果か分からないことを示せると確かめた（HND-01）。T_payment_response の値は QAS-33 による品質チェーンの暫定の決定。乗車を始めた位置を記録して SLI-09 を数えることは DAT-07
-premises: [QAS-33, CON-01, CON-08]
+basis_note: 依頼の状態を ELM-03 だけが今の状態を条件にした書き込みで変え、端末の状態を変える操作を一回の操作ごとのキーで冪等にすることは DEC-08、押さえ、押さえ直し、全額と一部の確定、取り消しを EXT-01 で行うことは DEC-09、お金の操作の試みとキーと結果が分からないときの扱いは DEC-10、確認コードは DEC-25（どれも入力）。操作、誤りの符号、答え方は DEC-35、DEC-42、DEC-45 による推定。押さえと決済と押さえ直しの答えの期限は IFC-17 の待ちから計算し（HND-05、HND-01 を IFC-17 とともに決める）、決済の期限 8.8 秒が T_payment_response（NFR-29 がシステムの境界で数える 10 秒）のうちにあることで、EXT-01 のテスト環境の速さによらず QR-24 の時間のうちに結果か分からないことを示せると確かめた（HND-01）。T_payment_response の値は QAS-33 による品質チェーンの暫定の決定。乗車を始めた位置を記録して SLI-09 を数えることは DAT-07。乗る場所を決め始めた端末の時刻を依頼で運ぶことは FND-24、受けたインスタンスが答える前に止まったときの同じキーの送り直しへの答えは FND-22、乗客が押さえ直したことと決済の状態をドライバーに示すことは FND-30、SLI の出どころを DEC-43 の操作のまとめ方にそろえたことは FND-23 を受けた（その読み方は QCR-07 で品質チェーンに確かめる）
+premises: [QAS-33, CON-01, CON-08, QCR-07]
 kind: http
 name: 依頼と乗車の操作
 provider: ELM-03
@@ -11,9 +11,9 @@ consumers: [ELM-01]
 functions: [FR-04, FR-06, FR-07, FR-08, FR-09, FR-10, FR-12, FR-13, FR-23, FR-24, FR-25, FR-26, FR-27, FR-28, FR-29, FR-30, FR-45, FR-46, FR-47, FR-54]
 operations:
   - name: POST /v1/rides
-    does: 乗客の依頼。名指した見積もり（IFC-02）の料金を確定額とし、乗客の支払い方法で確定額を押さえてから依頼を受け付け、届ける相手の規則（DEC-24）に合うドライバーに届ける（FR-04 の 1、FR-54 の 1）
+    does: 乗客の依頼。名指した見積もり（IFC-02）の料金を確定額とし、乗客の支払い方法で確定額を押さえてから依頼を受け付け、届ける相手の規則（DEC-24）に合うドライバーに届ける（FR-04 の 1、FR-54 の 1）。要求は、この手配で乗客が乗る場所を決め始めた端末の時刻（pickupPlanningStartedAt、DEC-37 の添え方）を必ず持ち、ELM-03 は依頼を書く取引で、それを直した時刻を依頼の経過の「乗る場所を決め始めた」として書く（FR-45 の 1、DAT-09）。欠けているか送った時刻より後なら 400 VALIDATION_FAILED
   - name: GET /v1/rides/current
-    does: 呼んだ人の進んでいる依頼の今の状態を返す。乗客には、探している、確定した配車のドライバーの名前と車の手がかり、迎車の位置と着く見込み、迎車の到着、確認コードと乗る前の案内、乗車中の降りる場所と車の位置を、ドライバーには、乗車場所と乗客の現在地と名前、乗車が始まってからの降りる場所を返す。示す範囲は DEC-15 の決まりによる（FR-06、FR-08、FR-09、FR-10、FR-12 の 1、FR-13、FR-24、FR-25）
+    does: 呼んだ人の進んでいる依頼の今の状態を返す。乗客には、探している、確定した配車のドライバーの名前と車の手がかり、迎車の位置と着く見込み、迎車の到着、確認コードと乗る前の案内、乗車中の降りる場所と車の位置を、ドライバーには、乗車場所と乗客の現在地と名前、乗車が始まってからは乗客の現在地に代えて降りる場所、到着を確認した後は決済の状態（済んだ、拒否されて乗客の支払い方法の変更を待つ、乗客が押さえ直してやり直せる、分からない）を返す。示す範囲は DEC-15 の決まりによる（FR-06、FR-08、FR-09、FR-10、FR-12 の 1、FR-13、FR-24、FR-25、FR-29 の 4、5）
   - name: POST /v1/rides/{rideId}/cancellation
     does: 乗客の取り消し。許諾の前は無料で取り消して押さえを解き、許諾の後はキャンセル料（CON-08）を確かめたときだけ取り消し、取り消しを書いた後にキャンセル料を請求する（FR-07、FR-54 の 6、8）
   - name: POST /v1/rides/{rideId}/driver-cancellation
@@ -27,7 +27,7 @@ operations:
   - name: POST /v1/rides/{rideId}/destination-changes/{changeId}/approval
     does: 乗客の承認。新しい確定額で押さえ直し、済んでから降りる場所と確定額を変え、前の押さえを解き、ドライバーに新しい降りる場所を示す（FR-47 の 2、FR-54 の 4、DEC-09）
   - name: PUT /v1/rides/{rideId}/payment-method
-    does: 進んでいる依頼の支払い方法を、乗客が登録した新しい支払い方法（IFC-07）に変える。新しい支払い方法で押さえ直し、済んでから前の押さえを解く。決済が拒否された依頼では、これでドライバーが決済をやり直せる（FR-46 の 5、FR-29 の 4、DEC-09）
+    does: 進んでいる依頼の支払い方法を、乗客が登録した新しい支払い方法（IFC-07）に変える。新しい支払い方法で押さえ直し、済んでから前の押さえを解く。決済が拒否された依頼では、押さえ直しが済むとドライバーに流れの ride.payment_method_changed（IFC-11）で知らせ、ドライバーが決済をやり直せる（FR-46 の 5、FR-29 の 4、DEC-09）
   - name: POST /v1/rides/{rideId}/arrival
     does: ドライバーの到着の確認。到着を確認した場所と時刻を記録し、乗車を終えて決済に進む（FR-28、FR-13 の 2）
   - name: POST /v1/rides/{rideId}/payment
@@ -102,7 +102,7 @@ errors:
   - case: 決済の結果が、最初に送ってから待ちのうちに分からない
     signal: 202 with code PAYMENT_PENDING
     caller_does: 済んだかどうか分からないことを示し、流れの ride.charge_settled を待つ。やり直しは同じ冪等キーで送り、新しいキーで送っても同じ試みを確かめた結果を受ける（FR-29 の 5、FR-30 の 2、DEC-45）
-idempotency: GET は繰り返してよい。状態を変えるどの操作も冪等キー（DEC-42）を付け、送り直しには最初の答えを返す（決済の結果が分からないときは、そのときの結果）。依頼は乗客ごとに進んでいる依頼を一つまでとし（FR-04 の 4）、許諾、取り消し、乗車の開始、到着の確認は今の状態を条件に書くので、重なった操作は先に書けた一つだけが通る（DEC-08）。決済は一つの乗車に済んだか結果が分からない試みを一つまでしか持たず、新しいキーの決済でも済んでいれば最初の結果を、分からなければその試みを確かめた結果を答える（FR-30、DEC-45）。EXT-01 へのキーは試みごとに ELM-03 が作る（IFC-17）
+idempotency: GET は繰り返してよい。降りる場所の変更の見積もり（POST /v1/rides/{rideId}/destination-changes）は見積もりを作るだけで、送り直すと別の見積もりができ、承認が名指すのは一つだけのため、冪等キーを付けない（DEC-42）。ほかの状態を変えるどの操作も冪等キー（DEC-42）を付け、送り直しには最初の答えを返す（決済の結果が分からないときは、そのときの結果）。外部を呼ばない操作（取り消し、ドライバーの取り消し、不在、乗車の開始、到着の確認）は結果とキーを一つの取引で書くので、答える前に受けたインスタンスが止まれば送り直しが初めから行う。外部を呼ぶ操作（依頼、承認、支払い方法の変更、決済）は試みとともにキーを動いているとして書き、答えの期限（8.8 秒）のうちの送り直しには 409 OPERATION_IN_PROGRESS、期限を過ぎても答えがなければ試みの状態から DEC-45 のとおりに答える（押さえと押さえ直しは HOLD_UNCONFIRMED か REHOLD_UNCONFIRMED か PAYMENT_DECLINED、決済は試みの今の結果）。依頼は乗客ごとに進んでいる依頼を一つまでとし（FR-04 の 4）、許諾、取り消し、乗車の開始、到着の確認は今の状態を条件に書くので、重なった操作は先に書けた一つだけが通る（DEC-08）。決済は一つの乗車に済んだか結果が分からない試みを一つまでしか持たず、新しいキーの決済でも済んでいれば最初の結果を、分からなければその試みを確かめた結果を答える（FR-30、DEC-45）。EXT-01 へのキーは試みごとに ELM-03 が作る（IFC-17）
 timing:
   timeout: 時間のしきい値の SLO とお金の道の上の操作の値を決める。押さえと押さえ直しと決済（POST /v1/rides、承認、PUT /v1/rides/{rideId}/payment-method、POST /v1/rides/{rideId}/payment）は、ELM-03 の答えの期限が、自身の処理と取引の 0.2 秒と、最初に EXT-01 に送ってからの待ち 8.5 秒（IFC-17）と、結果を書く取引の 0.1 秒の和の 8.8 秒で、決済の 8.8 秒は T_payment_response（10 秒）のうち。ELM-01 のタイムアウトは 15 秒（8.8 秒と通信の余裕 5 秒の和より長い）。乗客の取り消し（NFR-07 の道とキャンセル料）、ドライバーの取り消し（NFR-07 の道）、乗客の不在（不在の料金）は外部を呼ばず、ELM-03 の答えの期限は 2 秒、ELM-01 のタイムアウトは 10 秒（2 秒と余裕 5 秒の和より長い）。料金の請求と押さえを解くことはこれらの操作の答えを待たせず、期限の処理（DEC-46 の 5 秒の間隔）が送る。タイムアウトしたら同じ冪等キーで送り直し、つながらない間は送り直す操作を持ってつながったら送る（DEC-08、DEC-17）。値は DEC-46 と IFC-17 による。ほかの操作（今の状態、乗車の開始、到着の確認、降りる場所の変更の見積もり）は時間のしきい値の SLO とお金の道になく、枠だけを決める。ELM-03 の答えの期限は自身の取引の最悪（見積もりは EXT-02 の呼び出しのタイムアウトとやり直しの和、HND-07）より長く、ELM-01 のタイムアウトはその期限に通信の余裕を足したものより長い。値は第 4 段階が決める（ELM-01 は HND-17、ELM-03 の期限は HND-19）
   ordering: null
@@ -111,24 +111,24 @@ versioning: DEC-41
 observability: 境界の出来事（DAT-19）、依頼の経過（DAT-09。依頼したときの料金と示した到着予定時刻、届けた先、許諾、迎車の到着、乗車の開始、降りる場所の変更、到着の確認とその場所、決済とその額、取り消しと不在とそれを行った人、FR-45）、たどる記録（DAT-18）、操作の記録（DAT-17。料金を確かめて依頼したこと、降りる場所と料金の承認、キャンセル料を確かめた取り消し、不在として終えたこと、到着の確認、QR-12）に残す
 sli_bindings:
   - sli: SLI-01
-    events: 乗客が ELM-03 の入口に送った POST /v1/rides と、乗車の開始の前の POST /v1/rides/{rideId}/cancellation（システムの境界）。同じたどる ID の送り直しは一つと数え、その操作に最後に返した答えで数える
-    fields: [traceId, idempotencyKey, route, actorKind, ridePhase, testAccount, environment, receivedAt, respondedAt, httpStatus, errorCode, failureOrigin]
-    method: 境界の出来事（DAT-19）を、本番の環境のデモの回の間のものに絞って数える。PAYMENT_DECLINED、RIDE_ALREADY_ACTIVE、PAYMENT_METHOD_REQUIRED は受け付けない入力か決済サービスの拒否の知らせとして GOOD、HOLD_UNCONFIRMED（failureOrigin が EXT-01）と 500 と答えのないものは GOOD でない。testAccount が真のものは外す
+    events: 乗客が ELM-03 の入口に送った POST /v1/rides と、乗車の開始の前の POST /v1/rides/{rideId}/cancellation（システムの境界）。同じたどる ID の要求を、DEC-43 の決まりで一つの操作にまとめる（端末が答えを受ける前の送り直しと 409 OPERATION_IN_PROGRESS の後の送り直しは同じ操作、ほかの答えを受けた後の送り直しは新しい操作）
+    fields: [traceId, resend, idempotencyKey, route, actorKind, ridePhase, testAccount, environment, receivedAt, respondedAt, httpStatus, errorCode, outcome, failureOrigin]
+    method: 境界の出来事（DAT-19）を、本番の環境のデモの回の間のものに絞り、DEC-43 の決まりで操作にまとめて、最初の要求を受けた日に数える。PAYMENT_DECLINED、RIDE_ALREADY_ACTIVE、PAYMENT_METHOD_REQUIRED、CANCELLATION_FEE_CONFIRMATION_REQUIRED は受け付けない入力か決済サービスの拒否の知らせとして GOOD。HOLD_UNCONFIRMED か PAYMENT_SERVICE_UNAVAILABLE（failureOrigin が EXT-01）か 500 か答えのない要求を一つでも含む操作は GOOD でない（QCR-07）。testAccount が真のものは外す
   - sli: SLI-02
-    events: 乗客が ELM-03 の入口に送った GET /v1/rides/current のうち、受けたときの依頼が迎車中か迎車が着いた状態（ridePhase が assigned か pickup_arrived）のもの。数え方は SLI-01 と同じ
-    fields: [traceId, route, actorKind, ridePhase, testAccount, environment, receivedAt, respondedAt, httpStatus, errorCode, failureOrigin]
-    method: 境界の出来事（DAT-19）を、受けたときの依頼の状態で絞って数える
+    events: 乗客が ELM-03 の入口に送った GET /v1/rides/current のうち、最初の要求を受けたときの依頼が迎車中か迎車が着いた状態（ridePhase が assigned か pickup_arrived）のもの。操作へのまとめ方と数え方は SLI-01 と同じ（DEC-43）
+    fields: [traceId, resend, route, actorKind, ridePhase, testAccount, environment, receivedAt, respondedAt, httpStatus, errorCode, outcome, failureOrigin]
+    method: 境界の出来事（DAT-19）を、最初の要求を受けたときの依頼の状態で絞り、DEC-43 の決まりで操作にまとめて数える
   - sli: SLI-03
-    events: 乗客が ELM-03 の入口に送った GET /v1/rides/current のうち、受けたときの依頼が乗車中（ridePhase が riding）のもの。数え方は SLI-01 と同じ
-    fields: [traceId, route, actorKind, ridePhase, testAccount, environment, receivedAt, respondedAt, httpStatus, errorCode, failureOrigin]
-    method: 境界の出来事（DAT-19）を、受けたときの依頼の状態で絞って数える
+    events: 乗客が ELM-03 の入口に送った GET /v1/rides/current のうち、最初の要求を受けたときの依頼が乗車中（ridePhase が riding）のもの。操作へのまとめ方と数え方は SLI-01 と同じ（DEC-43）
+    fields: [traceId, resend, route, actorKind, ridePhase, testAccount, environment, receivedAt, respondedAt, httpStatus, errorCode, outcome, failureOrigin]
+    method: 境界の出来事（DAT-19）を、最初の要求を受けたときの依頼の状態で絞り、DEC-43 の決まりで操作にまとめて数える
   - sli: SLI-05
-    events: ドライバーが ELM-03 の入口に送った GET /v1/rides/current のうち受けたときの依頼が迎車中か迎車が着いた状態のものと、POST /v1/rides/{rideId}/boarding。数え方は SLI-01 と同じ
-    fields: [traceId, idempotencyKey, route, actorKind, ridePhase, testAccount, environment, receivedAt, respondedAt, httpStatus, errorCode, failureOrigin]
-    method: 境界の出来事（DAT-19）から数える。CONFIRMATION_CODE_MISMATCH と CONFIRMATION_CODE_LOCKED は受け付けない入力の知らせとして GOOD
+    events: ドライバーが ELM-03 の入口に送った GET /v1/rides/current のうち最初の要求を受けたときの依頼が迎車中か迎車が着いた状態のものと、POST /v1/rides/{rideId}/boarding。操作へのまとめ方と数え方は SLI-01 と同じ（DEC-43）
+    fields: [traceId, resend, idempotencyKey, route, actorKind, ridePhase, testAccount, environment, receivedAt, respondedAt, httpStatus, errorCode, outcome, failureOrigin]
+    method: 境界の出来事（DAT-19）を DEC-43 の決まりで操作にまとめて数える。CONFIRMATION_CODE_MISMATCH と CONFIRMATION_CODE_LOCKED は受け付けない入力の知らせとして GOOD。500 か答えのない要求を一つでも含む操作は GOOD でない（QCR-07）
   - sli: SLI-06
-    events: ドライバーが ELM-03 の入口に送った POST /v1/rides/{rideId}/arrival と POST /v1/rides/{rideId}/payment。数え方は SLI-01 と同じ
-    fields: [traceId, idempotencyKey, route, actorKind, ridePhase, testAccount, environment, receivedAt, respondedAt, httpStatus, errorCode, failureOrigin]
-    method: 境界の出来事（DAT-19）から数える。PAYMENT_DECLINED は決済サービスが支払いを受け付けなかった知らせとして GOOD、PAYMENT_PENDING（failureOrigin が EXT-01）と 500 と答えのないものは GOOD でない
+    events: ドライバーが ELM-03 の入口に送った POST /v1/rides/{rideId}/arrival と POST /v1/rides/{rideId}/payment。操作へのまとめ方と数え方は SLI-01 と同じ（DEC-43）
+    fields: [traceId, resend, idempotencyKey, route, actorKind, ridePhase, testAccount, environment, receivedAt, respondedAt, httpStatus, errorCode, outcome, failureOrigin]
+    method: 境界の出来事（DAT-19）を DEC-43 の決まりで操作にまとめて数える。PAYMENT_DECLINED は決済サービスが支払いを受け付けなかった知らせとして、PAYMENT_METHOD_CHANGE_REQUIRED は受け付けない入力の知らせとして GOOD。PAYMENT_PENDING か PAYMENT_SERVICE_UNAVAILABLE（failureOrigin が EXT-01）か 500 か答えのない要求を一つでも含む操作は GOOD でない（QCR-07）
 spec: null
 as_is: new

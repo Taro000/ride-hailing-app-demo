@@ -2,7 +2,7 @@ id: IFC-19
 title: 地図のサービスの API（EXT-02）
 status: active
 basis: assumed
-basis_note: 場所の候補、住所と位置、二つの場所の間の道の長さと移動時間をサーバーの一つのつなぎ口から求め、EXT-02 が失敗するか答えないときは場所の検索と見積もりを止め、確定した依頼と乗車は止めず、迎車中と乗車中の着く見込みをサーバーが新しい位置から決まった間隔で求め直すことは DEC-13（入力）。製品が Google Maps Platform であることは TC-12（入力）。使う API と項目（Places API (New) の Autocomplete と Place Details、Geocoding API の逆の検索、Routes API の computeRoutes）は Google Maps Platform の文書による（POL-05、報告の「入力」）。名前と連絡先を渡さないことは DEC-13 と脅威のモデルの F7（入力）。着く見込みを求め直す間隔を決めて HND-08 を決めた。間隔の値は DAS-11 による暫定の決定で、着く見込みの遅れが T_vehicle_location_lag に収まることは報告の「遅延の予算とタイムアウト」で計算した。呼び出しのタイムアウトとやり直しは HND-07 で第 4 段階
+basis_note: 場所の候補、住所と位置、二つの場所の間の道の長さと移動時間をサーバーの一つのつなぎ口から求め、EXT-02 が失敗するか答えないときは場所の検索と見積もりを止め、確定した依頼と乗車は止めず、迎車中と乗車中の着く見込みをサーバーが新しい位置から決まった間隔で求め直すことは DEC-13（入力）。製品が Google Maps Platform であることは TC-12（入力）。使う API と項目（Places API (New) の Autocomplete と Place Details、Geocoding API の逆の検索、Routes API の computeRoutes）は Google Maps Platform の文書による（POL-05、報告の「入力」）。名前と連絡先を渡さないことは DEC-13 と脅威のモデルの F7（入力）。着く見込みを求め直す間隔を決めて HND-08 を決めた。間隔の値は DAS-11 による暫定の決定で、着く見込みの遅れが T_vehicle_location_lag に収まることは報告の「遅延の予算とタイムアウト」で計算した。呼び出しのタイムアウトとやり直しは HND-07 で第 4 段階で、着く見込みを求め直す呼び出しがやり直しを含めて諦めるまでの枠を、その計算から書いたことは FND-28 を受けた
 premises: [EXT-02, TC-12, DAS-11]
 kind: http
 name: 地図のサービスの API（Google Maps Platform）
@@ -36,7 +36,7 @@ errors:
     caller_does: 異常として記録し、上と同じに答える
 idempotency: どの呼び出しも読むだけで繰り返してよい
 timing:
-  timeout: 呼び出しのタイムアウトとやり直しの回数と間隔は第 4 段階が決める（HND-07。DEC-13 のタイムアウトの順を守る）。迎車中と乗車中の着く見込みは、新しい位置を受けたときに、前に求めてから 10 秒以上たっていれば求め直す（HND-08）。求め直しに使う位置が T_vehicle_location_lag より古ければ求めず、着く見込みを示せないとする。値は DAS-11
+  timeout: 呼び出しのタイムアウトとやり直しの回数と間隔は第 4 段階が決める（HND-07。DEC-13 のタイムアウトの順を守る）。迎車中と乗車中の着く見込みは、新しい位置を受けたときに、前に求めてから 10 秒以上たっていれば求め直す（HND-08）。求め直しに使う位置が T_vehicle_location_lag より古ければ求めず、着く見込みを示せないとする。着く見込みを求め直す呼び出しは、やり直しを含めて最初に送ってから 8.5 秒のうちに答えを得なければ諦め、着く見込みを示せないとする（T_vehicle_location_lag の 30 秒から、位置の古さ 10.7 秒、求め直す間隔 10 秒、流れと示すまで 0.8 秒を引いた残り。報告の「遅延の予算とタイムアウト」）。第 4 段階はこの枠の中で値を決める（HND-07）。値は DAS-11
   ordering: null
   delivery: null
 versioning: Places API (New) の v1、Geocoding API、Routes API の v2 の端点（EXT-02 の文書）。項目は FieldMask で決めたものだけを求める

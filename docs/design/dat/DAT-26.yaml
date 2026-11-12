@@ -2,15 +2,16 @@ id: DAT-26
 title: 冪等キーの記録
 status: active
 basis: inferred
-basis_note: 端末の状態を変える操作に一回の操作ごとのキーを付け、同じキーの二度目に一度目の結果を返すことは DEC-08（入力）。キーの範囲、答え方、持つ期間は DEC-42（その期間は DEC-42 の parameters）。最初の答えが個人の情報を含みうるため個人の情報とすることは推定
+basis_note: 端末の状態を変える操作に一回の操作ごとのキーを付け、同じキーの二度目に一度目の結果を返すことは DEC-08（入力）。キーの範囲、答え方、書き方、持つ期間は DEC-42（その期間は DEC-42 の parameters）。外部を呼ばない操作は結果とキーを一つの取引で書いて動いている印を持たず、外部を呼ぶ操作は試みとともに動いている印と答えの期限を書き、期限の後の送り直しが試みから答えることは、FND-22 を受けて DEC-42 とともに決めた。最初の答えが個人の情報を含みうるため個人の情報とすることは推定
 premises: []
 entity: 冪等キーと最初の答え
 owner: ELM-03
 store: ELM-04
-key_attributes: [accountId, route, idempotencyKey, requestHash, status, response, firstReceivedAt]
+key_attributes: [accountId, route, idempotencyKey, requestHash, status, response, attemptId, answerDueAt, firstReceivedAt]
 relations:
   - {to: DAT-01, kind: many-to-one, note: キーを送ったアカウント}
-consistency: 要求を処理する前に動いているとして書き、答えたときに答えを書く（DEC-42）。操作の結果と同じ取引で書けるものは同じ取引で書く。お金の操作で結果が分からないと答えたものは、送り直しにそのときの結果を答える（DEC-45）
+  - {to: DAT-11, kind: one-to-one, note: 外部を呼ぶ操作の試み（あるとき）}
+consistency: アカウント、操作、キーの組で一つ（DEC-42）。外部を呼ばない操作は、操作の結果と同じ取引でキーと答えを書き、その前に動いている印を書かない。同じキーの要求が重なれば、先に取引を終えた一つだけが書け、ほかはその答えを返す。答える前に止まった操作は何も書いておらず、送り直しが初めから行う。外部を呼ぶ操作（お金の操作と支払い方法の登録）は、呼ぶ前の取引で試み（DAT-11）とともにキーを動いている（status が in_progress）として、その操作の答えの期限の時刻（answerDueAt）とともに書き、結果を書く取引で答えを書く。答えを書く取引はキーがまだ in_progress のときだけ書き、answerDueAt を過ぎて同じキーの送り直しを受けた ELM-03 は試みの状態から DEC-45 の答えを書く。先に書けた答えが残り、遅れた方はそれを上書きしない。お金の操作で結果が分からないと答えたものは、送り直しにそのときの結果を答える（DEC-45）。状態は報告の「要素をまたぐ状態」
 retention: 最初に受けてから 24 時間（DEC-42）
 classification: personal
 drivers: [DRV-02, DRV-32]

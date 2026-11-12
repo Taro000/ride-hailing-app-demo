@@ -2,8 +2,8 @@ id: IFC-06
 title: 連絡のメッセージ
 status: active
 basis: inferred
-basis_note: 乗客とドライバーの連絡を、配車が確定してから乗車が始まるまでサーバーを通るアプリの中のメッセージで行い、車が走っている間はドライバーから送らせず中身も示さないことは DEC-27（入力。走っている間の扱いは設計の第 2 段階の質問 4 で確認済みで、QCR-04 は回答済み）。走っているかの判断は DEC-22 と同じ（入力）。操作と誤りの符号は DEC-35、DEC-42 による推定
-premises: [QCR-04]
+basis_note: 乗客とドライバーの連絡を、配車が確定してから乗車が始まるまでサーバーを通るアプリの中のメッセージで行い、車が走っている間はドライバーから送らせず中身も示さないことは DEC-27（入力。走っている間の扱いは設計の第 2 段階の質問 4 で確認済みで、QCR-04 は回答済み）。走っているかの判断は DEC-22 と同じ（入力）。操作と誤りの符号は DEC-35、DEC-42 による推定。SLI-02 の出どころを DEC-43 の操作のまとめ方にそろえたことは FND-23 を受けた（その読み方は QCR-07 で品質チェーンに確かめる）
+premises: [QCR-04, QCR-07]
 kind: http
 name: 連絡のメッセージ
 provider: ELM-03
@@ -39,8 +39,8 @@ versioning: DEC-41
 observability: 境界の出来事（DAT-19）に残す。メッセージの中身は暗号にして持ち（DEC-16）、ログ、たどる記録、知らせには書かない（DEC-15、DEC-21）
 sli_bindings:
   - sli: SLI-02
-    events: 迎車中の依頼の乗客が ELM-03 の入口に送った GET /v1/rides/{rideId}/messages と POST /v1/rides/{rideId}/messages（ドライバーへの連絡、システムの境界）。同じたどる ID の送り直しは一つと数え、その操作に最後に返した答えで数える
-    fields: [traceId, idempotencyKey, route, actorKind, ridePhase, testAccount, environment, receivedAt, respondedAt, httpStatus, errorCode, failureOrigin]
-    method: 境界の出来事（DAT-19）を、本番の環境のデモの回の間のものに絞って数える。MESSAGING_CLOSED は受け付けない入力の知らせとして GOOD
+    events: 迎車中の依頼の乗客が ELM-03 の入口に送った GET /v1/rides/{rideId}/messages と POST /v1/rides/{rideId}/messages（ドライバーへの連絡、システムの境界）。同じたどる ID の要求を、DEC-43 の決まりで一つの操作にまとめる
+    fields: [traceId, resend, idempotencyKey, route, actorKind, ridePhase, testAccount, environment, receivedAt, respondedAt, httpStatus, errorCode, outcome, failureOrigin]
+    method: 境界の出来事（DAT-19）を、本番の環境のデモの回の間のものに絞り、DEC-43 の決まりで操作にまとめて、最初の要求を受けた日に数える。MESSAGING_CLOSED は受け付けない入力の知らせとして GOOD。500 か答えのない要求を一つでも含む操作は GOOD でない（QCR-07）。testAccount が真のものは外す
 spec: null
 as_is: new

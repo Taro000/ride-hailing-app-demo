@@ -2,8 +2,8 @@ id: IFC-01
 title: Web アプリの起動と本人の確かめ
 status: active
 basis: inferred
-basis_note: 担当者が渡す設定の符号で本人がパスワードを決め、サーバーのセッションで使わせることは DEC-14（入力、設計の第 2 段階の質問 3 で確認済み）、認証のライブラリを使わないことは DEC-30（入力）。Web アプリが環境ごとの値を起動のときに ELM-03 の一つの操作から読み、ELM-03 は自身の確かめた設定から公開してよい値と偽物の選び方だけを渡すことは DEC-34 と POL-04（入力）で、その操作を GET /v1/client-config としてこの IFC に入れて HND-15 を決めた。操作、誤りの符号、冪等性、版の扱いは共通の約束事（DEC-35〜DEC-44）からの推定。サインインの ID の形は DEC-36。SLI-01 と SLI-04 の出どころは DEC-23 の入口の記録による推定
-premises: [TC-16]
+basis_note: 担当者が渡す設定の符号で本人がパスワードを決め、サーバーのセッションで使わせることは DEC-14（入力、設計の第 2 段階の質問 3 で確認済み）、認証のライブラリを使わないことは DEC-30（入力）。Web アプリが環境ごとの値を起動のときに ELM-03 の一つの操作から読み、ELM-03 は自身の確かめた設定から公開してよい値と偽物の選び方だけを渡すことは DEC-34 と POL-04（入力）で、その操作を GET /v1/client-config としてこの IFC に入れて HND-15 を決めた。操作、誤りの符号、冪等性、版の扱いは共通の約束事（DEC-35〜DEC-44）からの推定。サインインの ID の形は DEC-36。SLI-01 と SLI-04 の出どころは DEC-23 の入口の記録による推定で、要求を一つの操作にまとめる決まりと答えのない要求を含む操作の数え方を DEC-43 にそろえたことは FND-23 を受けた（その読み方は QCR-07 で品質チェーンに確かめる）。ACCOUNT_RETIRED をほかの IFC と同じ 409 にしたことは FND-31 を受けた
+premises: [TC-16, QCR-07]
 kind: http
 name: Web アプリの起動と本人の確かめ
 provider: ELM-03
@@ -34,8 +34,8 @@ errors:
     signal: 423 with code ACCOUNT_LOCKED and retryAfterSeconds
     caller_does: 止めていることと待つ時間を示す（値は HND-12）
   - case: アカウントが個人を特定できない形に変わって使えない（FR-51 の 4）
-    signal: 403 with code ACCOUNT_RETIRED
-    caller_does: 担当者に新しいアカウントを頼むよう示す（FR-51 の 4、FR-41）
+    signal: 409 with code ACCOUNT_RETIRED
+    caller_does: このアカウントは使えないことと、担当者に新しいアカウントを頼むよう示す（FR-51 の 4、FR-41）
   - case: 設定の符号が合わないか、使ったか、期限が過ぎた（どれに当たるかは明かさない）
     signal: 422 with code SETUP_CODE_INVALID
     caller_does: 担当者に符号を出し直してもらうよう示す（DEC-14）
@@ -54,12 +54,12 @@ versioning: DEC-41（経路の /v1、足すだけ）。Web アプリは起動の
 observability: 境界の出来事（DAT-19）と、本人の確かめの成否と止めたことをたどる記録（DAT-18）に残す。サインインの ID とアカウントは仮の名で残し、パスワードと設定の符号は書かない（DEC-15、QR-58）
 sli_bindings:
   - sli: SLI-01
-    events: 乗客のアカウントのサインインの ID で ELM-03 の入口に届いた POST /v1/sessions（システムの境界）。同じたどる ID の送り直しは一つと数え、その操作に最後に返した答えで数える。存在しないサインインの ID の試みは乗客の操作と分からないため数えない
-    fields: [traceId, route, actorKind, testAccount, environment, receivedAt, respondedAt, httpStatus, errorCode, failureOrigin]
-    method: ELM-03 の入口が要求ごとに書く境界の出来事（DAT-19。受けたときに書き、答えたときに結果を足し、結果のない記録は応えなかったものとする）を、本番の環境のデモの回の間のものに絞って数える。AUTH_FAILED と ACCOUNT_LOCKED は確かめられなかった知らせとして GOOD、500 と答えのないものは GOOD でない。testAccount が真のものと、本番でない環境のものは外す
+    events: 乗客のアカウントのサインインの ID で ELM-03 の入口に届いた POST /v1/sessions（システムの境界）。同じたどる ID の要求を、DEC-43 の決まりで一つの操作にまとめる（端末が答えを受ける前の送り直しは同じ操作、答えを受けた後の送り直しは新しい操作）。存在しないサインインの ID の試みは乗客の操作と分からないため数えない
+    fields: [traceId, resend, route, actorKind, testAccount, environment, receivedAt, respondedAt, httpStatus, errorCode, outcome, failureOrigin]
+    method: ELM-03 の入口が要求ごとに書く境界の出来事（DAT-19。受けたときに書き、答えたときに結果を足し、結果のない記録は応えなかったものとする）を、本番の環境のデモの回の間のものに絞り、DEC-43 の決まりで操作にまとめて、最初の要求を受けた日に数える。AUTH_FAILED と ACCOUNT_LOCKED は確かめられなかった知らせとして GOOD。答えのない要求か 500 を一つでも含む操作は GOOD でない（QCR-07）。testAccount が真のものと、本番でない環境のものは外す
   - sli: SLI-04
-    events: ドライバーのアカウントのサインインの ID で ELM-03 の入口に届いた POST /v1/sessions。数え方は SLI-01 と同じ
-    fields: [traceId, route, actorKind, testAccount, environment, receivedAt, respondedAt, httpStatus, errorCode, failureOrigin]
-    method: SLI-01 と同じく境界の出来事（DAT-19）から数える
+    events: ドライバーのアカウントのサインインの ID で ELM-03 の入口に届いた POST /v1/sessions。操作へのまとめ方と数え方は SLI-01 と同じ（DEC-43）
+    fields: [traceId, resend, route, actorKind, testAccount, environment, receivedAt, respondedAt, httpStatus, errorCode, outcome, failureOrigin]
+    method: SLI-01 と同じく境界の出来事（DAT-19）を DEC-43 の決まりで操作にまとめて数える
 spec: null
 as_is: new

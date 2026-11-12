@@ -2,14 +2,14 @@ id: DAT-27
 title: 日々の処理の記録
 status: active
 basis: inferred
-basis_note: 日々の処理を一日一度だけ行い、取ったことを書いてから行うことは DEC-18（入力）。すべての仕事を終えたら終えた記録をログに書くことは DEC-20（入力）で、その項目は IFC-15。属性と保持期間は推定
+basis_note: 日々の処理を一日一度だけ行い、取ったことを書いてから行うことは DEC-18（入力）。すべての仕事を終えたら終えた記録をログに書くことは DEC-20（入力）で、その項目は IFC-15。インスタンスが落ちうることは DEC-05（入力）。取った実行に止まったとみなす時刻を持たせ、それを過ぎたら次の呼び出しが取り直して終わっていない仕事から行い、取り直された実行は書けずに止まることは FND-22 を受けた（推定）。属性と保持期間は推定
 premises: []
 entity: 日々の処理の実行（日ごと）
 owner: ELM-03
 store: ELM-04
-key_attributes: [jobDate, startedAt, finishedAt, state, steps]
+key_attributes: [jobDate, runId, state, takenAt, staleAt, startedAt, finishedAt, steps]
 relations: []
-consistency: その日の処理を取ったことを書いてから行い、一日一度だけ行う（DEC-18）。仕事ごとの結果を書き、すべて済んだら終えた記録をログに書く（IFC-15）
+consistency: その日の処理を取ったこと（実行の ID と、取った時刻に日々の処理の時間の上限を足した、止まったとみなす時刻 staleAt）を書いてから行い、一日一度だけ済ませる（DEC-18）。動いている実行の staleAt を過ぎた呼び出しは、今の値を条件に書き換えて取り直し、終わっていない仕事から行う。仕事ごとの結果と終わりは、その実行がまだ取っているときだけ書くため、取り直された実行は書けずに止まる。仕事の一つが失敗した実行は、失敗を書いて取ったことを外し、次の呼び出しが取り直す。すべて済んだら済んだとして書き、終えた記録をログに書く（IFC-15）。時間の上限の値は第 4 段階（HND-19）
 retention: N_trace_retention_days を過ぎたら日々の処理が消す
 classification: internal
 drivers: [DRV-23, DRV-21, DRV-24]

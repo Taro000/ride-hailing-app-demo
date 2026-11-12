@@ -1,6 +1,6 @@
 id: FND-24
 title: 乗る場所を決め始めたことと評価を始めたことを ELM-03 に届けるインタフェースがなく、FR-45 の 1 と 4 を記録できない
-status: open
+status: accepted
 basis: inferred
 basis_note: FR-45 の受け入れ基準、QIU-02 と QIU-13 の measure、IFC-02、IFC-03、IFC-09、IFC-10、DAT-09 の文、受け入れ基準のたどりの行は入力。どの操作も二つの時点を運ばないことは、このレビューの推定
 premises: []
@@ -11,4 +11,4 @@ targets: [IFC-03, IFC-09, DAT-09]
 severity: major
 evidence: FR-45 の 1 は乗客が乗る場所を決め始めたことを、4 は乗客が評価を始めたことを、時刻とともに記録することを求める。QIU-02 は依頼ごとに決め始めてから T_request_entry のうちに出されたかを数え、QIU-13 は評価を始めた乗車（評価しなかった乗車は含めない）を分母にするため、どちらもこの二つに頼る。どちらも端末の中で起きることで、ELM-03 が知るには端末が送る必要があるが、どの IFC も運ばない。IFC-02 の操作は依頼に結び付かず、その時点を持たない。POST /v1/rides（IFC-03）は見積もりの ID を名指すだけで、IFC-03 の observability は依頼から記録を始める。IFC-10 の端末からの報告はエラーと示した時刻だけ。IFC-09 の observability は「評価を始めたことと記録したこと」を DAT-09 に残すと書くが、評価の操作は記録する評価を送る POST /v1/rides/{rideId}/rating だけで、始めたことを伝えるものはない。DAT-09 は記録する段階に「場所を決め始めたこと」を挙げるが、依頼の ID で結び付き、その ID は POST /v1/rides の後にしかない。受け入れ基準のたどりの FR-45 の 1 と 4 の行が指す流れ（CUJ-01〜CUJ-08 の取引、CUJ-04 ドライバーの評価）にも、この二つを書く所はない
 suggestion: 二つの時点を運ぶ所を IFC で決める。たとえば、乗る場所を決め始めた端末の時刻を POST /v1/rides で送り（DEC-37 の添え方）、評価を始めたことを IFC-09 の操作か IFC-10 の報告で送り、DAT-09 の段階とその出どころをそれに合わせ、受け入れ基準のたどりの行を直す
-resolution: null
+resolution: 乗る場所を決め始めた端末の時刻を、IFC-03 の POST /v1/rides が pickupPlanningStartedAt として必ず運び、ELM-03 が依頼を書く取引で依頼の経過に書くことにした。評価を始めたことは IFC-10 の端末からの報告の種類に加え（functions に FR-45）、ELM-03 が依頼ごとに最初のものを依頼の経過に書く。DAT-09 に二つの段階とその出どころを書き、IFC-09 の observability と IFC-22 の画面をこれに合わせ、報告の CUJ-01 と CUJ-04 の流れと、受け入れ基準のたどりの FR-45 の 1 と 4 の行を直した。IFC-22 が FR-45 を担い、ELM-01 の functions にないため FND-35 を第 2 段階に出した
