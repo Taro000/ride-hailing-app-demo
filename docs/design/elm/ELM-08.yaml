@@ -2,16 +2,16 @@ id: ELM-08
 title: 想定の本番の実行基盤（GCP、東京）
 status: active
 basis: assumed
-basis_note: 本番の実行の基盤を Cloud Run として設計し、実際には配備しないことは TC-08、TC-09（入力）。置き方は DEC-05 により、インスタンスの数は DAS-02 による暫定の決定。外からの生存確認をデモの回の間だけ動かすことは FND-05 を受けて加えた（DEC-20）
+basis_note: 本番の実行の基盤を Cloud Run として設計し、実際には配備しないことは TC-08、TC-09（入力）。置き方は DEC-05 により、インスタンスの数は DAS-02 による暫定の決定。外からの生存確認をデモの回の間だけ動かすことは FND-05 を受けて加えた（DEC-20）。日々の処理が動かなかったか終えなかったことを、ELM-03 を呼ばずに回を問わず見張ってメールで知らせるアラートと、それが読むログは FND-09 を受けて加えた（DEC-20）
 premises: [TC-08, TC-15, DAS-02]
 kind: node
 name: 想定の本番の実行基盤（GCP、東京）
-responsibility: 想定の本番で ELM-03 のコンテナを動かす。日々の処理の呼び出し、秘密の値の置き場所、デモの回の間だけ動かす外からの生存確認もここに置く。実際には配備しない
+responsibility: 想定の本番で ELM-03 のコンテナを動かす。日々の処理の呼び出し、秘密の値の置き場所、ELM-03 と日々の呼び出しのログ、デモの回の間だけ動かす外からの生存確認と、回を問わず日々の処理を見張るアラートもここに置き、サーバーの停止と日々の処理が終わらないことを開発者にメールで知らせる。実際には配備しない
 functions: []
-drivers: [DRV-01, DRV-15, DRV-16, DRV-23]
+drivers: [DRV-01, DRV-15, DRV-16, DRV-23, DRV-24]
 decisions: [DEC-05, DEC-18, DEC-20]
 team: TEAM-01
-technology: GCP の Cloud Run（東京リージョン、CPU を常に割り当てる）、Cloud Scheduler、Secret Manager、Cloud Monitoring の生存確認
+technology: GCP の Cloud Run（東京リージョン、CPU を常に割り当てる）、Cloud Scheduler、Secret Manager、Cloud Logging、Cloud Monitoring の生存確認とアラート
 runs_on: null
 depends_on: []
 as_is: new
