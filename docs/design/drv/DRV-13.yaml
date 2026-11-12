@@ -1,0 +1,31 @@
+id: DRV-13
+title: 問題のある変更を止めるか前の版に戻しても、進んでいる依頼と記録を使い続けられる
+status: active
+basis: assumed
+basis_note: 変更のシナリオは QR-39、QR-69、QR-40（最低限守る線）と FR-36 と NFR-41、NFR-42 のゲート（入力）から。前の版が新しい版の書いた記録を読めるかで、保存するデータの形の変え方が分かれるため、設計を動かす要求にした（推定）。T_rollback の値は QAS-39 による。配備はデモの回を開くときに行う（TC-15）。順位は質問 6 を待つ
+premises: [TC-15, QAS-39]
+kind: change
+statement: 新しい版や変えた振る舞いに問題があれば、システムを動かしたまま変えた振る舞いを止めるか、決まった自動の手順で T_rollback のうちに前の版に戻せ、進んでいる依頼と乗車とそれまでの記録をそのまま使い続けられる。利用技術の版上げでデータを移しても、データは失われず変わらない
+sources: [QR-39, QR-69, QR-40, FR-36, NFR-41, NFR-42]
+concern_of: [USR-03]
+scenario:
+  source: エンジニア（USR-03）
+  stimulus: 公開した変更や利用技術の版上げに問題が見つかる
+  artifact: 配備の手順、変えた振る舞いの切り替え（FR-36）、保存するデータの形
+  environment: デモの回を開くときの配備（TC-15）。配車を止めずに入れ替えることは求めない
+  response: 変えた振る舞いを止めるか前の版に戻すと元の振る舞いに戻り、進んでいる依頼と乗車と記録は前の版でもそのまま使える
+  measure: NFR-41 のゲート、NFR-42 のゲート
+negotiable: null
+derived_from: []
+priority:
+  business: medium
+  business_reason: QR-39、QR-69、QR-40 は最低限守る線
+  difficulty: medium
+  difficulty_reason: 前の版が新しい版の書いたデータを読めるように保存するデータの形の変え方を決め、変えた振る舞いを動かしたまま切り替える
+  rank: 30
+primary: false
+conflicts: []
+placeholders:
+  - name: T_rollback
+    meaning: 新しい版や変えた振る舞いを戻すと決めてから、前の振る舞いに戻るまでの時間
+    from: QR-39

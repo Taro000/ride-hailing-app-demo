@@ -1,0 +1,28 @@
+id: DRV-26
+title: 状態の変化を相手の画面に示した時刻が見える
+status: active
+basis: assumed
+basis_note: SLI-14 の見る位置（利用者の側）と数え方の規則と FR-53（入力）から。FR-53 を今期作ることは QAS-54 による。相手の端末が前に出ていない間の扱いは質問 2 と QCR-02 を、順位は質問 6 を待つ
+premises: [OPF-01, TC-13, QAS-54, QCR-02]
+kind: observability
+statement: 依頼、許諾、取り消し、迎車の到着が相手の画面、一覧、知らせに示されたとき、その時刻がその依頼と相手に結び付いて見え、相手の端末がつながっていないために示せなかったことと、後で示した時刻も見える
+sources: [SLI-14, FR-53, NFR-07]
+concern_of: [USR-03]
+scenario:
+  source: デモの回の後に SLO を数えるエンジニア（USR-03）
+  stimulus: 状態の変化が相手の画面、一覧、知らせに示されるか、相手の端末がつながっていないために示せない
+  artifact: 相手の端末の画面（SLI-14 の数える単位の出来事）
+  environment: デモの回の間（OPF-01）。相手の端末は iOS の Safari で使う Web アプリ（TC-13）で、前に出ていないことがある
+  response: 示した時刻、示せなかったこと、後で示した時刻が、依頼と相手に結び付いて残る
+  measure: SLI-14 を定義どおりに数えられること（NFR-07 の SLO）
+negotiable: null
+derived_from: []
+priority:
+  business: high
+  business_reason: 重視の QR-06 の SLO を数える
+  difficulty: medium
+  difficulty_reason: 相手の端末が示した時刻を、つながり直した後も失わずにシステムへ返す。前に出ていない間は示せない（DRV-14）
+  rank: 14
+primary: false
+conflicts: []
+placeholders: []

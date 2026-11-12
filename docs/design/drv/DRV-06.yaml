@@ -1,0 +1,31 @@
+id: DRV-06
+title: 手配のときに示す到着予定時刻どおりに着く
+status: active
+basis: assumed
+basis_note: シナリオは QR-08（重視）と NFR-08 の SLO（入力）から。T_arrival_estimate_gap の値と目標は QAS-26 による。SLI-08 は FRP-14 が決まるまで、乗車中に降りる場所を変えた乗車だけを数える（報告の「未解決の点」）。順位は質問 6 を待つ
+premises: [OPF-01, EXT-02, TC-12, QAS-26]
+kind: quality
+statement: 依頼の前に示す目的地への到着予定時刻（ドライバーが見つかるまでと迎車の時間を含む）と、乗車中に降りる場所を変えるときに示す到着予定の時刻は、実際に目的地に着いた時刻から T_arrival_estimate_gap を超えて外れない
+sources: [QR-08, NFR-08, SLI-08, FR-03, FR-47]
+concern_of: [USR-01]
+scenario:
+  source: 乗客（USR-01）
+  stimulus: 乗る場所と降りる場所を決めて到着予定時刻を見る。乗車中に降りる場所を変える
+  artifact: 到着予定時刻の求め方（FR-03、FR-47）
+  environment: デモの回の間（OPF-01）。道と移動時間の見込みのもとは EXT-02
+  response: 乗客は示された時刻のとおりに目的地に着く
+  measure: NFR-08 の SLO（SLI-08 で数える）
+negotiable: null
+derived_from: []
+priority:
+  business: high
+  business_reason: QR-08 は CUJ-01 の組で重視
+  difficulty: low
+  difficulty_reason: EXT-02 の移動時間に迎車とドライバーが見つかるまでの見込みを足すことは、どの妥当な作りでもできる。外れは EXT-02 の見込みと、運用で直す見込みの決まりによるもので、作りでは変わらない
+  rank: 27
+primary: false
+conflicts: []
+placeholders:
+  - name: T_arrival_estimate_gap
+    meaning: 示した到着予定時刻と、実際に目的地に着いた時刻との差の許容
+    from: QR-08

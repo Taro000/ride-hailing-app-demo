@@ -1,0 +1,31 @@
+id: DRV-11
+title: 走っている間は依頼を選ぶ操作と許諾を受け付けず、止まれば受け付ける
+status: active
+basis: inferred
+basis_note: シナリオは QR-28 と NFR-21 のゲート（入力）から。QR-28 は最低限守る線だが、運転中の安全に関わり、速さのもとと判断する場所で作りが分かれるため、設計を動かす要求にした（推定）。走っているかどうかをどこで確かめるか（QIU-17 の basis_note）と、ドライバーの端末から得られる速さの確からしさ（QR-28 の basis_note）は、設計に確かめを求める点として、第 2 段階がこの要求に照らして確かめる。QR-28 と QIU-16 のぶつかりは品質チェーンで決まっている（走っている間の操作を受け付けないことを先にする）。順位は質問 6 を待つ
+premises: [TC-13]
+kind: quality
+statement: 車が実際に V_moving_lock 以上の速さで動いている間は、依頼を選ぶ操作と許諾の操作を一つも受け付けず、止まっているか V_moving_lock を下回るときは受け付ける
+sources: [QR-28, QR-55, NFR-21, FR-22]
+concern_of: [USR-02]
+scenario:
+  source: 乗客を乗せずに走っているドライバー（USR-02）
+  stimulus: 走り出した直後か、信号で止まっているときに、依頼を選ぶ操作か許諾の操作をする
+  artifact: 走っている間の操作を受け付けるかの判断（FR-22）
+  environment: 車内。速さのもとは、iOS の Safari で使う Web アプリ（TC-13）が測る位置と速さ
+  response: 走っている間は受け付けず、止まれば受け付け、判断は実際の速さに遅れない
+  measure: NFR-21 のゲート
+negotiable: null
+derived_from: []
+priority:
+  business: medium
+  business_reason: QR-28 は最低限守る線
+  difficulty: high
+  difficulty_reason: 速さのもとはドライバーの端末の Web アプリが測る位置と速さだけで、その確からしさは分かっていない。古い値は、走り出した直後の許諾を受け付け、止まっているのに受け付けない両方向に誤る
+  rank: 15
+primary: false
+conflicts: []
+placeholders:
+  - name: V_moving_lock
+    meaning: 車が走っているとみなし、依頼を選ぶ操作と許諾を受け付けなくなる速さ
+    from: FR-22

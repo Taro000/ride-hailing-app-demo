@@ -1,0 +1,24 @@
+id: DRV-16
+title: 開発者 1 人が、個人で払える費用で作り、動かし、保守する
+status: active
+basis: assumed
+basis_note: 費用、納期、人数は利用者が与えた設計の与件（入力）。開発者が使いこなす技術は入力になく、DAS-01 で仮定した。交渉できないことは、個人の開発者の事情という出どころから下書きした。事業化しないデモであること（CON-02）が規模と費用の見方を支える。順位は質問 6 を待つ
+premises: [PC-01, PC-02, PC-03, TEAM-01, CON-02, DAS-01]
+kind: constraint
+statement: システムは開発者 1 人が作り、動かし、保守する。費用は個人が自分で支払える程度に収める。納期は決まっていない
+sources: [PC-01, PC-02, PC-03, TEAM-01, CON-02]
+concern_of: [STK-01]
+scenario: null
+negotiable: false
+derived_from: []
+priority:
+  business: high
+  business_reason: 利用者が与えた交渉できない制約（下書き）
+  difficulty: medium
+  difficulty_reason: 品質チェーンのすべての機能、SLO、監視、ゲート、監査を 1 人で作って回し、デモの回の間の知らせも 1 人で受ける。個人で払えない有償のサービスと冗長な置き方は使えない
+  rank: 7
+primary: true
+conflicts:
+  - with: DRV-01
+    note: 冗長な置き方や常に見守る体制は費用ともう一人を要する。1 人の開発者が個人で払える範囲で、悪いイベントを出さない作りにする
+placeholders: []

@@ -1,0 +1,28 @@
+id: DRV-05
+title: 乗客が決めた場所が、取り違えなく実際の場所を表す
+status: active
+basis: inferred
+basis_note: QR-05 と QR-09（重視）と QR-70（最低限守る線）は、乗客が場所を決めるという同じ刺激に対する応答のため、一つのシナリオにまとめた（入力から推定）。場所の名前、住所と位置は EXT-02 が作る（入力）。順位は質問 6 を待つ
+premises: [EXT-02, TC-12]
+kind: quality
+statement: 乗客が現在地か場所の名前・住所で決めた乗る場所と降りる場所は、乗客が意図した場所で、同じ名前の別の場所と取り違えられず、依頼に入る位置は実際の場所を表す。到着を確認した場所として記録する位置も、車が実際に止まった場所を表す
+sources: [QR-05, QR-09, QR-70, NFR-12, SLI-09, NFR-13, NFR-30, FR-01, FR-02, FR-28, FR-47]
+concern_of: [USR-01, USR-02]
+scenario:
+  source: 乗客（USR-01）
+  stimulus: 現在地か、場所の名前や住所で乗る場所と降りる場所を決める。乗車中に降りる場所を変える
+  artifact: 乗る場所と降りる場所の決め方（FR-01、FR-02、FR-47）と、依頼と到着の確認（FR-28）に入る位置
+  environment: 屋外の乗る場所と車内。場所の名前、住所と位置は EXT-02 が作る
+  response: 同じ名前や似た名前の候補は所在地などで分けて示され、選んだ場所の位置が依頼の前と承認の前に示されて、乗客が確かめられる。依頼に入る位置は乗客が実際に待つ場所と降りたい場所を表す
+  measure: NFR-12 の SLO（SLI-09 で数える）、NFR-13 のゲート、NFR-30 の監視
+negotiable: null
+derived_from: []
+priority:
+  business: high
+  business_reason: QR-05 は CUJ-06 と CUJ-07 の組で、QR-09 は CUJ-03 の組で重視
+  difficulty: low
+  difficulty_reason: 選んだ場所を位置とともに示して確かめさせることは、どの妥当な作りでもできる。残る外れは EXT-02 のデータと端末の位置の確かさによるもので、作りでは変わらない
+  rank: 22
+primary: false
+conflicts: []
+placeholders: []

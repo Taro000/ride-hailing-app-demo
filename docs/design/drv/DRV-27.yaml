@@ -1,0 +1,30 @@
+id: DRV-27
+title: データの SLI が比べる時刻と値が、欠けずにデータに残る
+status: active
+basis: inferred
+basis_note: SLI-08〜SLI-13 の見る位置（データ）と数え方の規則、QR-15 と FR-45（入力）から。SLI-08 は FRP-14 が決まるまで、乗車中に降りる場所を変えた乗車だけを数える（報告の「未解決の点」）。順位は質問 6 を待つ
+premises: [OPF-01, CON-03, EXT-01]
+kind: observability
+statement: データの SLI が比べる時刻と値がデータに残る。手配のときに示した到着予定時刻と実際に着いた時刻（SLI-08）、依頼の乗る場所の位置と乗車を始めた車の位置（SLI-09）、システムが持つ位置と端末がそれを測った時刻（SLI-10）、押さえた額、示した額、請求した額と確定額（SLI-11）、システムの記録と EXT-01 が処理した押さえと請求（SLI-12）、評価を受けた時刻とマッチに使う評価が反映した時刻（SLI-13）。配車の経過の記録に欠けがない
+sources: [SLI-08, SLI-09, SLI-10, SLI-11, SLI-12, SLI-13, QR-15, FR-45, NFR-14]
+concern_of: [USR-03, USR-04]
+scenario:
+  source: デモの回の後に SLO を数えるエンジニア（USR-03）
+  stimulus: 依頼と乗車が終わり、評価が付き、位置を確かめる時刻が来る
+  artifact: 配車の経過の記録（FR-45）と、位置、額、評価の記録
+  environment: デモの回の間（OPF-01）。EXT-01 の処理はテスト環境（CON-03）
+  response: SLI が比べる時刻と値が、依頼ごと、乗車ごと、確かめごとに欠けずに残る
+  measure: SLI-08、SLI-09、SLI-10、SLI-11、SLI-12、SLI-13 を定義どおりに数えられること（NFR-08、NFR-12、NFR-19、NFR-23、NFR-26、NFR-34 の SLO）、NFR-14 の監視
+negotiable: null
+derived_from: []
+priority:
+  business: high
+  business_reason: 重視の QR-04、QR-05、QR-08、QR-16、QR-19、QR-30 の SLO を数える
+  difficulty: low
+  difficulty_reason: 比べる時刻と値は、どの妥当な作りでも記録に残せる。EXT-01 の処理との突き合わせは DRV-07 が受け持つ
+  rank: 24
+primary: false
+conflicts:
+  - with: DRV-21
+    note: 配車の経過の記録が欠けないことは保存期間のうちの記録について成り立ち、過ぎた記録には状態の変化の種類と時刻だけが残る（品質チェーンが QR-15 と QR-59 に書いた扱い）
+placeholders: []

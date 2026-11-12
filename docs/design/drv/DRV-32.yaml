@@ -1,0 +1,17 @@
+id: DRV-32
+title: お金を動かす操作は繰り返しても一度しか動かず、結果が分からない操作は確かめてから進む
+status: active
+basis: inferred
+basis_note: QR-04、QR-29、QR-45 と FR-30、FR-40（入力）と、DRV-07、DRV-02 から推定した全体の原則
+premises: [EXT-01]
+kind: principle
+statement: お金を動かす操作（押さえ、押さえ直し、請求、解除、返金）は、何度繰り返しても一度しか動かない。EXT-01 の結果が分からない操作は、EXT-01 で結果を確かめてから、同じ操作をし直すか次に進む
+sources: [QR-04, QR-29, QR-45, FR-30, FR-40, FR-54]
+concern_of: [USR-01, USR-04]
+scenario: null
+negotiable: false
+derived_from: [DRV-07, DRV-02]
+priority: null
+primary: false
+conflicts: []
+placeholders: []

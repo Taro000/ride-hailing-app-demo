@@ -1,0 +1,30 @@
+id: DRV-01
+title: 配車の手配から決済までの流れが、使いたいときに使える
+status: active
+basis: inferred
+basis_note: シナリオは QR-01（重視）と NFR-01〜NFR-06 の SLO（入力）から。外部のサービスの失敗も悪いイベントに数えることは SLI-01〜SLI-06 の数え方の規則による。どの部分の停止が配車の流れを止めるか（QR-01 の basis_note が設計に確かめを求める点）は、第 2 段階がこの要求に照らして確かめる。本番をどこに置くかは質問 1 を、順位は質問 6 を待つ
+premises: [OPF-01, OPF-02, OPF-03, EXT-01, EXT-02, TC-07, TC-08, TC-09]
+kind: quality
+statement: 乗客とドライバーがデモの回の間に、配車の手配、迎車と乗車中の画面、配車受付、乗車の開始、到着の確認と決済の機能を使おうとすると、システムは自身の誤りを返さず、外部のサービスの失敗や無応答で操作を終えられなくなることなく、その結果を応える
+sources: [QR-01, NFR-01, NFR-02, NFR-03, NFR-04, NFR-05, NFR-06, SLI-01, SLI-02, SLI-03, SLI-04, SLI-05, SLI-06]
+concern_of: [USR-01, USR-02]
+scenario:
+  source: 乗客（USR-01）とドライバー（USR-02）
+  stimulus: 配車の手配、迎車中と乗車中の画面の表示、配車受付、乗車の開始、到着の確認と決済の操作をする
+  artifact: 配車の依頼から決済までの機能（QR-01 の対象の機能）
+  environment: デモの回の間（OPF-01）、デモの回の配車の数と参加者（OPF-02、OPF-03）。EXT-01 と EXT-02 を通る操作を含む
+  response: システムは、どの操作にも自身の誤りを返さず、EXT-01 や EXT-02 の失敗や無応答で操作を終えられなくなることなく、その操作の結果を応える
+  measure: NFR-01、NFR-02、NFR-03、NFR-04、NFR-05、NFR-06 の SLO（SLI-01、SLI-02、SLI-03、SLI-04、SLI-05、SLI-06 で数える）
+negotiable: null
+derived_from: []
+priority:
+  business: high
+  business_reason: QR-01 は CUJ-01、CUJ-02、CUJ-03、CUJ-06、CUJ-07、CUJ-08 の組で重視
+  difficulty: high
+  difficulty_reason: デモの回の配車の数では悪いイベント 1 件でエラーバジェットを使い切り、チームが変えられない EXT-01 と EXT-02 の失敗も悪いイベントに数える。動かして見守るのは開発者 1 人（DRV-16）
+  rank: 2
+primary: true
+conflicts:
+  - with: DRV-16
+    note: 冗長な置き方や常に見守る体制は費用ともう一人を要する。1 人の開発者が個人で払える範囲で、悪いイベントを出さない作りにする
+placeholders: []

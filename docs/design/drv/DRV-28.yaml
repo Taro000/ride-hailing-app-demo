@@ -1,0 +1,28 @@
+id: DRV-28
+title: 本人であることを確かめた人だけがアカウントを使える
+status: active
+basis: inferred
+basis_note: 守る資産（乗客の支払い方法による請求、担当者の返金などの機能）と脅威（他人によるアカウントの利用）は、QR-10（重視）の失敗のシナリオ（入力）から。セキュリティのリスク分析の中身は質問 5 を待つ。どう確かめるかは第 2 段階から決める。順位は質問 6 を待つ
+premises: [TC-13, TC-16, CON-06]
+kind: security
+statement: 乗客、ドライバー、運営・サポートの担当者、エンジニアのアカウントは、そのアカウントの本人であることを確かめた人だけが使え、使い終える操作をした後は確かめ直すまで使えない
+sources: [QR-10, FR-48, FR-49, NFR-27, NFR-28]
+concern_of: [USR-01, USR-02, USR-03, USR-04]
+scenario:
+  source: アカウントの本人ではない人
+  stimulus: ほかの人のアカウントで、配車の依頼、許諾、乗車の開始、決済、返金、登録、停止、調査の機能を使おうとする
+  artifact: 本人であることを確かめて使い始めること（FR-48）と、利用者の種類ごとに使える機能（FR-49）
+  environment: 乗客とドライバーはスマートフォンの Web アプリ（TC-13）から、担当者とエンジニアは問わない端末から使う。設定の符号は担当者が直接渡す（TC-16）。参加者は実在の人（CON-06）
+  response: 本人であることを確かめられなければ、そのアカウントでどの機能も使えない
+  measure: NFR-27 のゲート、NFR-28 の監査
+negotiable: null
+derived_from: []
+priority:
+  business: high
+  business_reason: QR-10 は CUJ-03 の組で重視
+  difficulty: medium
+  difficulty_reason: 4 種類の利用者、担当者が手で渡す設定の符号、確かめる仕組みを作るか外部のサービスに任せるかの選び方がある
+  rank: 8
+primary: true
+conflicts: []
+placeholders: []

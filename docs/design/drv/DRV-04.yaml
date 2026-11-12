@@ -1,0 +1,33 @@
+id: DRV-04
+title: 車と乗客の現在地が、実際の位置から遅れない
+status: active
+basis: inferred
+basis_note: シナリオは QR-19（重視）と NFR-19 の SLO（入力）から。T_vehicle_location_lag の値と目標は利用者が仮とした値（品質チェーンの第 4 段階の決めたこと 17）。ドライバーの端末からの位置がどれだけ早く届くか（QR-19 の basis_note が設計に確かめを求める点）は、第 2 段階がこの要求に照らして確かめる。iOS の Safari の Web アプリが前に出ていない間に位置を送れないことの扱いは質問 2 と QCR-02 を、順位は質問 6 を待つ
+premises: [OPF-01, TC-13, QCR-02]
+kind: quality
+statement: 乗客に示す迎車と乗車中の車の位置と着く見込み、迎車中のドライバーに示す乗客の現在地、依頼を届けるかを決めるときのドライバーの現在地は、実際の位置から T_vehicle_location_lag を超えて遅れない
+sources: [QR-19, NFR-19, SLI-10, FR-08, FR-13, FR-19, FR-24]
+concern_of: [USR-01, USR-02]
+scenario:
+  source: 受付中、迎車中、乗車中のドライバー（USR-02）の端末と、迎車を待つ乗客（USR-01）の端末
+  stimulus: 車と乗客が動く
+  artifact: 乗客に示す車の位置と着く見込み（FR-08、FR-13）、ドライバーに示す乗客の現在地（FR-24）、依頼を届けるときのドライバーの現在地（FR-19）
+  environment: デモの回の間（OPF-01）。走っている車の中と屋外の乗る場所。位置のもとは iOS の Safari で使う Web アプリ（TC-13）だけ
+  response: システムが持ち相手に示す位置は、端末が測った実際の位置に追い付いている
+  measure: NFR-19 の SLO（SLI-10 で数える）
+negotiable: null
+derived_from: []
+priority:
+  business: high
+  business_reason: QR-19 は CUJ-02、CUJ-07、CUJ-09 の組で重視
+  difficulty: high
+  difficulty_reason: 位置のもとは乗客とドライバーの端末だけで、iOS の Safari の Web アプリは、前に出ていない間と画面を消している間は位置を送らない（DRV-14）。走る車の中の途切れやすい通信も混ざる
+  rank: 3
+primary: true
+conflicts:
+  - with: DRV-14
+    note: アプリが前に出ていない間は位置が届かず、示す位置が実際の位置から遅れる
+placeholders:
+  - name: T_vehicle_location_lag
+    meaning: 示す位置と依頼を届けるときに使う位置が、実際の位置から遅れる時間の許容
+    from: QR-19

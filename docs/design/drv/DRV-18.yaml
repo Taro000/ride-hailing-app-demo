@@ -1,0 +1,22 @@
+id: DRV-18
+title: 決済は Stripe のテスト環境で、カードの情報はシステムを通さず、地図は Google Maps Platform
+status: active
+basis: inferred
+basis_note: 制約は DIN-01、DIN-03、DIN-05、CON-03、CON-04 と、カードの情報の扱いの標準を模す開発方針から来た QR-60（入力）。交渉できないことは、利用者の回答と開発方針という出どころから下書きした（質問 3 と質問 4 を待つ）。押さえ、押さえ直し、答えのない操作の扱いは DRV-07 が受け持つ。順位は質問 6 を待つ
+premises: [TC-10, TC-11, TC-12, CON-03, CON-04, EXT-01, EXT-02]
+kind: constraint
+statement: 決済と返金は Stripe のテスト環境を通し、システムの中で記録するだけの仮の仕組みは使わない。カードの情報は決済のサービスが用意する入力部品で入れ、このシステムのサーバー、ログ、データのどこも通さず、どこにも残さない。地図のサービスは Google Maps Platform を使う
+sources: [TC-10, TC-11, TC-12, QR-60, NFR-47, NFR-28, DIN-01, DIN-03, DIN-05, CON-03, CON-04]
+concern_of: [USR-01, STK-03]
+scenario: null
+negotiable: false
+derived_from: []
+priority:
+  business: high
+  business_reason: 利用者の回答と開発方針から来た交渉できない制約（下書き）。QR-60 は入口のある要求
+  difficulty: low
+  difficulty_reason: 決済のサービスの入力部品を使えば、カードの情報はどの妥当な作りでもシステムを通らない。二つの外部のサービスをつなぐこと自体はどの作りでも同じ
+  rank: 19
+primary: false
+conflicts: []
+placeholders: []

@@ -1,0 +1,28 @@
+id: DRV-08
+title: 依頼は、その時点で届けてよいドライバーにだけ届き、示され、許諾できる
+status: active
+basis: assumed
+basis_note: QR-16、QR-32、QR-49、QR-66（重視）は、同じ規則（依頼を届ける相手を決める規則と評価のまとめ方）に対する応答のため、一つのシナリオにまとめた（入力から推定）。登録されたドライバーだけが受付できること（QR-63）は DRV-20、規則を一か所に置くこと（QR-54）は DRV-35 にある。NFR-34 のしきい値と目標は QAS-36 による。現在地から乗車場所までの距離が道のりか直線かは QCR-01 で品質チェーンに求めている。順位は質問 6 を待つ
+premises: [OPF-03, QAS-36, QCR-01]
+kind: quality
+statement: 依頼は、受付をしていて、停止されておらず、乗客の閾値と自分の条件にその時点の値で合うドライバーにだけ届き、示され、許諾できる。停止した時から、そのドライバーはまだ許諾していない依頼を、停止の前に一覧に届いていたものも含めて受けられない
+sources: [QR-16, QR-32, QR-49, QR-66, NFR-34, SLI-13, NFR-35, NFR-36, FR-05, FR-15, FR-16, FR-17, FR-18, FR-19, FR-20, FR-32, FR-44]
+concern_of: [USR-01, USR-02, USR-04]
+scenario:
+  source: 乗客（USR-01）、ドライバー（USR-02）、運営・サポートの担当者（USR-04）
+  stimulus: 乗客が依頼する。乗客が閾値を変え、ドライバーが条件を変え、乗客が評価を付け、担当者がドライバーを停止する
+  artifact: 依頼を届ける相手を決める規則と、閾値と比べるドライバーの評価のまとめ方（FR-05、FR-15、FR-17、FR-19、FR-44）
+  environment: デモの回の間（OPF-01）。ドライバーは 1 人（OPF-03）
+  response: 依頼は、その時点の規則に合うドライバーにだけ届き、示され、許諾できる。停止の前に一覧に届いていた依頼も、停止した時から示されず許諾できない
+  measure: NFR-35 の監視、NFR-36 のゲート、NFR-34 の SLO（SLI-13 で数える）
+negotiable: null
+derived_from: []
+priority:
+  business: high
+  business_reason: QR-16 と QR-66 は CUJ-05 の組で、QR-32 は CUJ-09 の組で、QR-49 は CUJ-14 と CUJ-18 の組で重視
+  difficulty: low
+  difficulty_reason: 規則を一か所に置き（DRV-35）、一覧の変化を DRV-03 で届ければ、どの妥当な作りでも満たせる
+  rank: 23
+primary: false
+conflicts: []
+placeholders: []

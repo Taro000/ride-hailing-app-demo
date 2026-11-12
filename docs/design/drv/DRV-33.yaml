@@ -1,0 +1,17 @@
+id: DRV-33
+title: 外部のサービス、時計、端末とのつながり、端末の位置と速さは、試験で失敗まで差し替えられる
+status: active
+basis: inferred
+basis_note: QR-50、QR-51、QR-67（重視）と QR-55（最低限守る線）は、どれも試験の差し替え口を求める内部品質で、第 2 段階、第 2b 段階、第 4 段階がそれぞれ決めかねないため、全体の原則にした（推定）
+premises: []
+kind: principle
+statement: EXT-01、EXT-02、時計、端末とのつながり、端末が測る位置と速さは、試験で差し替えられ、受け付けない、答えない、途切れる、境目の値の場合まで再現できる
+sources: [QR-50, QR-51, QR-55, QR-67, NFR-09, NFR-11, NFR-21, NFR-25]
+concern_of: [USR-03]
+scenario: null
+negotiable: false
+derived_from: [DRV-07, DRV-02, DRV-06, DRV-10, DRV-11, DRV-12]
+priority: null
+primary: false
+conflicts: []
+placeholders: []

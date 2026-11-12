@@ -1,0 +1,133 @@
+read_from:
+  quality_chain: docs/quality/
+  other: [利用者が与えた設計の与件（第 1 段階の最初の実行の依頼）]
+technology_constraints:
+  - id: TC-01
+    statement: コードは TypeScript で書く
+    kind: mandated
+    source: 利用者が与えた設計の与件（技術制約）
+    basis: stated
+  - id: TC-02
+    statement: 画面は React で作る
+    kind: mandated
+    source: 利用者が与えた設計の与件（技術制約）
+    basis: stated
+  - id: TC-03
+    statement: サーバーは Hono で作る
+    kind: mandated
+    source: 利用者が与えた設計の与件（技術制約）
+    basis: stated
+  - id: TC-04
+    statement: 静的な検査に Oxlint を使う
+    kind: mandated
+    source: 利用者が与えた設計の与件（技術制約）
+    basis: stated
+  - id: TC-05
+    statement: 書式の整形に Oxfmt を使う
+    kind: mandated
+    source: 利用者が与えた設計の与件（技術制約）
+    basis: stated
+  - id: TC-06
+    statement: 試験に Vitest を使う
+    kind: mandated
+    source: 利用者が与えた設計の与件（技術制約）
+    basis: stated
+  - id: TC-07
+    statement: データベースは Turso とする。利用者はこれを「あくまで想定」としており、実際には配備しない
+    kind: platform
+    source: 利用者が与えた設計の与件（技術制約）
+    basis: stated
+  - id: TC-08
+    statement: 実行の基盤は GCP Cloud Run とする。利用者はこれを「あくまで想定」としており、実際には配備しない
+    kind: platform
+    source: 利用者が与えた設計の与件（技術制約）
+    basis: stated
+  - id: TC-09
+    statement: このアプリはデモで、実際にはデプロイせず、ローカルだけで完結させる
+    kind: platform
+    source: 利用者が与えた設計の与件（技術制約）
+    basis: stated
+  - id: TC-10
+    statement: 決済と返金は外部の決済サービス（EXT-01）のテスト環境を通し、製品は Stripe のテスト環境（サンドボックス）とする。システムの中で記録するだけの仮の仕組みは使わず、実際のお金は動かない
+    kind: external-service
+    source: context.yaml DIN-01; context.yaml CON-03
+    basis: stated
+  - id: TC-11
+    statement: カードの情報は決済のサービスが用意する入力部品で入れ、このシステムのサーバー、ログ、データを通さず、保存しない
+    kind: external-service
+    source: context.yaml DIN-03; context.yaml CON-04
+    basis: stated
+  - id: TC-12
+    statement: 外部の地図のサービス（EXT-02）は Google Maps Platform とする
+    kind: external-service
+    source: context.yaml DIN-05
+    basis: stated
+  - id: TC-13
+    statement: 乗客とドライバーは、ネイティブアプリではなく、スマートフォンのブラウザで使う Web アプリでこのサービスを使う。対象は iOS の Safari だけで、ほかの端末とブラウザには対応しない
+    kind: platform
+    source: context.yaml DIN-04; context.yaml CON-05
+    basis: stated
+  - id: TC-14
+    statement: 乗客とドライバーが同じ依頼の相手であることは確認コードで確かめ、乗客が伝えたコードをドライバーが入れる
+    kind: mandated
+    source: context.yaml DIN-02
+    basis: stated
+  - id: TC-15
+    statement: 新しい版の配備はデモの回を開くときに行う。配車を止めずに新しい版を入れることは求めない
+    kind: platform
+    source: context.yaml DIN-06
+    basis: stated
+  - id: TC-16
+    statement: 運営・サポートの担当者は参加者に、アカウントの設定の符号を直接渡す
+    kind: mandated
+    source: context.yaml DIN-07
+    basis: stated
+  - id: TC-17
+    statement: ドライバーと車両の審査の結果（審査の日付と、審査の記録を探す手がかりを含む）と免許の期限は、このシステムに記録しない
+    kind: prohibited
+    source: context.yaml CON-07
+    basis: stated
+project_constraints:
+  - id: PC-01
+    kind: budget
+    statement: 決まった予算はない。費用は、個人の開発者が自分で支払える程度に収める
+    source: 利用者が与えた設計の与件（予算と納期）
+    basis: stated
+  - id: PC-02
+    kind: deadline
+    statement: 決まった納期はない
+    source: 利用者が与えた設計の与件（予算と納期）
+    basis: stated
+  - id: PC-03
+    kind: team
+    statement: 開発者 1 人の個人開発。その人は自分で選んだ TypeScript、React、Hono を使いこなし、Stripe の押さえと請求、Google Maps Platform、iOS の Safari の位置情報と知らせを使った経験は見込まない
+    source: 利用者が与えた設計の与件（チームの構成）; DAS-01
+    basis: assumed
+teams:
+  - id: TEAM-01
+    name: 個人の開発者
+    owns: システムの全体（作ること、動かすこと、保守すること）
+    source: 利用者が与えた設計の与件（チームの構成）
+    basis: stated
+anticipated_changes: []
+stakeholders:
+  - id: STK-01
+    role: 個人の開発者（費用を払い、作って動かす人）
+    concerns: [個人で支払える費用, 1 人で作って動かせること, ローカルだけで完結させること]
+    source: 利用者が与えた設計の与件
+    basis: stated
+  - id: STK-02
+    role: 法務の担当
+    concerns: [個人の情報の扱いに関する法令（QR-57、QR-58、QR-59）]
+    source: QR-57、QR-58、QR-59 の入口
+    basis: stated
+  - id: STK-03
+    role: 開発の責任者
+    concerns: [カードの情報の扱いの標準を模す開発方針（QR-60、DIN-03）, 旅客運送の法令を模す開発方針（QR-61、QR-62、QR-63、CON-07）, Web アプリで iOS の Safari だけを対象にする開発方針（DIN-04）]
+    source: QR-60、QR-61、QR-62、QR-63 の入口; context.yaml DIN-04
+    basis: stated
+  - id: STK-04
+    role: プロダクトの責任者
+    concerns: [乗客とドライバーの画面の WCAG 2.2 レベル AA（QR-64）]
+    source: QR-64 の入口
+    basis: stated

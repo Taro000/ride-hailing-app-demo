@@ -1,0 +1,22 @@
+id: DRV-22
+title: 乗客とドライバーの画面は WCAG 2.2 のレベル AA に従う
+status: active
+basis: inferred
+basis_note: 標準から来た QR-64（入力。扱いは重視で、品質チェーンで確認済み）。事業が決めた標準で交渉できないと、出どころの種類から下書きした。順位は質問 6 を待つ
+premises: []
+kind: constraint
+statement: 乗客とドライバーが使うどの画面も、WCAG 2.2 のレベル AA に従う
+sources: [QR-64, NFR-49, NFR-50]
+concern_of: [USR-01, USR-02, STK-04]
+scenario: null
+negotiable: false
+derived_from: []
+priority:
+  business: high
+  business_reason: 標準から来た、入口のある要求
+  difficulty: low
+  difficulty_reason: 画面の作り方で満たし、全体の作りによらない
+  rank: 17
+primary: false
+conflicts: []
+placeholders: []

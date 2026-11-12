@@ -1,0 +1,28 @@
+id: DRV-12
+title: 一つの機能の変更はその部分にとどまり、変えなかった機能を公開の前に自動で確かめられる
+status: active
+basis: inferred
+basis_note: 変更のシナリオは QR-52（重視、QR-01 を支える内部品質）と QR-38（最低限守る線）と NFR-40 のゲート（入力）から。将来の変更は利用者が挙げていない（設計の与件）ため、変更の刺激は CUJ-11、CUJ-12、CUJ-13 の作業から取った。順位は質問 6 を待つ
+premises: []
+kind: change
+statement: 一つの機能の追加や修正と、利用技術のバージョンアップに伴う変更は、それを受け持つ部分にとどまり、変えなかった機能が以前どおりに振る舞うことを公開の前に自動で確かめられる
+sources: [QR-52, QR-38, NFR-40]
+concern_of: [USR-03]
+scenario:
+  source: エンジニア（USR-03）
+  stimulus: 機能を加えるか直すか、利用技術の版を上げる（CUJ-11、CUJ-12、CUJ-13）
+  artifact: その機能か利用技術を受け持つ部分
+  environment: 開発の間と公開の前
+  response: 変更はその部分にとどまり、変えなかった機能が公開の前と同じに振る舞うことが、自動の試験と部分の間の依存の検査で確かめられる
+  measure: NFR-40 のゲート
+negotiable: null
+derived_from: []
+priority:
+  business: high
+  business_reason: QR-52 は重視（QR-01 を支える内部品質）
+  difficulty: medium
+  difficulty_reason: 機能ごとの部分の分け方と依存の決まりを初めから持ち、1 人で回せる自動の試験で守る。部分の分け方は後から変えにくい
+  rank: 12
+primary: true
+conflicts: []
+placeholders: []

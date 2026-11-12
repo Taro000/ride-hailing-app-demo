@@ -1,0 +1,37 @@
+id: DRV-23
+title: 時刻が来れば、誰も操作していなくても処理が進む
+status: active
+basis: assumed
+basis_note: FR-04、FR-23、FR-26、FR-51 の、時刻が来たときの振る舞い（入力）から推定した機能の要求。時刻が来たことを、利用者の操作の応えとしてではなく働かせる仕組みで作りが分かれる。T_wait_prompt の値は QAS-53、T_noshow_wait の値は QAS-51 による。T_no_accept は利用者が仮に決めた値（品質チェーンの第 4 段階の決めたこと 19）。順位は質問 6 を待つ
+premises: [OPF-01, CON-06, TC-08, QAS-51, QAS-53]
+kind: function
+statement: 許諾のない依頼を乗客に知らせることと依頼を終えること、乗客の不在として終えられるようになること、保存期間を過ぎた記録を個人を特定できない形に変えることは、その時刻が来れば、乗客もドライバーも操作していなくても、システムが止まって再開した後でも行われる
+sources: [FR-04, FR-23, FR-26, FR-51, QR-59, NFR-46]
+concern_of: [USR-01, USR-02, STK-02]
+scenario:
+  source: 時計
+  stimulus: 依頼してから T_wait_prompt と T_no_accept が過ぎる。迎車が着いてから T_noshow_wait が過ぎる。記録してから QR-59 の保存期間が過ぎる
+  artifact: 依頼の待ちと終わり（FR-04、FR-23）、乗客の不在（FR-26）、個人を特定できない形への変換（FR-51）
+  environment: 乗客もドライバーも操作していない間。システムが止まって再開した後
+  response: 乗客への知らせ、依頼の終わり、不在として終えられるようになること、記録の変換が、その時刻に行われる
+  measure: FR-04、FR-23、FR-26 の受け入れ基準、NFR-46 の監視
+negotiable: null
+derived_from: []
+priority:
+  business: high
+  business_reason: 法令から来た QR-59（FR-51）と、迎車が実際に着いた時刻から不在の待ちを数える QR-06（重視、FR-26）に仕える
+  difficulty: medium
+  difficulty_reason: 想定する本番の Cloud Run（TC-08）は要求を受けている間に処理する基盤で、時刻で働く処理には別の仕組みが要る。再開の後も、待っている時刻を失わない
+  rank: 13
+primary: false
+conflicts: []
+placeholders:
+  - name: T_wait_prompt
+    meaning: 許諾のない依頼について乗客に知らせ、待ち続けるか取り消すかを選ばせるまでの、依頼してからの時間
+    from: FR-04
+  - name: T_no_accept
+    meaning: 依頼してからどのドライバーも許諾しないまま、システムが依頼を終えるまでの時間
+    from: FR-04
+  - name: T_noshow_wait
+    meaning: 迎車が乗車場所に着いてから、ドライバーが乗客の不在として依頼を終えられるようになるまでの時間
+    from: FR-26

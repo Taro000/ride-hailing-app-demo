@@ -1,0 +1,28 @@
+id: DRV-10
+title: 地図のサービスが失敗しても答えなくても、進んでいる配車は続く
+status: active
+basis: inferred
+basis_note: シナリオは QR-65 と NFR-09 のゲート（入力）から。QR-65 は最低限守る線だが、確定した依頼と乗車を EXT-02 に頼らずに続けられるかで作りが分かれるため、設計を動かす要求にした（推定）。順位は質問 6 を待つ
+premises: [EXT-02, TC-12]
+kind: quality
+statement: EXT-02 が失敗しても答えなくても、システムはそのことを示して誤った到着予定時刻や料金で依頼させず、EXT-02 によるものを示せないときはそのことを示し、確定した依頼と進んでいる乗車は続ける
+sources: [QR-65, NFR-09, FR-01, FR-03, FR-06, FR-08, FR-20, FR-47]
+concern_of: [USR-01, USR-02]
+scenario:
+  source: EXT-02
+  stimulus: 失敗するか、答えない
+  artifact: 場所の候補、到着予定時刻と料金、迎車の着く見込み、依頼の内容（FR-01、FR-03、FR-06、FR-08、FR-20、FR-47）
+  environment: デモの回の間（OPF-01）。確定した依頼と乗車中の乗車がある
+  response: 乗客には到着予定時刻と料金を示せないことを伝えて依頼させず、EXT-02 によるものを示せないときはそのことを示し、確定した依頼と進んでいる乗車は止めずに続ける
+  measure: NFR-09 のゲート
+negotiable: null
+derived_from: []
+priority:
+  business: medium
+  business_reason: QR-65 は最低限守る線
+  difficulty: medium
+  difficulty_reason: 確定した料金と乗車の流れを EXT-02 から切り離し、EXT-02 がないと示せないものだけを止める
+  rank: 29
+primary: false
+conflicts: []
+placeholders: []

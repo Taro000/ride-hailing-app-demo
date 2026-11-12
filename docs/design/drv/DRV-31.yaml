@@ -1,0 +1,17 @@
+id: DRV-31
+title: 額、評価、依頼の状態、決済の結果を決めるのはサーバーだけ
+status: active
+basis: inferred
+basis_note: QR-13（最低限守る線）の失敗のシナリオ（端末から送る値の書き換え）と、DRV-02、DRV-07、DRV-08 から推定した全体の原則。ドライバーと乗客の位置と車の速さは端末から受けるしかなく、到着や不在をめぐる争いは DRV-30 の記録で扱う
+premises: []
+kind: principle
+statement: 確定額と請求する額、ドライバーの評価、依頼の状態、決済と返金の結果を決めるのはサーバーだけで、端末が送る値はそれらを決めない。端末から受けるのは利用者の操作と、端末が測った位置と速さだけとする
+sources: [QR-13, FR-49, NFR-27]
+concern_of: [USR-01, USR-02]
+scenario: null
+negotiable: false
+derived_from: [DRV-02, DRV-07, DRV-08]
+priority: null
+primary: false
+conflicts: []
+placeholders: []

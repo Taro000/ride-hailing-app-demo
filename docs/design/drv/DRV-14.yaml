@@ -1,0 +1,26 @@
+id: DRV-14
+title: 乗客とドライバーは iOS の Safari で使う Web アプリで使う
+status: active
+basis: inferred
+basis_note: 制約は DIN-04 と CON-05（入力）。交渉できないことは、開発方針という出どころから下書きした（質問 2 を待つ）。iOS の Safari の Web アプリは、前に出ていない間と画面を消している間は位置を送らず処理も止まり、知らせはホーム画面に加えた Web アプリでしか届かない（この段階の推定。Apple の公式の記述は見つからず、第 2 段階が実機で確かめる）。そのため DRV-03 と DRV-04 と競合し、その扱いは質問 2 と QCR-02 を待つ。対応する iOS と Safari の版はどの入力も決めておらず、第 2 段階が決める。順位は質問 6 を待つ
+premises: [TC-13, CON-05, QCR-02]
+kind: constraint
+statement: 乗客とドライバーは、ネイティブアプリではなく、スマートフォンのブラウザで使う Web アプリでこのサービスを使う。対象は iOS の Safari だけで、ほかの端末とブラウザには対応しない
+sources: [TC-13, DIN-04, CON-05]
+concern_of: [USR-01, USR-02, STK-03]
+scenario: null
+negotiable: false
+derived_from: []
+priority:
+  business: high
+  business_reason: 開発方針から来た交渉できない制約（下書き）
+  difficulty: high
+  difficulty_reason: 位置、知らせ、後ろでの処理が Web アプリでできる範囲に限られ、主な設計を動かす要求の DRV-03 と DRV-04 と競合する
+  rank: 1
+primary: true
+conflicts:
+  - with: DRV-03
+    note: アプリが前に出ていない間、ページは変化を受けて示せず、知らせはホーム画面に加えた Web アプリでしか届かない
+  - with: DRV-04
+    note: アプリが前に出ていない間は位置が届かず、示す位置が実際の位置から遅れる
+placeholders: []

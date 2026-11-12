@@ -1,0 +1,31 @@
+id: DRV-09
+title: 乗り終えた乗客は、少ない操作で評価を送れる
+status: active
+basis: assumed
+basis_note: シナリオは QR-68（重視）と NFR-33 のゲート（入力）から。N_rating_operations の値は QAS-35 による。順位は質問 6 を待つ
+premises: [QAS-35]
+kind: quality
+statement: 乗り終えた乗客は、乗車が終わった画面から N_rating_operations のうちの操作で、乗ったドライバーの評価を送れる
+sources: [QR-68, NFR-33, FR-15]
+concern_of: [USR-01]
+scenario:
+  source: 乗り終えた乗客（USR-01）
+  stimulus: 乗車が終わった画面から、乗ったドライバーを評価する
+  artifact: 評価の画面（FR-15）
+  environment: 降車の後
+  response: 乗客は少ない操作で評価を送り終える
+  measure: NFR-33 のゲート
+negotiable: null
+derived_from: []
+priority:
+  business: high
+  business_reason: QR-68 は CUJ-04 の組で重視
+  difficulty: low
+  difficulty_reason: 画面の流れで決まり、全体の作りによらない
+  rank: 28
+primary: false
+conflicts: []
+placeholders:
+  - name: N_rating_operations
+    meaning: 乗車が終わった画面から評価を送り終えるまでの乗客の操作の回数の上限
+    from: QR-68

@@ -1,0 +1,33 @@
+id: DRV-07
+title: お金は確定額と決まりの料金どおりに一度だけ動き、記録は決済サービスの処理と一致する
+status: active
+basis: assumed
+basis_note: QR-04、QR-29、QR-30（重視）と QR-45、QR-24、QR-17（最低限守る線）を、お金が動くどの場面でも同じ応答（確定額と決まりの料金どおりに一度だけ動き、記録が EXT-01 と一致する）を求めるものとして一つのシナリオにまとめた（入力から推定）。QR-04 と QR-24 の競合（EXT-01 が答えないときは分からないことを先に示し、結果が分かってから示し直す）は、この要求の応答の中で解ける。NFR-23 の目標は QAS-31、NFR-26 の目標と突き合わせの時点は QAS-32、T_payment_response の値は QAS-33 による（この段階では尋ねず、報告の「未確認の仮定」で評価し直した）。EXT-01 のテスト環境の応答の速さ（QR-24 の basis_note が設計に確かめを求める点）は HND-01 で第 3 段階に送った。順位は質問 6 を待つ
+premises: [OPF-01, CON-01, CON-03, CON-08, EXT-01, TC-10, QAS-31, QAS-32, QAS-33]
+kind: quality
+statement: 押さえる額、示す額、請求する額は確定額か CON-08 の料金と一致し、一つの乗車と一つの依頼に一度だけ動く。返金は認めた額を一度だけ、支払われた額まで行う。EXT-01 が答えないときも二重には動かず、済んだかどうか分からないことを T_payment_response のうちに示し、結果が分かればそれに合わせる。システムの記録は EXT-01 が実際に処理した額と結果と食い違わない
+sources: [QR-04, QR-29, QR-30, QR-45, QR-24, QR-17, NFR-23, SLI-11, NFR-26, SLI-12, NFR-24, NFR-25, NFR-29, FR-07, FR-26, FR-29, FR-30, FR-31, FR-39, FR-40, FR-46, FR-47, FR-54]
+concern_of: [USR-01, USR-02, USR-04]
+scenario:
+  source: 乗客（USR-01）、ドライバー（USR-02）、運営・サポートの担当者（USR-04）の操作と、EXT-01 の応え
+  stimulus: 依頼のときに押さえ、乗車中に降りる場所を変えて押さえ直し、許諾の後の取り消しと乗客の不在でキャンセル料か不在の料金を請求し、到着の後に決済し、担当者が返金する。EXT-01 が受け付けない、答えない、遅れて答えるときに操作をやり直す
+  artifact: 押さえ、押さえ直し、請求、解除、返金と、その記録（FR-29、FR-30、FR-31、FR-39、FR-40、FR-54）
+  environment: デモの回の間（OPF-01）。EXT-01 はテスト環境（CON-03、TC-10）
+  response: どの額も確定額か CON-08 の料金と一致して一度だけ動き、結果が分からない操作はそう示されてから EXT-01 の結果に合わせられ、記録は EXT-01 の処理と一致する
+  measure: NFR-23 の SLO（SLI-11 で数える）、NFR-26 の SLO（SLI-12 で数える）、NFR-24 の監視、NFR-25 のゲート
+negotiable: null
+derived_from: []
+priority:
+  business: high
+  business_reason: QR-04 は CUJ-03 と CUJ-08 の組で、QR-29 は CUJ-08 と CUJ-15 の組で、QR-30 は CUJ-03 と CUJ-15 の組で重視
+  difficulty: high
+  difficulty_reason: 押さえ、押さえた額より上がった確定額の押さえ直し、請求、解除、返金を、チームが変えられない EXT-01 と受け渡し、答えのない操作を二重にせずに結果に合わせ、記録を EXT-01 と突き合わせる
+  rank: 4
+primary: true
+conflicts:
+  - with: DRV-21
+    note: 止まった後に戻すために残す決済と返金の結果にも、保存期間を過ぎた個人の情報は残さない（品質チェーンが QR-17 と QR-59 に書いた扱い）
+placeholders:
+  - name: T_payment_response
+    meaning: ドライバーが決済を行ってから、結果（済んだ、済まなかった、分からない）がドライバーと乗客に示されるまでの時間
+    from: QR-24
