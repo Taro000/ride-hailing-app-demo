@@ -1,0 +1,12 @@
+id: DAS-08
+title: 開発者のマシンは macOS でコンテナを動かせ、iOS 18.4 以降の iPhone を一台テストに使える
+status: open
+stage: 2b
+kind: judgment
+statement: 開発者のマシン（ELM-10）は macOS で、Docker Compose の形のファイルを動かせるコンテナの実行環境（個人の使い方では無償のもの）、Node.js 26、Python 3、mkcert を入れられ、iOS のシミュレーターを動かせる。開発者は、iOS 18.4 以降に上げられる iPhone を一台、実機の受け入れに使える
+why_unsure: 設計の与件は開発者のマシンの種類と、テストに使える端末を述べていない。第 2 段階は、同じマシンの iOS のシミュレーターで ELM-01 を動かしてもよいとした（配置のビュー）
+breadth: medium
+severity: low
+rating_note: POL-01、POL-03、POL-04、DEC-32 が依存する。macOS でなければ iOS のシミュレーターを使えないだけで、コンテナ、Node.js、Python 3 はほかの OS でも動き、実機の受け入れは iPhone で行える。テストに使える iPhone がなければ、実機の受け入れ（NFR-15）を行えず、そのときは尋ね直す
+answer: null
+answered_in: null

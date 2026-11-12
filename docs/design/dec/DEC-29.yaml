@@ -1,0 +1,41 @@
+id: DEC-29
+title: ELM-04 の読み書きは Drizzle ORM で行い、データの形の変更は drizzle-kit が生成する SQL のマイグレーションで行う
+status: active
+basis: assumed
+basis_note: 本番のデータベースを Turso として設計し、実際にはローカルの libSQL で動かすことは TC-07、TC-09（入力）。一つのデータベースに置いて ELM-03 だけが書くことは DEC-17、一つの取引の中の条件つきの書き込みは DEC-08、お金の操作の試みの記録は DEC-10、データの形を前の版が読める足し方で変えることは DEC-26（入力）。道具の比べ方と選び方は推定。開発者が Drizzle ORM を使いこなすか学べることは DAS-07 による仮定。Turso の文書が Drizzle を @libsql/client でつなぐとしていること、drizzle-kit の push が libSQL で表を作り直すときに失敗する報告があることは、公開の情報で読んだ（報告の「入力」）。Drizzle ORM の 1 系が正式に出たかは確かめていない
+premises: [TC-07, TC-09, DAS-07]
+stage: technical-policy
+question: 配車サーバー（ELM-03）は、配車データベース（ELM-04。想定の本番は Turso、ローカルは libSQL）を何で読み書きし、データの形を何で変えるか
+addresses: [DRV-16, DRV-15, DRV-13, DRV-02, DRV-07]
+options:
+  - name: Drizzle ORM（@libsql/client でつなぐ）で読み書きし、drizzle-kit がコードの表の定義から生成する SQL のマイグレーションを、新しい版が動く前に Drizzle の適用器で当てる
+    effect: 表の定義が TypeScript の型になり、読み書きを型で確かめられる。一つのつなぎ方でローカルの libSQL と Turso の両方を扱う。マイグレーションは読んで確かめられる SQL のファイルで、足すだけの変更かをレビューで見られる
+    cost: ORM の書き方を学ぶ（DAS-07）。drizzle-kit の push は使わない
+  - name: Kysely で型つきの SQL を組み立て、Kysely のマイグレーションを使う
+    effect: SQL に近い書き方で、型で確かめられる
+    cost: 表の型を別に書くか生成し、libSQL の方言は別の部品で足す
+  - name: "@libsql/client で SQL を直接書き、マイグレーションの適用は小さな自作の道具で行う"
+    effect: 部品が最も少ない
+    cost: 行と型の対応を手で書き、マイグレーションの適用と記録を自分で作って試す
+chosen: Drizzle ORM（@libsql/client でつなぐ）で読み書きし、drizzle-kit がコードの表の定義から生成する SQL のマイグレーションを、新しい版が動く前に Drizzle の適用器で当てる
+rationale: どの案も、一つの取引の中の条件つきの書き込み（DEC-08）とお金の操作の試みの記録（DEC-10）を書け、DRV-07 と DRV-02 では並ぶ。三つ目は型の対応と適用器を自分で作って試す手間が DRV-16 で劣り、二つ目は表の型と libSQL の方言を別に揃える手間がかかる。一つ目は、ローカルの libSQL と Turso を同じつなぎ方で扱い（DRV-15）、コードの表の定義と生成したマイグレーションの違いを検査の手順で見つけられる（POL-01）。マイグレーションは新しい版が動く前に当て、一つの版の中では足すだけにし、消すのは前の版に戻す見込みがなくなった後のリリースで行う（DEC-26、DRV-13、POL-04）
+rejected:
+  - option: Kysely で型つきの SQL を組み立て、Kysely のマイグレーションを使う
+    reason: 表の型と libSQL の方言を別に揃える手間が DRV-16 で一つ目に劣る
+  - option: "@libsql/client で SQL を直接書き、マイグレーションの適用は小さな自作の道具で行う"
+    reason: 型の対応と適用器を自分で作って試す手間が DRV-16 で劣る
+gains:
+  - 読み書きとマイグレーションが、コードの表の定義から型で確かめられる
+  - ローカルと想定の本番で同じつなぎ方を使う
+costs:
+  - ORM の書き方を学ぶ
+  - Drizzle の版を上げるとき、マイグレーションのファイルの形を合わせることがある
+sensitive_points: []
+trade_offs: []
+assumptions:
+  - Drizzle ORM は、libSQL の取引の中の条件つきの書き込みとマイグレーションの適用を、ローカルの libSQL のファイルとサーバー、Turso のどれでも行える
+  - 開発者は Drizzle ORM を使いこなすか、学ぶ時間を取れる（DAS-07）
+depends_on: [DEC-08, DEC-10, DEC-17, DEC-26]
+parameters: []
+debt: null
+as_is: new

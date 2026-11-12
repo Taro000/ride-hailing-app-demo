@@ -1,0 +1,45 @@
+id: DEC-28
+title: 二つの Web アプリは Vite で単一ページのアプリとして作り、React Router、TanStack Query、React Aria Components を使う
+status: active
+basis: assumed
+basis_note: 画面を React で作ることは TC-02（入力）。二つの Web アプリが利用者のブラウザで動き、その静的なファイルを ELM-03 が配ることは DEC-01、DEC-04、ELM-01、ELM-02（入力）。組み立て方の比べ方と選び方は推定。開発者がこれらの主なライブラリを使いこなすか学べることは DAS-07 による仮定。React Router 8 が 2026 年 6 月に出てデータの組み立て方（data mode）を持ち、React 19 を求めることは公開の情報で確かめた（報告の「入力」）。TanStack Query と React Aria Components の今の版と、React Aria Components の部品が iOS の Safari の読み上げで使えることは確かめていない
+premises: [TC-02, TC-13, DAS-07]
+stage: technical-policy
+question: 乗客とドライバーの Web アプリ（ELM-01）と担当者とエンジニアの Web アプリ（ELM-02）を、React（TC-02）の上で何で組み立てるか（ビルド、画面の移り変わり、サーバーの状態の持ち方、画面の部品）
+addresses: [DRV-16, DRV-22, DRV-15, DRV-12]
+options:
+  - name: Vite で単一ページのアプリとしてビルドし、画面の移り変わりは React Router のデータの組み立て方、サーバーの状態は TanStack Query、入力やダイアログの部品は React Aria Components で作る
+    effect: 二つの Web アプリが同じ組み合わせになり、ビルドの出力は ELM-03 が配る静的なファイルだけで、Hono の ELM-03 と役割が重ならない。候補の一覧つきの場所の入力（FR-01）やダイアログのように、自分で作ると WCAG 2.2 の AA を外しやすい部品を、読み上げと操作に対応した部品で作れる
+    cost: 開発者が学ぶ主なライブラリが四つある（DAS-07）
+  - name: React Router のフレームワークの組み立て方（framework mode）で、サーバーでの描画を切った単一ページのアプリにし、部品は React Aria Components で作る
+    effect: ファイルの置き方で画面の移り変わりとデータの読み込みが揃う
+    cost: 使わないサーバーの機能のためにフレームワークのビルドの決まりと Vite のプラグインに従い、その出力の形に ELM-03 の配り方を合わせる
+  - name: Next.js の静的な書き出しで作り、部品は React Aria Components で作る
+    effect: 広く使われ、資料が多い
+    cost: サーバーの機能を使わずに Hono の ELM-03（TC-03）と役割が重なり、静的な書き出しの制限（実行時に決まる経路）に合わせる
+  - name: React と Vite だけで作り、画面の移り変わり、サーバーの状態、部品を自分で書く
+    effect: 主なライブラリが最も少ない
+    cost: ELM-02 の一覧と詳しい画面の行き来、戻る操作、読み直しとやり直しを自分で作り、候補の一覧つきの入力とダイアログを WCAG 2.2 の AA に合わせて自分で作る
+chosen: Vite で単一ページのアプリとしてビルドし、画面の移り変わりは React Router のデータの組み立て方、サーバーの状態は TanStack Query、入力やダイアログの部品は React Aria Components で作る
+rationale: 二つの Web アプリは静的なファイルとして ELM-03 が配り（DEC-01、DEC-04）、サーバーの仕事は Hono の ELM-03 が持つ（TC-03）ので、サーバーでの描画を持つ二つ目と三つ目は、使わない機能のために決まりを増やして DRV-16 で一つ目に劣る。四つ目はライブラリが少ないが、ELM-02 の画面の行き来とサーバーの状態の読み直しを自分で書き、候補の一覧つきの場所の入力を WCAG 2.2 の AA に合わせて自分で作るため、DRV-16 で劣り、交渉できない DRV-22 を外す見込みが高い。一つ目は静的なファイルだけを出すため、ローカルでも想定の本番でも同じ配り方で済み（DRV-15）、画面の業務の機能ごとに経路を分けられる（DRV-12）。ホーム画面に加えた ELM-01（DEC-02）の Web Push を受けるサービスワーカー、画面を消さない仕組み、位置は、アプリの土台（POL-02 の src/platform/）に置き、ライブラリには頼らない
+rejected:
+  - option: React Router のフレームワークの組み立て方（framework mode）で、サーバーでの描画を切った単一ページのアプリにし、部品は React Aria Components で作る
+    reason: 使わないサーバーの機能のためにフレームワークの決まりが増え、DRV-16 で一つ目に劣る
+  - option: Next.js の静的な書き出しで作り、部品は React Aria Components で作る
+    reason: Hono の ELM-03（TC-03）と役割が重なり、静的な書き出しの制限に合わせる手間が DRV-16 で劣る
+  - option: React と Vite だけで作り、画面の移り変わり、サーバーの状態、部品を自分で書く
+    reason: 候補の一覧つきの入力とダイアログを自分で作って DRV-22 を外す見込みが高く、ELM-02 の画面の行き来を作る手間が DRV-16 で劣る
+gains:
+  - 二つの Web アプリが同じ組み合わせで、片方を知れば他方も作れる
+  - 候補の一覧つきの入力やダイアログを、読み上げと操作に対応した部品で作れる
+costs:
+  - 開発者が学ぶ主なライブラリが四つある
+sensitive_points: []
+trade_offs: []
+assumptions:
+  - 開発者は Vite、React Router、TanStack Query、React Aria Components を使いこなすか、学ぶ時間を取れる（DAS-07）
+  - React Aria Components の部品は、iOS 18.4 以降の Safari の読み上げと拡大の機能で使える
+depends_on: [DEC-01, DEC-02, DEC-03, DEC-04]
+parameters: []
+debt: null
+as_is: new
