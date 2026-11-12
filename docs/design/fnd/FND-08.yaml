@@ -1,0 +1,14 @@
+id: FND-08
+title: DEC-17 の名前と理由が、FR-51 の 3 年とその扱いを自身の言葉で書いている
+status: open
+basis: inferred
+basis_note: null
+premises: []
+raised_by: design-review
+raised_in: reviews/2-architecture.md
+to: architecture-drivers-to-architecture
+targets: [DEC-17]
+severity: minor
+evidence: DEC-17 の title「…記録してから 3 年を過ぎた個人の情報は日々の処理で消す」は、FR-51 と QR-59 の保存期間を ID なしで決定の言葉として書いている。rationale も「記録してから 3 年を過ぎた記録とデータは…状態の変化の種類と時刻を残し、操作した人と位置を消す（FR-51）」と FR-51 の statement を言い直している。今は一致しているが、品質チェーンが期間か扱いを変えると食い違う
+suggestion: title から期間を外し（「保存期間を過ぎた個人の情報は日々の処理で FR-51 のとおりに変える」など）、rationale は FR-51 と QR-59 を ID で引くだけにする
+resolution: null

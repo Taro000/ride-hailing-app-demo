@@ -1,0 +1,14 @@
+id: FND-03
+title: DEC-06 が DAS-03 に頼りながら前提に挙げていない
+status: open
+basis: inferred
+basis_note: null
+premises: []
+raised_by: design-review
+raised_in: reviews/2-architecture.md
+to: architecture-drivers-to-architecture
+targets: [DEC-06]
+severity: minor
+evidence: DEC-06 の想定は「iOS の Safari は、画面に出ている間は Server-Sent Events の流れを保ち、切れたら最後の出来事を伝えてつなぎ直す」で、DAS-03 の「画面に出ていて画面を消さずに保っている間は…サーバーとの流れを開いたまま保てる」と同じ判断に頼る。DEC-06 の premises は TC-13、TC-18、QCR-02、QCR-03 だけで、depends_on（DEC-01、DEC-08）をたどっても DAS-03 に届かず、根拠は推定のままになっている。DAS-03 を premises で名指す項目は DEC-02、DEC-07、DEC-21、ELM-01 の四つで、DEC-06 を加えると五つになる
+suggestion: DEC-06 の premises に DAS-03 を加え、根拠を仮定にする。DAS-03 に依存する項目が五つになって影響の広さが高になるため、その実行で DAS-03 を利用者に尋ねる（conventions の「Assumptions」）。画面に出ている間に流れを保てることを確かだと判断するなら、DAS-03 の statement からその部分を外し、DEC-06 の推定とそろえる
+resolution: null

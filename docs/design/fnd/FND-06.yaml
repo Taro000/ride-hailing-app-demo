@@ -1,0 +1,14 @@
+id: FND-06
+title: キャンセル料と不在の料金を押さえから取るには確定額が CON-08 の額以上でなければならないが、DEC-09 はそれを想定に挙げていない
+status: open
+basis: inferred
+basis_note: CON-08 の額、DEC-09 の押さえ方、模擬の運賃表の中身が決まっていないこと（QR-62、NFR-48）は入力。押さえより多くは確定できないことはこのレビューの推定
+premises: [CON-08]
+raised_by: design-review
+raised_in: reviews/2-architecture.md
+to: architecture-drivers-to-architecture
+targets: [DEC-09]
+severity: minor
+evidence: DEC-09 は押さえた額をいつも確定額にそろえ、許諾の後の取り消しと乗客の不在では CON-08 の料金を押さえの一部の確定で請求し、残りを解く。押さえた額より多くは確定できないため、確定額が CON-08 の額を下回る依頼では料金を請求できない。確定額は模擬の運賃表から求めるが（QR-61）、運賃表の中身と模す定めは決まっておらず（QR-62、NFR-48 は品質チェーンの未解決の点）、確定額が CON-08 の額以上であることを述べる項目はない。DEC-09 の assumptions もこれを挙げていない
+suggestion: DEC-09 の assumptions に「確定額は CON-08 の料金以上である」を加え、確かでなければ DAS にするか利用者に尋ねる。成り立たない依頼がありうるなら、押さえを超える料金の請求の仕方を決め、FR-54 と SLI-11 もこの前提に頼っているため、品質チェーンへの要求を書く
+resolution: null

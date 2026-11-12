@@ -1,0 +1,14 @@
+id: FND-04
+title: HND-11 が、結果が分からないお金の操作を確かめる時期を左右する値を第 4 段階に送り、HND-05 と結び付けていない
+status: open
+basis: inferred
+basis_note: null
+premises: []
+raised_by: design-review
+raised_in: reviews/2-architecture.md
+to: architecture-drivers-to-architecture
+targets: [HND-11]
+severity: minor
+evidence: HND-11 の what は、サーバーの中の繰り返しが期限の来た処理（許諾のない依頼の知らせと終わり、結果が分からないお金の操作の確かめ）を拾う間隔の値で、basis_note は「時間のしきい値の SLO とお金の道にないため」第 4 段階に送るとしている。結果が分からないお金の操作の確かめはお金の道にあり、それを確かめに行く間隔は HND-05 で第 3 段階に送っている（お金の道の値は第 3 段階の確定の種類）。拾う間隔が長いと第 3 段階が決める確かめの間隔を守れないが、HND-11 の bounds は FR-04、FR-23、DEC-18 だけで、HND-05 も DEC-10 も挙げていない
+suggestion: お金の操作の確かめを拾う間隔を HND-05 に含めて第 3 段階に送るか、HND-11 の bounds に HND-05 と DEC-10 を加えて、第 4 段階が第 3 段階の決める確かめの間隔を守るようにする
+resolution: null
