@@ -2,7 +2,7 @@ id: ELM-03
 title: 配車サーバー
 status: active
 basis: inferred
-basis_note: 一つのサーバーにまとめることは DEC-01、ランタイムは DEC-04、置き場所は DEC-05 による。受け持つ機能の割り当ては推定。本人の確かめ方（DEC-14）は質問 3 を待つ
+basis_note: 一つのサーバーにまとめることは DEC-01、ランタイムは DEC-04、置き場所は DEC-05 による。受け持つ機能の割り当ては推定。本人の確かめ方（DEC-14）は質問 3 で確認済み
 premises: [TC-01, TC-03, TC-08, TC-09]
 kind: component
 name: 配車サーバー

@@ -1,8 +1,8 @@
 id: ELM-11
 title: 乗客とドライバーの iPhone
 status: active
-basis: inferred
-basis_note: 乗客とドライバーが iOS の Safari で使うことは TC-13、CON-05（入力）。対応する iOS の版は質問 1 を待つ（DEC-02）
+basis: confirmed
+basis_note: 乗客とドライバーが iOS の Safari で使うことは TC-13、CON-05（入力）。ホーム画面に加えて使うことと、対応する iOS の版（18.4 以降）は質問 1 で確認済み（DEC-02）
 premises: [TC-13, CON-05]
 kind: node
 name: 乗客とドライバーの iPhone

@@ -87,6 +87,11 @@ technology_constraints:
     kind: prohibited
     source: context.yaml CON-07
     basis: stated
+  - id: TC-18
+    statement: ドライバーは、受付をしている間もアプリを画面に出したままにする（TC-13 の、迎車を待つ間、迎車中、乗車中に加える）
+    kind: platform
+    source: 設計の第 2 段階の質問 2; QCR-03
+    basis: confirmed
 project_constraints:
   - id: PC-01
     kind: budget

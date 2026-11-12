@@ -1,6 +1,6 @@
 id: QCR-03
 title: ドライバーは受付をしている間もアプリを画面に出したままにする
-status: open
+status: answered
 stage: 2
 targets: [CON-05, QIU-15, QIU-16, QIU-17, QIU-20, QR-19, NFR-19, SLI-10]
 origin: [DEC-07, DRV-04]
@@ -8,6 +8,6 @@ issue: QCR-02 の答え（設計の第 1 段階の質問 2）は、乗客とド�
 suggestion: QCR-02 の条件に、ドライバーが受付をしている間もアプリを画面に出したままにすることを加え、共有する事実（制約）と、CUJ-06 と CUJ-09 の利用時の品質要求（QIU-15、QIU-16、QIU-17、QIU-20）の利用状況に書く。NFR-19 と SLI-10 の数え方は、それに合わせる
 quality_stages: [1]
 impact: high
-impact_note: 主な設計を動かす要求の DRV-04 と DRV-03 の環境が変わり、DEC-07 が送る場面も変わる。設計の第 2 段階の質問 2 で尋ねる
-answer: null
-answered_in: null
+impact_note: 主な設計を動かす要求の DRV-04 と DRV-03 の環境が変わり、DEC-07 が送る場面も変わる。設計の第 2 段階の質問 2 で尋ね、答えを受けた
+answer: 含む。ドライバーは受付をしている間もアプリを画面に出したままにし、QCR-03 のとおり品質チェーンに記録する（下書きどおり。試行の模擬回答）
+answered_in: 設計の第 2 段階の質問 2
