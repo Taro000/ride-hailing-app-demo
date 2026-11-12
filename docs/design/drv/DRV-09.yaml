@@ -2,7 +2,7 @@ id: DRV-09
 title: 乗り終えた乗客は、少ない操作で評価を送れる
 status: active
 basis: assumed
-basis_note: シナリオは QR-68（重視）と NFR-33 のゲート（入力）から。N_rating_operations の値は QAS-35 による。順位は質問 6 を待つ
+basis_note: シナリオは QR-68（重視）と NFR-33 のゲート（入力）から。N_rating_operations の値は QAS-35 による。順位は質問 6 で確認済み
 premises: [QAS-35]
 kind: quality
 statement: 乗り終えた乗客は、乗車が終わった画面から N_rating_operations のうちの操作で、乗ったドライバーの評価を送れる

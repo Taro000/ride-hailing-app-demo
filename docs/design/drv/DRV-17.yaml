@@ -1,8 +1,8 @@
 id: DRV-17
 title: TypeScript、React、Hono で作り、Oxlint、Oxfmt、Vitest で確かめる
 status: active
-basis: inferred
-basis_note: 制約は利用者が与えた設計の与件（入力）。交渉できないことは、利用者が技術制約として挙げたことから下書きした（質問 3 を待つ）。第 2 段階はこの中で各コンポーネントのランタイムを決め、第 2b 段階が技術方針でこれに従う。順位は質問 6 を待つ
+basis: confirmed
+basis_note: 制約は利用者が与えた設計の与件（入力）。交渉できないことは質問 3 で確認済み。第 2 段階はこの中で各コンポーネントのランタイムを決め、第 2b 段階が技術方針でこれに従う。順位は質問 6 で確認済み
 premises: [TC-01, TC-02, TC-03, TC-04, TC-05, TC-06]
 kind: constraint
 statement: コードは TypeScript で書き、画面は React で、サーバーは Hono で作る。静的な検査に Oxlint を、書式の整形に Oxfmt を、試験に Vitest を使う

@@ -33,20 +33,20 @@ technology_constraints:
     source: 利用者が与えた設計の与件（技術制約）
     basis: stated
   - id: TC-07
-    statement: データベースは Turso とする。利用者はこれを「あくまで想定」としており、実際には配備しない
+    statement: 本番のデータベースは Turso として設計する。利用者はこれを「あくまで想定」としており、実際には配備しない
     kind: platform
-    source: 利用者が与えた設計の与件（技術制約）
-    basis: stated
+    source: 利用者が与えた設計の与件（技術制約）; 第 1 段階の質問 1
+    basis: confirmed
   - id: TC-08
-    statement: 実行の基盤は GCP Cloud Run とする。利用者はこれを「あくまで想定」としており、実際には配備しない
+    statement: 本番の実行の基盤は GCP Cloud Run として設計する。利用者はこれを「あくまで想定」としており、実際には配備しない
     kind: platform
-    source: 利用者が与えた設計の与件（技術制約）
-    basis: stated
+    source: 利用者が与えた設計の与件（技術制約）; 第 1 段階の質問 1
+    basis: confirmed
   - id: TC-09
-    statement: このアプリはデモで、実際にはデプロイせず、ローカルだけで完結させる
+    statement: このアプリはデモで、実際にはデプロイせず、作ること、試すこと、動かすことをローカルだけで完結させる。ローカルでは本番と同じコードを Turso と Cloud Run の代わりのもので動かす。デモの回、SLO、監視、監査は、想定の本番（TC-07、TC-08）の要求として設計し、実際には行わない
     kind: platform
-    source: 利用者が与えた設計の与件（技術制約）
-    basis: stated
+    source: 利用者が与えた設計の与件（技術制約）; 第 1 段階の質問 1
+    basis: confirmed
   - id: TC-10
     statement: 決済と返金は外部の決済サービス（EXT-01）のテスト環境を通し、製品は Stripe のテスト環境（サンドボックス）とする。システムの中で記録するだけの仮の仕組みは使わず、実際のお金は動かない
     kind: external-service
@@ -63,10 +63,10 @@ technology_constraints:
     source: context.yaml DIN-05
     basis: stated
   - id: TC-13
-    statement: 乗客とドライバーは、ネイティブアプリではなく、スマートフォンのブラウザで使う Web アプリでこのサービスを使う。対象は iOS の Safari だけで、ほかの端末とブラウザには対応しない
+    statement: 乗客とドライバーは、ネイティブアプリではなく、スマートフォンのブラウザで使う Web アプリでこのサービスを使う。対象は iOS の Safari だけで、ほかの端末とブラウザには対応しない。乗客とドライバーは、迎車を待つ間、迎車中、乗車中にアプリを画面に出したままにする
     kind: platform
-    source: context.yaml DIN-04; context.yaml CON-05
-    basis: stated
+    source: context.yaml DIN-04; context.yaml CON-05; 第 1 段階の質問 2
+    basis: confirmed
   - id: TC-14
     statement: 乗客とドライバーが同じ依頼の相手であることは確認コードで確かめ、乗客が伝えたコードをドライバーが入れる
     kind: mandated

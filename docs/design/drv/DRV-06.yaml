@@ -2,7 +2,7 @@ id: DRV-06
 title: 手配のときに示す到着予定時刻どおりに着く
 status: active
 basis: assumed
-basis_note: シナリオは QR-08（重視）と NFR-08 の SLO（入力）から。T_arrival_estimate_gap の値と目標は QAS-26 による。SLI-08 は FRP-14 が決まるまで、乗車中に降りる場所を変えた乗車だけを数える（報告の「未解決の点」）。順位は質問 6 を待つ
+basis_note: シナリオは QR-08（重視）と NFR-08 の SLO（入力）から。T_arrival_estimate_gap の値と目標は QAS-26 による。SLI-08 は FRP-14 が決まるまで、乗車中に降りる場所を変えた乗車だけを数える（報告の「未解決の点」）。順位は質問 6 で確認済み
 premises: [OPF-01, EXT-02, TC-12, QAS-26]
 kind: quality
 statement: 依頼の前に示す目的地への到着予定時刻（ドライバーが見つかるまでと迎車の時間を含む）と、乗車中に降りる場所を変えるときに示す到着予定の時刻は、実際に目的地に着いた時刻から T_arrival_estimate_gap を超えて外れない

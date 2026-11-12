@@ -1,6 +1,6 @@
 id: QCR-02
 title: 乗客とドライバーは、待つ間、迎車中、乗車中にアプリを画面に出したままにする
-status: open
+status: answered
 stage: 1
 targets: [DIN-04, CON-05, QR-19, QR-06, NFR-19, NFR-07]
 origin: [DRV-14, DRV-04, DRV-03]
@@ -8,6 +8,6 @@ issue: DIN-04（iOS の Safari で使う Web アプリ）のもとでは、ア�
 suggestion: 乗客とドライバーが、迎車を待つ間、迎車中、乗車中にアプリを画面に出したままにすることを、共有する事実（制約）と、CUJ-02、CUJ-03、CUJ-06、CUJ-07、CUJ-09 の利用時の品質要求の利用状況に加える。NFR-19 と NFR-07 は、アプリが前に出ていない間をどう数えるかをそれに合わせる
 quality_stages: [1]
 impact: high
-impact_note: 主な設計を動かす要求の DRV-04 と DRV-03 の環境が変わる。設計の第 1 段階の質問 2 で尋ねている
-answer: null
-answered_in: null
+impact_note: 主な設計を動かす要求の DRV-04 と DRV-03 の環境が変わる。設計の第 1 段階の質問 2 で尋ね、答えを受けた
+answer: DIN-04 を保つ。乗客とドライバーは、迎車を待つ間、迎車中、乗車中にアプリを画面に出したままにし、設計は画面を消さずに保つこと、戻ったときに今の状態に合わせること、ホーム画面に加えた Web アプリの知らせで支える。この条件を QCR-02 で品質チェーンに記録する。（下書きどおり。試行の模擬回答）
+answered_in: 設計の第 1 段階の質問 2
