@@ -1,0 +1,14 @@
+id: FND-29
+title: 位置の送りのタイムアウト 5 秒は DEC-46 の決め方に合わず、流れのつなぎ直しの 35 秒は報告が書く順を満たさない
+status: open
+basis: inferred
+basis_note: IFC-05、IFC-11、DEC-46 の値と報告の文は入力。計算はこのレビューのスクリプト
+premises: []
+raised_by: design-review
+raised_in: reviews/3-high-level-design.md
+to: architecture-to-high-level-design
+targets: [IFC-05, DEC-46]
+severity: minor
+evidence: DEC-46 は、時間のしきい値の SLO の道の上の ELM-01 の呼び出しのタイムアウトを、ELM-03 の答えの期限に通信の余裕（5 秒）を足したものより長くするとする。IFC-05 の位置の送りは NFR-19 の道の上にあり、期限 2 秒に 5 秒を足すと 7 秒だが、タイムアウトは 5 秒。送り直さず次の送りが替わるという IFC-05 の理由は成り立つが、DEC-46 はその例外を書いていない。また報告のタイムアウトの表とスクリプトの出力は、流れの 35 秒が生存の確かめの 2 回分と余裕 5 秒より長いとするが、2 × 15 + 5 は 35 で等しい
+suggestion: DEC-46 の決め方に、送り直さずに次の送りが替わる呼び出し（位置）の例外を書くか、IFC-05 のタイムアウトを決め方に合わせる。報告の 35 秒の文を値に合わせる
+resolution: null

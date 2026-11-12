@@ -1,0 +1,14 @@
+id: FND-27
+title: 現在地の確かめは動いている ELM-03 だけが書くため、ELM-03 が止まった分の確かめが SLI-10 に入らない
+status: open
+basis: inferred
+basis_note: SLI-10 の VALID と GOOD、DAT-21 の整合の取り方、DAS-02 の文は入力。止まった間の確かめを誰も書かないことは、このレビューの推定
+premises: []
+raised_by: design-review
+raised_in: reviews/3-high-level-design.md
+to: architecture-to-high-level-design
+targets: [DAT-21]
+severity: minor
+evidence: SLI-10 の VALID は、受付をしている、迎車中、乗車中のドライバーと迎車を待つ乗客について 1 分ごとに行う確かめで、システムが位置を持たないときも GOOD に数えない。DAT-21 はその確かめを、ELM-03 がデモの回の間 1 分ごとに書く。ELM-03 のインスタンスが落ちてから起き直すまで（DAS-02）は位置を受けられず古くなるのに、その分の確かめは誰も書かないため、位置が最も古くなる分が VALID から抜け、SLI-10 は落ちたことを見ない
+suggestion: 起き直した ELM-03 が、最後の確かめから抜けた分の確かめを、その間の依頼と受付の状態（DAT-07、DAT-04）と最後に受けた位置から書くことを DAT-21 に加える
+resolution: null

@@ -1,0 +1,14 @@
+id: FND-32
+title: IFC-02 と DAT-07 が、頼っている CON-01 と TC-12 を前提に挙げていない
+status: open
+basis: inferred
+basis_note: IFC-02 と DAT-07 の basis_note と premises、CON-01、TC-12 は入力。頼っていることは、このレビューの推定
+premises: []
+raised_by: design-review
+raised_in: reviews/3-high-level-design.md
+to: architecture-to-high-level-design
+targets: [IFC-02, DAT-07]
+severity: minor
+evidence: IFC-02 の basis_note は、見積もりの示した料金を確定額にすることを CON-01 によるとし、POST /v1/quotes はそれに頼るが、premises は EXT-02 と TC-12 だけ。DAT-07 は、乗る場所の位置と乗車を始めた位置を同じ WGS84 で比べられることを、地図の製品（TC-12）の場所の位置が WGS84 であることで確かめて HND-02 を決めたが、premises は CON-01 と CON-06 だけ。CON-01 か TC-12 が変わったときに、この二つが見直す項目として見つからない
+suggestion: IFC-02 の premises に CON-01 を、DAT-07 の premises に TC-12 を加える
+resolution: null

@@ -1,0 +1,14 @@
+id: FND-34
+title: 境界の SLI を ELM-03 の入口の記録だけで数えるため、ELM-03 が止まっている間にプラットフォームが答えた操作がどこにも数えられない
+status: open
+basis: inferred
+basis_note: DEC-23、DAS-02、SLI-01〜SLI-06、第 2 段階の報告の実行時の構成の注、第 3 段階の IFC の sli_bindings と DAT-19 は入力。止まった間の操作が数えられないことは、このレビューの推定
+premises: []
+raised_by: design-review
+raised_in: reviews/3-high-level-design.md
+to: architecture-drivers-to-architecture
+targets: [DEC-23]
+severity: minor
+evidence: DEC-23 は SLI-01〜SLI-06 の出来事をサーバーの入口の記録で見ると決め、プラットフォームのロードバランサーの記録を退けた。第 2 段階の報告は ELM-03 の入口をシステムの境界とし、第 3 段階の出どころはそれに従って、入口が受けたときに書く境界の出来事（DAT-19）で数える。想定の本番で、一つのインスタンスが落ちて起き直すまで（DAS-02）や起き直せない間に届き、プラットフォームが ELM-03 に渡せずに誤りで答えた操作は、ELM-03 が受けないため記録がない。SLI-01 の vantage_reason は「システムに届いた操作はすべて見える」とするが、その間の操作はどこにも数えられず、DEC-23 の失うものにもこの見えない所がない。端末が後で同じキーで送り直せば、その操作は良い一つとして数えられる（FND-23）
+suggestion: DEC-23 の失うものにこの見えない所を書き、想定の本番では、ELM-03 が記録しなかった要求をプラットフォームの要求の記録から GOOD でないものとして加えるか、見えないことを品質チェーンに伝える
+resolution: null

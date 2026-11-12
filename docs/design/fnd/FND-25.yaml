@@ -1,0 +1,14 @@
+id: FND-25
+title: 担当者がアカウントとドライバーを探して今の内容を見る操作がなく、訂正、試験用の区別、設定の符号の出し直し、停止の相手を選べない
+status: open
+basis: inferred
+basis_note: IFC-12、IFC-24、FR-41〜FR-44 の受け入れ基準、DEC-14 の文は入力。担当者が相手を選べないことは、このレビューの推定
+premises: []
+raised_by: design-review
+raised_in: reviews/3-high-level-design.md
+to: architecture-to-high-level-design
+targets: [IFC-12, IFC-24]
+severity: major
+evidence: IFC-12 のアカウントとドライバーの操作（PATCH /v1/console/accounts/{accountId}、PUT …/test-flag、POST …/setup-codes、PATCH /v1/console/drivers/{accountId}、POST と DELETE …/suspension）はどれも accountId を名指すが、アカウントかドライバーの登録を一覧にする、探す、一つ読む操作は IFC-12 にない（探す操作は乗車と操作の記録だけ）。POST /v1/console/accounts はサインインの ID と設定の符号を返すだけ。そのため、FR-42 の 1（試験用として作ったアカウントを試験用として示す）を担当者に示す所がなく（試験用かを返すのは本人への GET /v1/me だけ）、FR-41 の 4 と FR-43 の 4（今の内容を訂正する）、FR-42 の 3、FR-44（停止するドライバーと、停止しているか）、DEC-14（パスワードを忘れた参加者の設定の符号を出し直す）の相手を、担当者が選べない。乗車の照会から ID が分かるのは乗車のある乗客とドライバーだけ。IFC-24 のアカウント、ドライバーと車両の登録、ドライバーの停止と再開の画面も、相手をどう選ぶかを書いていない。CUJ-16〜CUJ-18 の機能が一部しか使えない
+suggestion: IFC-12 に、アカウントを種類、名前、サインインの ID などで探す操作（条件は本文で送る、DEC-39、DEC-44）と、一つのアカウントとドライバーの登録を読む操作（試験用か、停止しているか、今の登録の内容）を加え、IFC-24 の画面にその一覧と内容を置く
+resolution: null
