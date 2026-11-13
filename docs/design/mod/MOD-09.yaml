@@ -37,7 +37,7 @@ interface:
     errors: []
   - operation: "onAccountChanged(listener: (accountId: AccountId or none) -> none) -> Unsubscribe"
     pre: null
-    post: このタブのサインインと使い終えるたびと、MOD-01 の onAccount が自身の知るものと違うアカウントを知らせたとき（ほかのタブのサインインと使い終えること、送る前とタブが前に出たときの確かめ）に、me を読み直して、サインインしているアカウントを知らせる（アカウントがなければ使い始めを示す）。MOD-01 の onNotSignedIn と MOD-03 の notSignedIn を受けたら使い始めに移り、同じアカウントで確かめ直した後は移る前の画面に戻すが、使い始めた操作は担当者が新しく行う（IFC-01、FR-48 の 3）
+    post: このタブのサインインと使い終えるたびと、MOD-01 の onAccount が自身の知るものと違うアカウントを知らせたとき（ほかのタブのサインインと使い終えること、送る前、タブが前に出たとき、422 IDEMPOTENCY_KEY_REUSED を受けたときの確かめ）に、me を読み直して、サインインしているアカウントを知らせる（アカウントがなければ使い始めを示す）。MOD-01 の onNotSignedIn と MOD-03 の notSignedIn を受けたら使い始めに移り、同じアカウントで確かめ直した後は移る前の画面に戻すが、使い始めた操作は担当者が新しく行う（IFC-01、FR-48 の 3）
     errors: []
 invariants: []
 depends_on: [MOD-01, MOD-03, MOD-05, MOD-08]
