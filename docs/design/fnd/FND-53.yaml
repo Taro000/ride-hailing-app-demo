@@ -1,6 +1,6 @@
 id: FND-53
 title: MOD-02 の判断表 C に、evidence が unanswered の操作で送る前の確かめが 503 か 4xx で答えた failed の行がない
-status: open
+status: accepted
 basis: inferred
 basis_note: MOD-01 の確かめの判断表と send の post、MOD-02 の判断表 C、契約の誤りと不変条件は入力（0347322 で加わった所）
 premises: []
@@ -11,4 +11,4 @@ targets: [MOD-02]
 severity: minor
 evidence: FND-44 を受けて加わった MOD-01 の確かめの判断表は、GET /v1/me が 5xx（503 を含む）、429、ほかの 4xx で答えると変える要求を出さずに失敗の答えにし、確かめの ApiError の failed を返して evidence を変えない。MOD-02 の判断表 C は、evidence が unanswered の行を「failed（503 でない 5xx か 429）か unanswered」に限るため、前の要求に答えのない返金の操作で確かめが 503 か 4xx で答えた failed はどの行にも当たらない（evidence が failed と notDone の行は failed を限らない）。MOD-02 の契約の誤りは 503 を「受け付けなかったことを示し、同じキーで送り直さずに一覧を読み直す」とするので、それに従うと、ELM-03 で済んでいるかもしれない返金に受け付けなかったと示す（不変条件は結果が分からない返金を済まなかったと示さない）。読み込み中に戻れば kept() が答えがないとして返すので、二重にはならない
 suggestion: 判断表 C の evidence が unanswered の行を failed の中身によらない行にし（確かめが返した failed を含む）、契約の誤りの 503 の行は変える要求への定まった答えだけに当たると書く
-resolution: null
+resolution: 受け入れ。MOD-02 の判断表 C の evidence が unanswered の行を、failed の中身によらない行にした（送る前の確かめが 503、429 かほかの 4xx で答えた failed を含む）。契約の誤りの PAYMENT_SERVICE_UNAVAILABLE とほかの符号の 503 は、返金の要求への MOD-01 の定まった答え（refused）だけに当たると書き、答えがないことと定まらない答えの行に送る前の確かめの失敗の答えを加えて、evidence で済んだかどうか分からないか送れなかったかを示すとした。結果が分からない返金の不変条件を evidence で書き直した。MOD-01 の send の post にも、送る前の確かめの失敗の答えを failed として返し、evidence を変えないことを書いた。MOD-02 の単体の層の判断表 C の確かめに、確かめの failed と evidence の各組を加えた

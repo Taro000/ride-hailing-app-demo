@@ -1,6 +1,6 @@
 id: FND-54
 title: 報告の割り当ての FR-50 の 1 が MOD-01 を挙げるが、MOD-01 の functions に FR-50 がない
-status: open
+status: accepted
 basis: inferred
 basis_note: null
 premises: []
@@ -11,4 +11,4 @@ targets: [MOD-01]
 severity: minor
 evidence: 0347322 で報告の割り当ての FR-50 の 1 に MOD-01（操作を始めたアカウントのセッションでだけ送る）を加えたが、MOD-01 の functions は FR-40 と FR-48 だけで FR-50 を持たない。FND-48 を受けて FR-49 の 1 から MOD-01 を外したのと同じ食い違い
 suggestion: MOD-01 の functions に FR-50 を加える（送る前の確かめが操作の記録の担当者を操作を始めた担当者に保つ。DRV-30）か、FR-50 の 1 の行から MOD-01 を外す
-resolution: null
+resolution: 受け入れ。MOD-01 の functions に FR-50 を加えた。FR-50 の 1 は行った担当者とともに記録することを求め、MOD-01 は一つの操作のどの要求も操作を始めたアカウントのセッションでだけ送ることで、記録される担当者を操作を始めた担当者に保つ（DRV-30）ので、FR-49 の 1 のように渡すだけのものではない。報告の割り当ての FR-50 の 1 はそのままにし、MOD-01 の端から端の層の確かめに、二つのタブで担当者を替えた後にほかの担当者の名で記録されないこと（FR-50 の 1）を書いた
