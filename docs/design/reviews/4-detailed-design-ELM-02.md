@@ -56,7 +56,6 @@ kept operation dropped before ELM-03 forgets the key: 23 h < 24 h: True (margin 
 |---|---|---|---|---|
 | FND-43 | MOD-01 は、MOD-09 がサインインの前に送るサインインとパスワードを決める操作を始められず、合わないパスワードの 401 AUTH_FAILED をセッションが切れた 401 と同じに扱う | 中 | high-level-design-to-detailed-design | MOD-01、MOD-09 |
 | FND-44 | ほかのタブでほかのアカウントがサインインすると、このタブに残った答えのない返金が、そのアカウントでキーの範囲の外として送られ、二度返金されうる | 中 | high-level-design-to-detailed-design | MOD-01、MOD-02 |
-| FND-45 | EXT-01 が実行の前に退けた返金は refunding のまま残り、済みもせず済まなかったとも示されず、担当者がやり直す道がない | 中 | architecture-to-high-level-design | DAT-12、IFC-13、DEC-45 |
 | FND-46 | MOD-01 のタブの保存の項目が、kept() が返す答えの種類を不変条件で除き、答えのない送りの後に 401 を受けた操作の種類と、版が変わった後の読み方を決めていない | 軽微 | high-level-design-to-detailed-design | MOD-01 |
 | FND-47 | MOD-02 の読み込み中に、一覧の読みが 429 か知らない符号の 4xx で答えたときの移り先がない | 軽微 | high-level-design-to-detailed-design | MOD-02 |
 | FND-48 | 報告の割り当てと MOD-01、MOD-09 の functions が、FR-49 で食い違う | 軽微 | high-level-design-to-detailed-design | MOD-01、MOD-09 |
@@ -74,10 +73,11 @@ kept operation dropped before ELM-03 forgets the key: 23 h < 24 h: True (margin 
 <!-- generated: assumptions -->
 | ID | 名前 | 種類 | 影響の広さ | 重大さ | 依存する項目 |
 |---|---|---|---|---|---|
-| QAS-54 | 状態の変化を相手の画面に示した時刻の記録（FRP-11）を今期作る | 暫定の決定 | 高 | 中 | DAT-20、DRV-03、DRV-26、IFC-10 |
+| QAS-54 | 状態の変化を相手の画面に示した時刻の記録（FRP-11）を今期作る | 暫定の決定 | 高 | 中 | DAT-20、DEC-46、DRV-03、DRV-26、IFC-10、IFC-11、IFC-21 |
 | DAS-11 | 端末、通信、自身の処理の時間と、流れ、位置、着く見込みの間隔を暫定に採る | 暫定の決定 | 中 | 低 | DEC-46、IFC-05、IFC-11、IFC-19 |
 | DAS-15 | 流れで送った変化を Web Push でも知らせるまでの待ちと、Web Push を送る呼び出しと配信の時間を暫定に採る | 暫定の決定 | 中 | 低 | DEC-46、IFC-11、IFC-21 |
 | DAS-16 | ELM-02 の呼び出しのタイムアウトと、答えのない操作の送り直し、持つ長さと数を暫定に採る | 暫定の決定 | 中 | 低 | MOD-01 |
+| QAS-25 | 依頼の状態の変化を届ける速さのしきい値と最初の目標値 | 暫定の決定 | 中 | 低 | DEC-46、DRV-03、IFC-11 |
 <!-- /generated -->
 
 ELM-02 のモジュールが premises で名指す DAS-16 と、ELM-02 が使う IFC が名指す仮定で、影響の広さと重大さは E3 で評価し直したとおり。DAS の評価は変えていない。QAS-54 の値は品質チェーンのファイルには書かず、ここに示す（第 3 段階のレビューの決めたこと 1 で成り立つと答えを受け、QCR-08 が品質チェーンに運ぶ。品質チェーンが当てるまで、品質チェーンでは未確認のまま）。このレビューが書いた仮定はなく、指摘はどの仮定にも頼らない。
