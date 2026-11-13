@@ -1,6 +1,6 @@
 id: FND-43
 title: MOD-01 は、MOD-09 がサインインの前に送るサインインとパスワードを決める操作を始められず、合わないパスワードの 401 AUTH_FAILED をセッションが切れた 401 と同じに扱う
-status: open
+status: accepted
 basis: inferred
 basis_note: MOD-01、MOD-09、IFC-01 の中身は入力。書かれたとおりに作ったときに使い始められないことは、このレビューの推定
 premises: []
@@ -11,4 +11,4 @@ targets: [MOD-01, MOD-09]
 severity: major
 evidence: MOD-09 の SignIn と SetPassword は、サインインの前に POST /v1/sessions と POST /v1/account-setups（IFC-01。どちらも本人の確かめなしで受ける）を MOD-01 で送る。MOD-01 で状態を変える操作を送るには begin を呼ぶ（read の pre は GET と探すだけの POST だけ）が、begin は useAccount にアカウントがなければ NotSignedIn を返し、操作に useAccount のアカウントを写す。新しく開いた画面では useAccount は none なので、書かれたとおりでは二つの操作を始められず、担当者もエンジニアも使い始められない（FR-48 の 1。ELM-02 のどの CUJ もその後にある）。加えて、IFC-01 は合わないサインインの ID かパスワードに 401 AUTH_FAILED を返すが、MOD-01 の三つの所が 401 をそれぞれ違って扱う。send の post は 401 をどれも notSignedIn にして onNotSignedIn に知らせ、Outcome の notSignedIn は ApiError を持たない。状態遷移図は 401 を定まったから除き、サインイン待ちには 401 NOT_SIGNED_IN だけで移るので、AUTH_FAILED の移り先がない。答えの判断表は 401 NOT_SIGNED_IN の行だけを持ち、AUTH_FAILED は「上のほかの 4xx」（refused）に読める。MOD-09 は AUTH_FAILED を示すとする（FR-48 の 2）が、send の post のとおりなら AUTH_FAILED と NOT_SIGNED_IN を見分けられず、合わないパスワードの操作はサインイン待ちに残り、状態ごとの表のとおり、アカウントがないため同じ入力では送り直せない（NotSignedIn）。MOD-09 の単体の層は MOD-01 の偽物で AUTH_FAILED を確かめるため、この食い違いを見つけない
 suggestion: MOD-01 に、アカウントなしで送る操作（IFC-01 の POST /v1/sessions と POST /v1/account-setups）を始める道を決める（begin の pre と errors、useAccount とのかかわり、サインインした後と画面を離れた後にその操作と入力（パスワードと設定の符号）を持たないこと）。401 を符号で分け、NOT_SIGNED_IN だけを notSignedIn とサインイン待ちにし、AUTH_FAILED は refused にして、send の post、状態遷移図、答えの判断表、状態ごとの表をそろえる。MOD-01 の単体の層に、サインインの前の操作と 401 AUTH_FAILED の行を加え、端から端の層で合わないパスワードとサインインを通す
-resolution: null
+resolution: 受け入れ。MOD-01 に、サインインの前に送る操作（IFC-01 の POST /v1/sessions と POST /v1/account-setups）を始める beginSignedOut を加えた。その操作はアカウントを持たず、タブの保存に書かず、入力（サインインの ID、パスワード、設定の符号）を定まるか捨てられるまでメモリにだけ持ち、タブのアカウントが決まると捨てる。401 は、AUTH_FAILED とサインインの前の操作への 401 を refused（定まった）にし、サインインした後の操作への NOT_SIGNED_IN と知らない符号の 401 だけを notSignedIn とサインイン待ちにして、send の post、状態遷移図、答えの判断表、状態ごとの表、onNotSignedIn をそろえた。MOD-09 はサインインとパスワードを決める操作を beginSignedOut で送り、画面を離れたら discard で捨てる。MOD-01 の単体の層にサインインの前の操作と 401 AUTH_FAILED の行を、端から端の層に合わないパスワードと正しいパスワードのサインインの場面を加えた
