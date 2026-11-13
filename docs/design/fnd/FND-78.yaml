@@ -1,0 +1,14 @@
+id: FND-78
+title: MOD-56 に加えた不変条件は依頼の今の押さえを解くのを ended と decide に限るが、受け付けなかった依頼の今の押さえは押さえの期限の後の答えと判断表 C が found_late で解く
+status: open
+basis: inferred
+basis_note: MOD-56 と MOD-45 の invariants、MOD-58 の overdueAnswer の post、MOD-56 の判断表 C と E、MOD-45 の判断表 C、報告の「データ」の rides の行は入力
+premises: []
+raised_by: design-review
+raised_in: reviews/4-detailed-design-ELM-03.md
+to: high-level-design-to-detailed-design
+targets: [MOD-56]
+severity: minor
+evidence: FND-75 を受けて MOD-56 に加えた不変条件は、押さえ直しの結果の取引、期限の後の答え、確かめで分かった押さえ直しの結果は依頼の今の押さえを解く試みを作らず、依頼の今の押さえを解くのは終わった依頼の後の処理（ended）と後で効きうる確定を決めるとき（decide）だけとする。FND-76 を受けて MOD-45 に加えた不変条件では、依頼の今の押さえは依頼を作るときに押さえの試みとともに決まるので、受け付けなかった依頼（not_accepted）の今の押さえはその押さえの試み。ところが同じ変更の MOD-58 の overdueAnswer（押さえの期限の後の答え）は、依頼が holding か not_accepted で押さえが済んでいればその押さえを解く試みを作り、MOD-56 の判断表 C の found_late の行（受け付けなかった依頼の押さえ）と MOD-45 の判断表 C の「押さえた（遅れて分かった）、holding でない」の行も、それを解く。報告の「データ」の rides の新しい行は「受け付けた依頼（searching から先）の今の押さえ」に限っており、こちらとは合う。MOD-56 の不変条件をそのまま検査に写すと、受け付けなかった依頼の押さえの found_late の解除を退けることになる（判断表 E の 2 が ended として解くので、押さえが残ることはない）
+suggestion: MOD-56 の不変条件を、報告の「データ」の rides の行と同じく、受け付けた依頼（searching から先）の今の押さえに限る
+resolution: null

@@ -1,74 +1,95 @@
 # 設計のレビュー: 配車サービスの詳細設計（第 4 段階、ELM-03 配車サーバー）
 
-状態: 回答反映済み · 更新: 2026-11-13 · 入力の基準: 35c7443 · レビュー: eddbe53 からの差分のレビュー · 文脈: 別の文脈 · レビューした項目: 変わった MOD-20、MOD-23、MOD-27、MOD-32、MOD-33、MOD-39、MOD-41〜MOD-45、MOD-51、MOD-52、MOD-56、MOD-59、MOD-67、この段階が書いた HND-21 と、ELM-03 の報告（4-detailed-design/ELM-03.md）の変わった節（概要、入力、モジュールの図とその段落、モジュールの表、割り当ての FR-18 の 1、FR-46 の 3 と 5、FR-54 の 4、型、MOD-20、MOD-23、MOD-27、MOD-32、MOD-41〜MOD-45、MOD-51、MOD-52、MOD-56、MOD-59、MOD-67 の振る舞いと並行性とエラー、データの rides、money_attempts、fare_tables、取引、メモリの構造、確かめ方、設計上の値と計算、指摘、申し送り、決めたこと、未確認の仮定、未解決の点、次）、詳細設計の索引の見出し。つながる項目は、変わった契約を使う所と状態を分ける所を読んだ（MOD-26 の check、answerOverdue、finishExternal、MOD-31、MOD-53 が使う MOD-51 の aggregate、MOD-57 と MOD-58 が使う MOD-42 の試み、MOD-58 の依頼の押さえを書く取引 A、MOD-66 の SLI-12 の数え、MOD-41 の DEC-47、HND-20、HND-22）。確かめに使った入力の DEC-24、DEC-40、DEC-42、DEC-45、IFC-03、IFC-04、IFC-07、IFC-15、IFC-17、DAT-13、第 3 段階の報告の DAT-05 と DAT-08 の状態遷移、FR-18、SLI-12、DRV-07、POL-02、POL-04 は、どれも前のレビューの後に変わっておらず、行ったことが要る所を読んだ。指摘 FND-59〜FND-74（E1）、仮定 DAS-05、DAS-16〜DAS-18、DAS-20、DAS-21、DAS-23、DAS-28（E3）
+状態: 回答反映済み · 更新: 2026-11-14 · 入力の基準: 32d40c9 · レビュー: ddc4894 からの差分のレビュー · 文脈: 別の文脈 · レビューした項目: 変わった MOD-26、MOD-45、MOD-56、MOD-58、MOD-59 と、ELM-03 の報告（4-detailed-design/ELM-03.md）の変わった節（概要、入力、モジュールの段落、型の ReholdInProgress、RideMoneyFacts、MoneyChange、MOD-26 の並行性とエラー、MOD-45 の判断表 C とその段落、MOD-56 の押さえ直しの印と「期限の後の答えと遅れた結果の取引の順」と判断表 C の found_late の行と並行性とエラー、MOD-58 の期限の後の答え、MOD-59 の期限の後の答えと並行性とエラー、データの rides の行と取引の表、確かめ方の「遅れた結果の取引と期限の後の答え」、指摘、決めたこと、次）、詳細設計の索引の見出し。つながる項目は、変わった契約を使う所と状態を分ける所を読んだ（MOD-26 の registerRoute に期限の後の答え方を登録する MOD-43 と MOD-57、MOD-42 の sendWaiting と結果の取引と判断表 B、C、MOD-45 の settleHold、MOD-56 の判断表 B、D、E、MOD-59 の判断表 A）。確かめに使った入力の DEC-08、DEC-42、DEC-45、IFC-03、DAT-07、DAT-08、DAT-11、DAT-26、POL-02、POL-03、FR-04、FR-46、FR-47、FR-54、DRV-02、DRV-07、SLI-01 は、どれも前のレビューの後に変わっておらず、行ったことが要る所を読んだ。指摘 FND-61、FND-66、FND-74〜FND-76（E1）、仮定 DAS-23（E3）
 
 ## 概要
-第 4 段階の ELM-03（配車サーバー）の 2 回目のレビューで、前のレビュー（eddbe53）からの差分のレビュー。設計を書いた会話とは別の文脈で、成果物だけを読んだ。範囲は、この段階が中の FND-61〜FND-65 と軽微な FND-66〜FND-73 を受け入れて変えた 16 のモジュール、HND-21、ELM-03 の報告と索引の見出し（35c7443）。前のレビューの後に docs/quality/ と前の段階の項目は変わっていない。
+第 4 段階の ELM-03（配車サーバー）の 3 回目のレビューで、前のレビュー（ddc4894）からの差分のレビュー。設計を書いた会話とは別の文脈で、成果物だけを読んだ。範囲は、この段階が中の FND-75 と軽微な FND-76 を受け入れて変えた五つのモジュール（MOD-26、MOD-45、MOD-56、MOD-58、MOD-59）、ELM-03 の報告と索引の見出し（32d40c9）。前のレビューの後に docs/quality/、前の段階の項目、申し送りは変わっていない。
 
 指摘は 2 件で、中 1 件、軽微 1 件、どちらも `high-level-design-to-detailed-design` 宛て。
 
-- FND-75（中）: FND-61 を受けて加えた MOD-56 の settleRehold は、apply なし（期限の後の答えと確かめで分かった結果）で試みが済んでいれば、依頼の今の押さえがその試みかを見ずに found_late の解除を作り、DEC-45（結果が書かれていなければ解く）と自身の判断表 C（依頼の押さえでない押さえだけを解く）と食い違う。MOD-26 は check で overdue を読んでから別の取引の answerOverdue で持ち主に答えを決めさせるので、受けたインスタンスの結果の取引が答えの期限を過ぎて遅れ、同じキーの送り直しの check と answerOverdue の間に確定すると、結果の取引が替えた依頼の今の押さえを期限の後の答えが解き、乗客は 200 を受けたのに決済が退けられる（DRV-07、FR-54 の 5、FR-46 の 5）。
-- FND-76（軽微）: 押さえ直しの印を rides（rides/ の MOD-45 の表）の列に置いたが、それを書くか空にするか取引の中で読む操作が MOD-45 の契約になく、charges/ の MOD-56 が書くとしており、POL-02 の表の規則と DEC-08 のポートの外になる。
+- FND-77（中）: FND-75 の直し方で、MOD-26 は持ち主の期限の後の答え方を answerOverdue の一つの取引の中で呼ばない形に決め、持ち主の書き込みの取引とキーの書き込みは別の取引になった。押さえ（MOD-58）で、期限の後の答えが依頼を not_accepted にした後、キーを書く前に受けたインスタンスの遅れた結果の取引が押さえを済ませて確定すると、その取引の答えを決める行がなく、MOD-58 の post のとおり 201 がキーに残る。送り直しと受けたインスタンスはどちらも 201 を受け、依頼は not_accepted のまま押さえは解かれる（FR-04 の 1、FR-54 の 3、IFC-03、DRV-02。お金は動かない）。
+- FND-78（軽微）: MOD-56 に加えた不変条件は依頼の今の押さえを解くのを ended と decide に限るが、MOD-45 に加えた不変条件では受け付けなかった依頼の今の押さえは押さえの試みで、MOD-58 の期限の後の答えと判断表 C が found_late で解く。報告の「データ」の rides の行は受け付けた依頼に限っており、こちらと合う。
 
-受け入れた 13 件の変更はどれも項目にあり、それぞれの指摘の道を閉じる。FND-61 の二つの順（降りる場所の変更が先、支払い方法の変更が先）は、二つ目が 409 OPERATION_IN_PROGRESS の後の送り直しでそのときの押さえから押さえ直すので、依頼の押さえを古い確定額か支払い方法の押さえで置き換えない。FND-62 の送り直しの処理されなかったは試みを終えず、FND-63 の止まった作り手はその日の鍵を使えなくせず、FND-64 の日々の呼び出しは印を確かめて通り、FND-65 の照合の判断表はどの組にも一行が当たり、FND-69 でディレクトリの間の循環はなくなった（スクリプトで確かめた）。主なリスクは、FND-61 の直し方が加えた期限の後の答えの道で、遅れた結果の取引の後に依頼の今の押さえが解かれうること（FND-75）。質問はなく、仮定は書いておらず、品質チェーンへの要求は出しても答えても反映を見つけてもいない。
+受け入れた 2 件の変更はどちらも項目にある。FND-75 の順（遅れた結果の取引が送り直しの check の後、期限の後の答えの前に確定する）は、押さえ、支払い方法の変更、降りる場所の変更の承認のどれでも閉じ、期限の後の答えは遅れた結果の取引が書いた依頼の今の押さえ、受け付けた依頼、当てた変更を覆さない。FND-76 で、押さえ直しの印と今の押さえを読み書きするのは rides の持ち主の MOD-45 の操作だけになった。主なリスクは、FND-75 の直し方が持ち主の期限の後の答えとキーの書き込みを別の取引にしたことで、押さえでは、その間に確定した遅れた結果の取引の答えが、期限の後の答えの書いた依頼と食い違いうること（FND-77）。押さえ直しの二つの経路は、印がこの試みでない行が同じ間で 503 REHOLD_UNCONFIRMED と答えるので合う。質問はなく、仮定は書いておらず、品質チェーンへの要求は出しても答えても反映を見つけてもいない。
 
 ## 行ったことと結果
 | # | 行ったこと | したこと | 結果 | 指摘 |
 |---|---|---|---|---|
-| C1 | 割り当ての確かめ | 変わった割り当て（FR-18 の 1 の MOD-52、FR-24 の 5 の MOD-27 の functions、FR-46 の 3 の MOD-43 と MOD-42、FR-46 の 5 と FR-54 の 4 の MOD-56 と MOD-59）を、各 MOD の functions と verification と照らした。MOD-44 が加えた IFC-17 の GET /v1/payment_intents/{id} の読み出しが、利用する操作の受け持ちを変えないかを見た。変わった受け入れ基準と SLI の出どころはない | どの行もモジュールの functions に FR があり、FND-73 の食い違いはなくなった（check.py も、モジュールの functions がコンポーネントのものに入り、提供する操作がどれも一つのモジュールに当たることを確かめた）。IFC-17 の GET は前から MOD-42 が呼び、MOD-44 は MOD-41 を通して同じ操作を読むだけで、depends_on に MOD-41 がある。SLI-12 の項目を出すのは MOD-44 のまま | なし |
-| C2 | モジュールの深さ | 変わった 16 のモジュールの depth、depth_reason と部分を見た。つながる枠のモジュールが、変更でお金を動かすか同時に動く仕事と状態を分けるようになったかを見た | 変わったモジュールは確定のまま理由が成り立ち（MOD-51 の depth_reason から進んでいる依頼を除いたが、いくつもの条件の規則のまま）、部分がそろう。押さえ直しの印は確定の MOD-56、MOD-59、MOD-45 の間の状態で、枠のモジュールの深さは変わらない。欠けは、印を置く rides の持ち主の MOD-45 の契約に、印を書くか空にするか取引の中で読む操作がないこと | なし（FND-76 に含めた） |
-| C3 | 状態遷移図 | 変わった MOD-23 の状態遷移図、第 3 段階の DAT-05 に従う MOD-43 の確かめている（started と開いた読み直しの試み）と registration_unknown、DAT-11 に従う MOD-42 の送り直しと読み出しの答え、DAT-08 に従う MOD-59 の reholding、MOD-56 の押さえ直しの印を、どの状態でもどの出来事にもすることがあるか、終わりか名前のある待ちに着くか、状態を変える呼び出しのタイムアウトが確かめに進むかで見た | MOD-23 は、ないから中身とともに一度にあるに移り、作り手が中身を見せる前に止まってもないのままで次の作り手が作るので、出口のない作りかけはなくなった（FND-63）。MOD-42 は、送り直しと読み出しの処理されなかったで unknown のまま確かめ続け、作る試みは 23 時間の後の一覧で、確定と解除は読み出しで終わりに着く。MOD-43 の確かめている間は、その待ちのうちは 409、過ぎれば registration_unknown に移り、registration_unknown は DAT-05 の矢印のとおり usable か declined に着く（端末がまだ確かめていない読み直しを「確かめて拒否か、取引がなかった」の declined にする）。押さえ直しの印は答えの期限で効かなくなる待ちで、受けたインスタンスが止まっても次の押さえ直しを止め続けない。MOD-59 の reholding は、結果の取引か期限の後の答えか確かめで applied か not_applied に着く | なし |
-| C4 | 判断表 | 変わった判断表（MOD-20 A、MOD-23 A、MOD-27 A、MOD-32 A の 1、MOD-41 A の読む行、MOD-42 B、C、MOD-43 B、MOD-44 A と EXT-01 の側の表、MOD-45 C、MOD-51 A、MOD-52 A の 3 と届ける相手の表、MOD-56 B、C、E、MOD-59 A、MOD-67 A）の組を、各表の列の値の組で数え、上から当てる表は順も見て、DEC、IFC、DAT と照らした | どの組にも一行が当たる。MOD-42 C は、試みの種類、送ったか、前の答え、23 時間、確かめの答えの組に一行ずつで、送り直しの notProcessed と読み出しの read_rejected は最後の行だけに当たる（FND-62 の重なりはなくなった）。MOD-44 A は、システムの記録の四つと EXT-01 の側の四つ（済んだは額が同じか違うか）と値を決める実行かの組に一行ずつで、FND-65 の三つの組がある。MOD-56 E は 1 と 2 を行ってから 3 と 4 を上から当て、開いた試みが残る間は精算を済ませない（FND-66）。MOD-56 B と MOD-59 A は、印の行が使える支払い方法と押さえ直しの結果の行より上にあり、結果の行は依頼の終わりか到着、印と替える押さえの食い違い、済んだの順。MOD-20 A は日々の処理の経路がセッションと Origin の行の前で印の行に当たる（FND-64）。食い違いは、MOD-56 の settleRehold の apply なしの found_late の解除が、判断表 C の found_late の行の「依頼の押さえでない押さえ」の限りを持たないこと。小さく指摘にしないもの: MOD-42 B は、読み直しの試み（setup_result）の一回目の読み出しが read_rejected のときの行を持たないが、変更の前からの欠けで、IFC-07 と判断表 C の最後の行から stillUnknown に決まる。MOD-42 C の読み直しの行は登録の取引の canceled を持たないが、このシステムは登録の取引を取り消さない | なし（FND-75 に含めた） |
-| C5 | モジュールの依存 | 変わったモジュールへの依存とそこからの依存を、報告の図の機能のディレクトリに当てはめ、ディレクトリの間の強く結ばれた組をスクリプトで探し、POL-02 の規則に照らした。加わった呼び出し（MOD-44 から MOD-41 の読み出し、MOD-59 から MOD-56 の settleRehold、MOD-56 から MOD-45 の applyMoney）と、押さえ直しの印を読み書きする所を見た | MOD-32 を daily/ に置いたので、ディレクトリの間の循環はない（jobs/ は platform と tracing だけに向き、daily/ に向く機能はない。FND-69）。MOD-44 は MOD-41 を depends_on に持ち、EXT-01 を呼ぶのは payments の adapters/ のまま。欠けは、押さえ直しの印が rides/ の MOD-45 の表 rides の列なのに、印を書くのも空にするのも charges/ の MOD-56 で、MOD-45 の契約にその操作がないこと（POL-02 の、表を読み書きするのはその表を持つ機能の adapters/ だけの規則と、依頼の状態を DEC-08 のポートを通してだけ書く規則）。MOD-20 が想定の本番で Cloud Scheduler の OIDC の印を確かめるのは印の確かめのポートを通す（単体の層は偽物）。Google の署名の鍵をどこからどう読むかは、POL-04 の Secret Manager の鍵の置き場所のポートと同じく、そのポートの中の実装の点として指摘にしない | FND-76 |
-| C6 | 並行性と冪等性 | 変わったモジュールと状態を分ける MOD-26、MOD-31、MOD-45 で、次を DEC-42、DEC-45、IFC-17 の ordering と MOD-25 の一つずつの確定に照らして通した。(1) FND-61 の二つの順を答えの期限のうちに重ねる。(2) 一つ目の押さえ直しの答えの期限が過ぎた後に二つ目が印を取り、一つ目の遅れた結果の取引が二つ目の取引 A の前か後か、二つ目の結果の後に来る。(3) 一つ目の遅れた結果の取引が、同じキーの送り直しの check（overdue）と answerOverdue の間に来る。(4) 押さえ直しを送っている間の決済、乗客の取り消し、到着の確認。(5) 同じキーとほかのキーの completion の重なりと、受けたインスタンスが止まった後の completion。(6) firstSentAt を書く前後で止まったインスタンスと、checkNow と期限の来た処理の重なり。(7) MOD-23 の二つの作り手と止まった作り手。(8) MOD-59 の reholding の変更が答えの期限を過ぎて残る間のほかの変更の承認 | (1) は二つ目が 409 OPERATION_IN_PROGRESS の後の送り直しでそのときの押さえと確定額と支払い方法から押さえ直し、依頼の押さえの額と支払い方法は確定額と支払い方法に合う（FND-61 の道は閉じた）。(2) は遅れた結果が印か替える押さえの食い違いで依頼を替えずに新しい押さえを解き、503 REHOLD_UNCONFIRMED で答え、遅れた結果が先なら二つ目はそれが替えた押さえから押さえ直す。(3) は、結果の取引が依頼の押さえを新しい押さえ H2 に替えてキーに 200 を書いた後、answerOverdue の中の MOD-56 の overdueAnswer が 200 を決めつつ settleRehold を apply なしで呼び、H2 の解除（found_late）を作る。キーの書き込みだけが退けられて解除は残るので、依頼の今の押さえが解かれ、後の決済は取り消された取引の確定として退けられて payment_declined になる。(4) は前のとおり、依頼が終わったか決済が始まっていれば替えず、到着が先なら 409 RIDE_ALREADY_ARRIVED で新しい押さえを解く。(5) は同じキーが MOD-26、ほかのキーが setup:登録 の一意の決まりで一つになり、待ちのうちは 409、過ぎれば 202 と registration_unknown。(6) は firstSentAt を空のときだけ書くので初めての呼び出しは一つで、書いた後に送る前に止まった試みは送ったものとして扱われ、処理されなかったで終わらない（安全な側）。(7) はどちらの作り手も一つの鍵を使う。(8) は、ほかの変更が答えの期限を過ぎても reholding の間は 409 が続くが、その変更のキーの送り直しへの期限の後の答えか、最初の確かめ（待ちの後 30 秒）で not_applied になって終わる | FND-75 |
-| C7 | データ | 報告の「データ」に加わった不変条件（rides の、依頼の今の押さえの額と支払い方法が確定額と支払い方法に合うこと、答えの期限のうちの押さえ直しは一つまでであること。money_attempts の、替える押さえが変わらないこと、before_execution の not_processed を初めての呼び出しの答えだけにすること）と変わった fare_tables の行を、確定のモジュールの契約と DAT の consistency に照らした。ほかのコンポーネントが直接読む表とマイグレーションを見た | どれも、読んで比べてから書く BEGIN IMMEDIATE の取引、空のときだけの書き込み、UPDATE を断るトリガーのどれかが保ち、契約と合う。依頼の押さえを替えるのは applyMoney の一つの書き込みで、押さえと確定額か支払い方法を一緒に替える。rides の二つの不変条件を保つ MOD は MOD-56、MOD-59 で、rides の持ち主の MOD-45 がその読み書きを契約に持たない。ほかのコンポーネントが直接読む表はなく、どの表も新設のまま | なし（FND-76 に含めた） |
-| C8 | 設計上の値 | 変わった値（MOD-20 の送り元の上限、MOD-32 の拾い続ける終わりと Cloud Run の要求の時間の上限、MOD-33 のタイマーの上限、MOD-67 の答えのない要求の余裕）と、加わった待ち（押さえ直しの印の期限、completion の確かめている間）を、IFC-03、IFC-07、IFC-11、IFC-15、IFC-17、IFC-21 の timing、DEC-46、HND-19、HND-10 の枠で、このレビューのスクリプトで計算し直した（「C8 設計上の値の計算し直し」） | どれも報告の計算と合い、IFC の timing が持つ値をこの段階は決めていない。日々の処理は時間の上限 20 分 < 呼び出しの期限 25 分 < Cloud Run の要求の時間の上限 30 分 ≦ 60 分の順で、拾い続ける終わりの 15 分は後の仕事に 5 分を残す（FND-70）。押さえ直しの印の期限は IFC-03 の答えの期限 8.8 秒で、受けたインスタンスの待ちの終わり 8.7 秒と結果の取引 0.1 秒がちょうど収まり、結果の取引が遅れればその後になる（FND-75 の前提）。答えのない要求の知らせまで最悪 115 秒で T_alert_delay のうち。MOD-33 のタイマーの上限を超えた組は控えの処理で 7 秒になり T_dispatch_propagation を超えうるが、報告のとおりデモの量では超えない。どの値も parameters と DAS にある（FND-71） | なし |
-| C9 | 確かめ方 | 変わったモジュールの verification と、報告の「確かめ方」の変わった場面（押さえ直しの重なり、返金、料金と押さえの解除、日々の処理と 3 年の変換）と EXT-01 の偽物が起こせる答えを、変わった契約と判断表の行に照らした | 加わった行と契約には確かめ方がある（MOD-20 の日々の処理の行、MOD-23 の止まった作り手、MOD-27 の system と FR-24 の 5、MOD-42 の送り直しの処理されなかった、MOD-43 の確かめる前の requires_payment_method と completion の重なり、MOD-44 の日をまたいだ押さえと後で効いた確定、MOD-51 と MOD-52 の迎車中か乗車中のドライバー、MOD-56 と MOD-59 の押さえ直しの重なりと判断表 E）。欠けは、遅れた結果の取引を同じキーの送り直しの check と answerOverdue の間に通す順で、FND-75 の直し方に加えるよう書いた。想定の本番の Secret Manager の鍵の置き方、Cloud Scheduler の OIDC の印、Cloud Run の要求の時間の上限は、何も配備しない（TC-09）ためどの層も確かめず、報告の「未解決の点」のとおり | なし（FND-75 に含めた） |
-| C10 | 共通の約束事と技術方針 | 変わったモジュールの契約、型、誤り、確かめ方を、共通の約束事（DEC-35、DEC-40、DEC-42、DEC-43、DEC-45）と POL-01〜POL-04 に照らした | 日々の処理の経路をセッションのクッキーを使わないとして Origin の確かめから外すことは DEC-40 のとおりで、合わない印は IFC-15 の 401 NOT_SIGNED_IN。期限を過ぎてほかの押さえ直しが先に動いた遅れた結果に 503 REHOLD_UNCONFIRMED（変えなかった、済んでいた押さえは解く）で答えることは IFC-03 の利用側のすることと合う。ほかのキーの操作が動いている間の 409 OPERATION_IN_PROGRESS（MOD-43、MOD-56、MOD-59）を DEC-42 が書いていないことは、この段階が出した未解決の FND-74 が扱っており、重ねて出さない。node:crypto と鍵のファイルの読み書きは src/platform/ の MOD-23 だけ（POL-02）。EXT-01 の偽物が加わった答え（送り直しへの 401、確かめる前と確かめの失敗の後の登録の取引、一覧の期間の外の押さえ）を起こすことは POL-03 の「設計が扱うどの結果も起こせる」に入る。押さえ直しの印の読み書きが POL-02 の表の規則の外になる | なし（FND-76 に含めた） |
-| E1 | 指摘を読む | 状態が変わった FND-61〜FND-73（受け入れ）の resolution を変わった項目で確かめ、新しい FND-74 と、ELM-03 のモジュールが待つ FND-59、FND-60 を読んだ | 13 件の変更はどれも項目にあり、変えた項目の basis_note に引かれている（check.py も確かめた）。FND-61 は、案の二つ（依頼ごとに一つずつにすること、結果の取引で取引 A のものと比べること）を合わせ、一つずつにするのを答えの期限のうちに限った直し方で、二つの順の道を閉じるが、加えた期限の後の答えの道に FND-75 がある。FND-62〜FND-73 は案のとおりか、案と同じ働きの直し方。FND-74（第 3 段階宛ての軽微）は今も成り立ち、重ねて出さない。FND-59、FND-60（第 3 段階宛ての軽微）は変わらず未解決で、MOD-56 の判断表 D と MOD-26 がそれを待つ。この報告の道で出して未解決の指摘は、このレビューの FND-75、FND-76 のほかにない。退けられた指摘はない | なし |
-| E2 | 前提の確かめ | 変わった項目の加わった本文が頼るもの（EXT-01 の登録の取引の状態と last_setup_error、Secret Manager の版と OS のハードリンク、Cloud Run の要求の時間の上限、加わった値、QCR-05 の答え）を、premises とスクリプトで照らした | MOD-39 は QCR-05 を挙げ（FND-72）、MOD-42 と MOD-43 は EXT-01 を新しく挙げた。加わった値は DAS-17、DAS-20、DAS-21、DAS-28 にあり、各モジュールがそれを挙げる。Cloud Run と Cloud Scheduler の値は MOD-32 の decisions の DEC-18、DEC-20 から TC-08 にたどれ、Secret Manager の版の付け方と OS のハードリンクの決まりは、basis_note が書くとおり公開の文書による入力。変わった項目が新しく頼る、未回答か回答済みの品質チェーンへの要求はない。欠けはない | なし |
-| E3 | 仮定の評価し直し | ファイルが変わった DAS-17、DAS-18、DAS-20、DAS-21、DAS-28 と、変わった項目が premises で名指す DAS-05、DAS-16、DAS-23 を、依存する項目と後の段階への影響から評価し直した。範囲の項目が依存する品質チェーンへの要求（QCR-01、QCR-07）の影響も見た。このレビューの指摘は仮定に頼らない | どれも評価は変わらず、ファイルは変えていない。DAS-17 と DAS-20 は中、低（依存は 2 と 3 の項目。DAS-20 の Cloud Run の要求の時間の上限は ELM-03 のどの要求にも当たるが、流れは端末がつなぎ直す）。DAS-18、DAS-21、DAS-28 は低、低（依存は 1 の項目。DAS-21 のタイマーの上限を超えた組は知らせが遅れるだけ）。DAS-05、DAS-16、DAS-23 は中、低。高のものはなく、尋ねた点はない。QCR-01 と QCR-07 の影響は低のまま | なし |
-| E4 | 事業の判断の確かめ | 変わった項目の暫定の値、リスクを受け入れる決定、確定の種類か高の点の先送り、変わった HND-21、前のレビューの後にこの段階が退けた指摘を見た | 加わった値（MOD-20 の送り元の上限、MOD-32 の拾い続ける終わりと Cloud Run の要求の時間の上限、MOD-33 のタイマーの上限、MOD-67 の余裕）はどれも暫定の決定の DAS-17、DAS-20、DAS-21、DAS-28 にあり、依存する項目が premises に挙げる。FND-71 の四つの値もそろった（MOD-23 の 200 ミリ秒の 3 回は行ごとなくなった）。リスクを受け入れる決定と負債はなく、HND-21 は実装宛てで確定の種類の点を送らない。この段階が退けた指摘はない | なし |
-| E5 | 写しを探す | 変わった MOD と HND-21 と報告の加わった行を、FR の受け入れ基準、QR、NFR、SLI の文と 30 字ずつスクリプトで照らした | 写しはない。MOD-44 の SLI-12 の列は数え方を組ごとに当てたもので、SLI-12 と DAT-13 の文を写していない | なし |
-| E6 | 確かめを求める点 | 確かめる項目が変わった MOD-39（QR-62 の模す運賃の定めを、ELM-03 の決めたこと 1 と QCR-09 で確かめる）を見た。品質チェーンの basis_note と申し送りに、新しいか変わった点はない | MOD-39 の変更は premises に QCR-05 を加えただけで、QR-62 の点は前のとおり確かめられている | なし |
-| E7 | 申し送りの確かめ | この段階が ELM-03 で変えた HND-21 を、第 4 段階の確定の種類と枠に照らした | 加わった何を（鍵を作るときの一時のファイルの名前と、止まった作り手が残した一時のファイルの片付け方）は、MOD-23 の判断表 A と不変条件の外の点で、確定の種類でも高の点でもない。守る枠（中身とともに一度に現れて置き換わらない、名前だけの鍵はないものとする、一時のファイルは同じディレクトリに置きほかの作り手が結ぶ前のものを消さない）は互いに両立し、ハードリンクが同じファイルの置き場所の中でしか作れないことにも合う | なし |
-| E8 | 品質チェーンのものを決めていないか | 変わった項目の確かめ方と parameters、MOD-44 の SLI-12 の列、報告の確かめ方と設計上の値を、ゲート、目標、しきい値、受け入れ基準、SLI の数え方の変更を探して読んだ | ない。MOD-44 の SLI-12 の列は、両方にあり額と結果が同じものだけを GOOD とし、片方にしかない処理（処理されなかった試みだけで終わった処理を含む）と、EXT-01 が結果を返しているのに分からない処理を GOOD としない、SLI-12 と DAT-13 の決まりを組に当てたもの。値を決める実行で EXT-01 の側がまだ最終でない組を GOOD でないとするのは、EXT-01 が返していない結果は記録と等しいと言えないとする読みで、数える単位と規則を変えない。MOD-67 の余裕は異常を見つける値で、システムが届くべき水準を決めない | なし |
+| C1 | 割り当ての確かめ | 範囲のモジュール（変わった MOD-26、MOD-45、MOD-56、MOD-58、MOD-59 と、MOD-26 の registerRoute につながる MOD-43、MOD-57）の functions、realizes、verification を報告の割り当てと照らした。変わった受け入れ基準、利用する操作、SLI の出どころはない | どのモジュールも functions と realizes は変わらない。加わった確かめ方の行が挙げる FR（MOD-56 の FR-46 の 5 と FR-54 の 5、MOD-59 の FR-47 の 2 と FR-54 の 4、5、報告の場面の FR-54 の 3〜5、FR-46 の 5、FR-47 の 2）は、それぞれのモジュールの functions にある。MOD-45 に加わった moneyFacts、claimRehold、clearRehold はモジュールの中の操作で、IFC の操作の受け持ちを変えない（check.py も、提供する操作がどれも一つのモジュールに当たることを確かめた） | なし |
+| C2 | モジュールの深さ | 変わった五つのモジュールの depth、depth_reason と部分を見た | どれも確定のまま理由が成り立つ（MOD-45 は加わった印の操作でも同時に動く仕事と状態を分ける）。加わった操作はどれも事前条件、事後条件、誤りを持ち、MOD-45 の判断表 C、不変条件、確かめ方に印が加わり、MOD-56、MOD-58、MOD-59 の期限の後の答えの契約と確かめ方がそろう。欠けた部分はない | なし |
+| C3 | 状態遷移図 | 範囲のモジュールの状態遷移図（MOD-45 の依頼、DAT-08 に従う MOD-59 の変更）と、押さえ直しの印（空、この試みで答えの期限のうち、期限の後）を、加わった出来事（claimRehold、clearRehold、押さえを替える applyMoney、期限の後の答え、遅れた結果の取引、確かめで分かった結果）がどの状態でも定まるか、出口があるかで見た。押さえの holding から not_accepted への矢印と、not_accepted の依頼に遅れて済んだ押さえも見た | 印はどの状態でもどの出来事にもすることがあり（MOD-45 の判断表 C の四つの行と applyMoney の条件）、期限の後の答え、結果の取引、確かめのどれかが空にし、空にされなくても期限の後は効かない。変更は reholding から期限の後の答えか結果の取引で applied か not_applied に着き、applied の変更への期限の後の答えは何も変えない。not_accepted の依頼に遅れて済んだ押さえは、MOD-45 の判断表 C のとおり状態を変えずに MOD-56 が解き、状態は定まる（そのときの受けたインスタンスの答えは C6） | なし（FND-77 は C6） |
+| C4 | 判断表 | 変わった判断表（MOD-45 C の印を取る行と空にする行、MOD-56 C の found_late の行）の組を数え、上から当てる表は順も見た | MOD-45 C の claimRehold は、印（空、この試み、ほかの試み）と答えの期限（今以前、今より後）の組のうち、空と、どの試みの印でも期限が今以前の組が 1 行目に、ほかの試みで期限が今より後の組が 2 行目に当たる。この試みで期限が今より後の組はどの行にも当たらないが、claimRehold は同じ取引 A で作った試みで呼ばれ、印がその試みであることはない。clearRehold は三つの印に一行ずつ当たる。MOD-56 C は、済んだ押さえ直しの押さえがその取引で読んだ依頼の今の押さえなら found_late の行に当たらず最後の行（結果を書くだけ）に当たり、ほかの組は前のとおり一行に当たる | なし |
+| C5 | モジュールの依存 | 変わったモジュールへの依存とそこからの依存を、報告の図の機能のディレクトリと POL-02 の規則に照らした。加わった呼び出し（MOD-56 から MOD-45 の moneyFacts、claimRehold、clearRehold、MOD-58 から MOD-45 の moneyFacts、MOD-59 から MOD-56 の rehold を通した claimRehold）と、rides の列を読み書きする所を見た | depends_on は変わらず、加わった呼び出しはどれも前からある依存の中で、booking/ から charges/ と rides/ へ、charges/ から rides/ への下向き。押さえ直しの印と今の押さえを読み書きするのは rides/ の MOD-45 の操作だけになり、FND-76 の、charges/ が rides の列を読み書きする道はなくなった（POL-02 の表の規則、DEC-08 のポート）。循環はない（check.py） | なし |
+| C6 | 並行性と冪等性 | 変わった期限の後の答え（MOD-56、MOD-58、MOD-59）と MOD-26 の answerOverdue を、受けたインスタンスの遅れた結果の取引、確かめ、ほかの押さえ直しと重ねた。押さえ、支払い方法の変更、降りる場所の変更の承認の三つの経路の四つの結果と、持ち主の取引（T1）、遅れた結果の取引（T2）、MOD-26 のキーの書き込み（T3）の三つの順を、項目の決まりでスクリプトでたどった（「C6 期限の後の答えと遅れた結果の取引の順のたどり」）。答えの期限を過ぎた一つ目の押さえ直しが替えた後に二つ目が印を取って替える順と、MOD-26 の registerRoute の事前条件に縛られる MOD-43 と MOD-57 の期限の後の答えも見た | FND-75 の順（T2、T1、T3）は三つの経路のどれでも閉じた。押さえ直しの期限の後の答えは依頼の今の押さえを読み、遅れた結果の取引が替えた押さえを解かずに 200 と決め、押さえの期限の後の答えは受け付けた依頼に何も書かずに 201 と決める。T1、T3、T2 の順は、遅れた結果の取引が先の答えを受けて合う。36 の組のうち食い違うのは一つで、押さえが済んで T1、T2、T3 の順のとき、遅れた結果の取引が not_accepted の依頼にキーの 201 を書き、後の T3 はそれを返す（押さえ直しは、MOD-56 の判断表 B と MOD-59 の判断表 A の印がこの試みでない行が 503 REHOLD_UNCONFIRMED と答えるので合う）。一つ目の押さえ直しが期限の後に替えた押さえを二つ目が替えた後の一つ目の期限の後の答えは、その押さえの解除がすでにあれば作らないので、二重の解除はない。MOD-43 と MOD-57 の期限の後の答え方は、項目が書く限り何も書かない（MOD-43 の判断表 A の期限の後の行）か、判断表に書かれていない（MOD-57 の返金を作る経路）ので、事前条件との食い違いは見つけられない（「未解決の点」） | FND-77 |
+| C7 | データ | 報告の「データ」の rides の変わった行と加わった行（受け付けた依頼の今の押さえを解く試みは ended と decide だけ）と取引の表を、MOD-45、MOD-56、MOD-58、MOD-59 の契約と不変条件に照らした | 加わった行は、解除を作る取引が同じ BEGIN IMMEDIATE の取引で state と hold_attempt_id を読むことで保たれ、契約と合う。印の書き手と読み手が MOD-45 だけであることも契約と合う。食い違いは、MOD-56 に加えた不変条件が依頼の今の押さえを解くのを ended と decide に限り、受け付けた依頼に限っていないこと（MOD-45 の不変条件では受け付けなかった依頼の今の押さえは押さえの試みで、MOD-58 の期限の後の答えと MOD-56 の判断表 C が found_late で解く）。ほかのコンポーネントが直接読む表とマイグレーションは変わらない | FND-78 |
+| C8 | 設計上の値 | 対象の変更なし | | |
+| C9 | 確かめ方 | 変わったモジュールの verification と、報告の「確かめ方」の加わった場面（遅れた結果の取引と期限の後の答え）を、変わった契約と判断表の行に照らした | 加わった契約と行には確かめ方がある（MOD-45 の印の行、MOD-56 と MOD-59 の二つの順、MOD-58 の T2 が先の順、MOD-26 の場面）。欠けは、押さえで T1、T2、T3 の順を確かめる場面がないこと（報告の場面は、逆の順でも受けたインスタンスが同じ答えを返すとする）。POL-03 の差し込みは依頼の状態の条件つきの書き込みの直前で止めるので、その順を作るにはキーの書き込みの前で止める所が要る。FND-77 の直し方に加えた | なし（FND-77 に含めた） |
+| C10 | 共通の約束事と技術方針 | 変わったモジュールの契約、型、答え、確かめ方を、共通の約束事（DEC-35、DEC-42、DEC-45）と POL-02、POL-03 に照らした | 期限の後の答えの符号（200、201、402、503 の PAYMENT_SERVICE_UNAVAILABLE、HOLD_UNCONFIRMED、REHOLD_UNCONFIRMED）は IFC-03 と DEC-45 のとおりで、先に書いた答えを残すことは DEC-42 のとおり。rides の列は rides/ の adapters/ だけが読み書きし（POL-02）、依頼の状態は DEC-08 のポートを通す。確かめ方は POL-03 の結合の層、依頼の状態を書くポートの差し込み、EXT-01 と時計の偽物を使う。ほかのキーの操作に 409 OPERATION_IN_PROGRESS で答える点は、未解決の FND-74 が扱っており、重ねて出さない | なし |
+| E1 | 指摘を読む | 状態が変わった FND-75、FND-76（受け入れ）の resolution を変わった項目で確かめ、対象が範囲にある FND-61、FND-66（受け入れ）と、範囲のモジュールが待つ FND-74（未解決、第 3 段階宛て）を読んだ | FND-75、FND-76 の変更はどちらも項目にあり、変えた項目の basis_note に引かれている（check.py も確かめた）。FND-75 は案の一つ目（found_late を依頼の今の押さえでない押さえに限る）を採って押さえ（MOD-58）にも広げ、二つ目（answerOverdue の一つの取引の中でキーを先に読み、まだ in_progress なら持ち主を呼ぶ）は MOD-43 が EXT-01 を呼ぶ理由で採らなかった。採らなかった案が閉じていたはずの間に FND-77 がある。FND-76 は案の一つ目のとおり。FND-61、FND-66 の変更はそのまま残る。FND-74 は今も成り立ち、重ねて出さない。この報告の道で出して未解決の指摘は、このレビューの FND-77、FND-78 のほかにない。退けられた指摘はない | なし |
+| E2 | 前提の確かめ | 変わった項目の加わった本文が頼るもの（DEC-08、DEC-42、DEC-45、POL-02、IFC-03 の答え、DAS-23、CON-08）を、premises とスクリプトで照らした | 加わった本文は、仮定にも品質チェーンの共有する事実と仮定にも新しく頼らない。MOD-59 の DAS-23、MOD-45 と MOD-56 の CON-08 は前のとおり挙がる。範囲の項目が新しく頼る未回答か回答済みの品質チェーンへの要求はない。欠けはない | なし |
+| E3 | 仮定の評価し直し | 変わった項目が premises で名指す DAS-23 を、依存する項目と後の段階への影響から評価し直した。ファイルが変わった DAS と QAS はなく、範囲の項目が依存する品質チェーンへの要求もない。このレビューの指摘は仮定に頼らない | DAS-23 は中、低のまま（依存は MOD-43、MOD-59 で、変更は見積もりの有効期間と登録を見捨てる時間に触れない）。ファイルは変えていない。高のものはなく、尋ねた点はない | なし |
+| E4 | 事業の判断の確かめ | 変わった項目の暫定の値、リスクを受け入れる決定、確定の種類か高の点の先送りと、前のレビューの後にこの段階が退けた指摘を見た | 加わった値、負債、先送りはない。この段階は指摘を退けていない（FND-75 の案の一つを理由を書いて採らなかったが、指摘は受け入れた） | なし |
+| E5 | 写しを探す | 変わった MOD と報告の加わった行を、品質チェーンの文（FR の受け入れ基準、QR、NFR、SLI ほか）と 30 字ずつスクリプトで照らした | 写しはない | なし |
+| E6 | 確かめを求める点 | 対象の変更なし | | |
+| E7 | 申し送りの確かめ | 対象の変更なし | | |
+| E8 | 品質チェーンのものを決めていないか | 変わった項目の確かめ方と契約、報告の加わった場面を、ゲート、目標、しきい値、受け入れ基準、SLI の数え方の変更を探して読んだ | ない。加わった確かめは部分の確かめ方で、マージやリリースの条件にしていない | なし |
 
-### C8 設計上の値の計算し直し
-MOD-32、MOD-33、MOD-67 の parameters、IFC-03 と IFC-07 の答えの期限、IFC-17 の待ち、DEC-46 の結果の取引の予算、IFC-11 と IFC-21 の値から、このレビューのスクリプト（作業用で、リポジトリには置かない）で計算し直した出力。
+C8 は、変わった値、変わった IFC の timing と予算、この段階に送られたタイムアウトがない。E6 は品質チェーンの basis_note と申し送りに新しいか変わった点がなく、確かめる項目も変わっていない。E7 はこの段階が ELM-03 で書いた申し送りが変わっていない。
+
+### C6 期限の後の答えと遅れた結果の取引の順のたどり
+同じキーの送り直しの check が overdue を読んだ後の三つの取引を、項目の決まりのとおりに順に当てた（このレビューの作業用のスクリプトで、リポジトリには置かない）。T1 は持ち主の期限の後の答えの書き込みの取引（MOD-58、MOD-56、MOD-59 の overdueAnswer。settleRehold を含む）、T2 は受けたインスタンスの遅れた結果の取引（試みは unknown のときだけ移り、キーは in_progress のときだけ書く）、T3 は MOD-26 の answerOverdue のキーの書き込み。T1 の後に T3 が来るのは同じ送り直しの中の順で、T2 はその前、間、後のどこにも来うる（MOD-26 は持ち主を answerOverdue の一つの取引の中で呼ばない）。押さえの T2 の答えは MOD-58 の request の post（押さえたら 201、拒否 402、処理されなかった 503 PAYMENT_SERVICE_UNAVAILABLE、分からない 503 HOLD_UNCONFIRMED）、押さえ直しの T2 の答えは MOD-56 の判断表 B と MOD-59 の判断表 A。合うとは、キーの答えが依頼（押さえは受け付けたか、押さえ直しは今の押さえと変更）と合い、依頼の今の押さえを解かないこと。
 
 ```text
-== daily job path (MOD-32, IFC-15)
-time limit 20 min < caller deadline 25 min < Cloud Run request limit 30 min <= Cloud Run max 60 min: True
-due-work drain ends 15 min after taking the run; 5 min left for reconcile, conversion, purge, checks
-retries after the first failure at [5, 15, 30, 45, 60] min; a run taken at 0 is stale at 20 -> retakes possible at [30, 45, 60]
-worst normal completion 50 min < alert wait 90 min: True
-
-== rehold mark vs the receiving instance's wait (MOD-56, MOD-42, IFC-03, IFC-17, DEC-46)
-first send at 0.2 s, wait ends at min(0.2 + 8.5, 8.8 - 0.1) = 8.7 s, result txn ends by 8.8 s <= mark due 8.8 s: True
-a second rehold within the deadline waits at most 8.8 s (Retry-After 1 s -> about 8 resends)
-
-== completion overlap window (MOD-43, IFC-07)
-first read at 0.1 s; MOD-43 row 1 window 'first send + 8.5 s' ends at 8.6 s; wait ends 8.6 s; result txn by 8.7 s = answer deadline 8.7 s
-
-== no_response anomaly (MOD-67, DAS-28)
-8.8 + 60 + 30 + 5 + 0.2 + 11 = 115.0 s <= T_alert_delay 300 s: True
-
-== delivery timer cap (MOD-33, DAS-21)
-overflowed pair -> backup due work fires within 2.0 + 5.0 = 7.0 s > T_dispatch_propagation 5.0 s: a bad event if it ever happens
+hold succeeded T2-T1-T3 key 201 ride searching releases 0 OK
+hold succeeded T1-T2-T3 key 201 ride not_accepted releases 1 MISMATCH
+hold succeeded T1-T3-T2 key 503 HOLD_UNCONFIRMED ride not_accepted releases 1 OK
+hold refused T2-T1-T3 key 402 ride not_accepted releases 0 OK
+hold refused T1-T2-T3 key 402 ride not_accepted releases 0 OK
+hold refused T1-T3-T2 key 503 HOLD_UNCONFIRMED ride not_accepted releases 0 OK
+hold not_processed T2-T1-T3 key 503 PSU ride not_accepted releases 0 OK
+hold not_processed T1-T2-T3 key 503 PSU ride not_accepted releases 0 OK
+hold not_processed T1-T3-T2 key 503 HOLD_UNCONFIRMED ride not_accepted releases 0 OK
+hold unknown T2-T1-T3 key 503 HOLD_UNCONFIRMED ride not_accepted releases 0 OK
+hold unknown T1-T2-T3 key 503 HOLD_UNCONFIRMED ride not_accepted releases 0 OK
+hold unknown T1-T3-T2 key 503 HOLD_UNCONFIRMED ride not_accepted releases 0 OK
+rehold-meth succeeded T2-T1-T3 key 200 current R relR 0 relH1 1 OK
+rehold-meth succeeded T1-T2-T3 key 503 REHOLD_UNCONFIRMED current H1 relR 1 relH1 0 OK
+rehold-meth succeeded T1-T3-T2 key 503 REHOLD_UNCONFIRMED current H1 relR 1 relH1 0 OK
+rehold-meth refused T2-T1-T3 key 402 current H1 relR 0 relH1 0 OK
+rehold-meth refused T1-T2-T3 key 402 current H1 relR 0 relH1 0 OK
+rehold-meth refused T1-T3-T2 key 503 REHOLD_UNCONFIRMED current H1 relR 0 relH1 0 OK
+rehold-meth not_processed T2-T1-T3 key 503 PSU current H1 relR 0 relH1 0 OK
+rehold-meth not_processed T1-T2-T3 key 503 PSU current H1 relR 0 relH1 0 OK
+rehold-meth not_processed T1-T3-T2 key 503 REHOLD_UNCONFIRMED current H1 relR 0 relH1 0 OK
+rehold-meth unknown T2-T1-T3 key 503 REHOLD_UNCONFIRMED current H1 relR 0 relH1 0 OK
+rehold-meth unknown T1-T2-T3 key 503 REHOLD_UNCONFIRMED current H1 relR 0 relH1 0 OK
+rehold-meth unknown T1-T3-T2 key 503 REHOLD_UNCONFIRMED current H1 relR 0 relH1 0 OK
+rehold-dest succeeded T2-T1-T3 key 200 current R relR 0 relH1 1 change applied OK
+rehold-dest succeeded T1-T2-T3 key 503 REHOLD_UNCONFIRMED current H1 relR 1 relH1 0 change not_applied OK
+rehold-dest succeeded T1-T3-T2 key 503 REHOLD_UNCONFIRMED current H1 relR 1 relH1 0 change not_applied OK
+rehold-dest refused T2-T1-T3 key 402 current H1 relR 0 relH1 0 change not_applied OK
+rehold-dest refused T1-T2-T3 key 402 current H1 relR 0 relH1 0 change not_applied OK
+rehold-dest refused T1-T3-T2 key 503 REHOLD_UNCONFIRMED current H1 relR 0 relH1 0 change not_applied OK
+rehold-dest not_processed T2-T1-T3 key 503 PSU current H1 relR 0 relH1 0 change not_applied OK
+rehold-dest not_processed T1-T2-T3 key 503 PSU current H1 relR 0 relH1 0 change not_applied OK
+rehold-dest not_processed T1-T3-T2 key 503 REHOLD_UNCONFIRMED current H1 relR 0 relH1 0 change not_applied OK
+rehold-dest unknown T2-T1-T3 key 503 REHOLD_UNCONFIRMED current H1 relR 0 relH1 0 change not_applied OK
+rehold-dest unknown T1-T2-T3 key 503 REHOLD_UNCONFIRMED current H1 relR 0 relH1 0 change not_applied OK
+rehold-dest unknown T1-T3-T2 key 503 REHOLD_UNCONFIRMED current H1 relR 0 relH1 0 change not_applied OK
+mismatches: 1
 ```
 
-どれも報告の計算と合う。押さえ直しの印の期限は、受けたインスタンスの結果の取引が予算のうちに終わるときにちょうど収まる長さで、結果の取引が予算を超えれば期限の後になる。そのときの順の一つが FND-75 の道。
+H1 は依頼の前の押さえ、R は押さえ直しの試みの押さえ、PSU は PAYMENT_SERVICE_UNAVAILABLE、relR と relH1 はその押さえの解除の試みの数。T2、T1、T3 の行がそろって合うことは、FND-75 の道が閉じたことを示す。食い違う一行は FND-77 の道で、押さえ直しの同じ順（T1、T2、T3）が合うのは、T2 が印の食い違いを読んで 503 REHOLD_UNCONFIRMED と答える行が MOD-56 の判断表 B と MOD-59 の判断表 A にあるため。押さえには、依頼が holding でないと読んだ T2 の答えを決める行がない。
 
 ## 指摘
 <!-- generated: findings -->
 | FND | 名前 | 重さ | 宛先 | 対象 |
 |---|---|---|---|---|
-| FND-75 | 押さえ直しの期限の後の答えが、遅れた結果の取引で依頼の押さえになった押さえにも settleRehold で found_late の解除を作り、依頼の今の押さえを解く | 中 | high-level-design-to-detailed-design | MOD-56、MOD-59 |
-| FND-76 | 押さえ直しの印は依頼の表（rides）の列だが、それを書くか空にするか取引の中で読む操作が持ち主の MOD-45 の契約になく、MOD-56 が書くとしている | 軽微 | high-level-design-to-detailed-design | MOD-45、MOD-56 |
+| FND-77 | 押さえの期限の後の答えが依頼を not_accepted にした後、MOD-26 がキーを書く前に受けたインスタンスの遅れた結果の取引が確定すると、押さえが済んだその取引の 201 がキーに残り、受け付けなかった依頼に 201 と答える | 中 | high-level-design-to-detailed-design | MOD-58、MOD-26 |
+| FND-78 | MOD-56 に加えた不変条件は依頼の今の押さえを解くのを ended と decide に限るが、受け付けなかった依頼の今の押さえは押さえの期限の後の答えと判断表 C が found_late で解く | 軽微 | high-level-design-to-detailed-design | MOD-56 |
 <!-- /generated -->
 
-この報告の道で出して未解決の指摘は、このレビューの FND-75、FND-76。前のレビューの FND-61〜FND-73 はこの段階が受け入れた。退けられて出し直さなかった指摘はない。
+この報告の道で出して未解決の指摘は、このレビューの FND-77、FND-78。前のレビューの FND-75、FND-76 はこの段階が受け入れた。退けられて出し直さなかった指摘はない。
 
 ## 決めたこと
 | # | 質問 | 回答 | 項目 |
@@ -105,10 +126,11 @@ overflowed pair -> backup due work fires within 2.0 + 5.0 = 7.0 s > T_dispatch_p
 | DAS-06 | EXT-01 のテスト環境で、後で確定する押さえ、一部の確定、取り消し、返金を円で使える | 判断 | 中 | 中 | DEC-09、ELM-05、IFC-17 |
 <!-- /generated -->
 
-ELM-03 のモジュールが premises で名指す仮定と、ELM-03 が使う IFC と DEC が名指す仮定。このレビューが評価し直したのは、ファイルが変わった DAS-17、DAS-18、DAS-20、DAS-21、DAS-28 と、変わった項目が名指す DAS-05、DAS-16、DAS-23 で、どれも評価は変わらない（E3）。ほかの行は範囲の項目が名指していないので評価し直しておらず、前のレビューの評価のまま。QAS の値は品質チェーンのファイルには書かず、ここに示す（QAS-54 は第 3 段階のレビューの決めたこと 1 で成り立つと答えを受け、QCR-08 が品質チェーンに運ぶ。品質チェーンが当てるまで、品質チェーンでは未確認のまま）。このレビューが書いた仮定はなく、指摘はどちらも仮定に頼らない。
+ELM-03 のモジュールが premises で名指す仮定と、ELM-03 が使う IFC と DEC が名指す仮定。このレビューが評価し直したのは、変わった MOD-59 が名指す DAS-23 で、評価は変わらない（E3）。ほかの行は範囲の項目が名指していないので評価し直しておらず、前のレビューの評価のまま。QAS の値は品質チェーンのファイルには書かず、ここに示す（QAS-54 は第 3 段階のレビューの決めたこと 1 で成り立つと答えを受け、QCR-08 が品質チェーンに運ぶ。品質チェーンが当てるまで、品質チェーンでは未確認のまま）。このレビューが書いた仮定はなく、指摘はどちらも仮定に頼らない。
 
 ## 未解決の点
-- `scripts/check.py` は、レビューを始めたとき、範囲の項目（第 4 段階の ELM-03 のモジュール、HND-21、ELM-03 の報告）に問題を報告しなかった。このレビューの指摘を書いた後は、ELM-03 の報告の指摘の表が FND-75、FND-76 を持たないため古くなり（`high-level-design-to-detailed-design`、1 件）、第 4 段階の ELM-03 の次の実行が書き直す。範囲の外では、生成する表が古いことを `requirements-to-architecture-drivers`（1-architecture-drivers.md）、`architecture-drivers-to-architecture`（2-architecture.md）、`architecture-to-technical-policy`（2b-technical-policy.md）、`architecture-to-high-level-design`（3-high-level-design.md）に 1 件ずつ、`architecture-drivers-to-architecture` に DEC-05、DEC-18、ELM-08 の basis の 3 件を報告し、IFC-22 の functions の FR-05 と FR-45 を FND-35 待ちとして示した。`design-review` には、この報告の指摘の表が古いこと（このレビューが書き直した）と、第 4 段階の ELM-02 のレビューの報告の生成する表が古いことの 2 件。後のものは、ELM-02 の実行（eb55336）で MOD-01 が DAS-17 を名指したことによるもので、このレビューの commit に入れると ELM-02 のレビューの次の差分のレビューの基準が eb55336 の変更より後に動くため、前のレビューと同じく書き直していない（次の ELM-02 のレビューが書き直す）。
+- `scripts/check.py` は、レビューを始めたとき、範囲の項目（第 4 段階の ELM-03 のモジュールと報告）に問題を報告しなかった。このレビューの指摘を書いた後は、ELM-03 の報告の指摘の表が FND-77、FND-78 を持たないため古くなり（`high-level-design-to-detailed-design`、1 件）、第 4 段階の ELM-03 の次の実行が書き直す。範囲の外では、生成する表が古いことを `requirements-to-architecture-drivers`（1-architecture-drivers.md）、`architecture-drivers-to-architecture`（2-architecture.md）、`architecture-to-technical-policy`（2b-technical-policy.md）、`architecture-to-high-level-design`（3-high-level-design.md）に 1 件ずつ、`architecture-drivers-to-architecture` に DEC-05、DEC-18、ELM-08 の basis の 3 件を報告し、IFC-22 の functions の FR-05 と FR-45 を FND-35 待ちとして示した。`design-review` には、第 4 段階の ELM-02 のレビューの報告の生成する表が古いことの 1 件が残る。ELM-02 の実行（eb55336）で MOD-01 が DAS-17 を名指したことによるもので、このレビューの commit に入れると ELM-02 のレビューの次の差分のレビューの基準が eb55336 の変更より後に動くため、前のレビューと同じく書き直していない（次の ELM-02 のレビューが書き直す）。
+- MOD-26 の registerRoute の事前条件は期限の後の答え方を登録する MOD-43 と MOD-57 も縛るが、MOD-57 の返金を作る経路の期限の後の答え方は判断表に書かれておらず、MOD-43 の登録の完了の経路は判断表 B の状態の行から読むだけなので、このレビューは T1、T2、T3 の順を MOD-43 と MOD-57 についてたどれていない（FND-77 の案が、この段階に確かめるよう書いた）。
 - 何も配備しない（TC-09）ため、想定の本番の Secret Manager の版の付け方と最初の版を使う置き方、Cloud Scheduler の OIDC の印の確かめ（Google の署名の鍵をどこから読むかを含む）、Cloud Run の要求の時間の上限は、公開の文書と設計の入力から読み、どの層も確かめていない。EXT-01 の登録の取引が、確かめる前と確かめの失敗の後のどちらも requires_payment_method を示して失敗のときだけ last_setup_error を持つことも、MOD-42 と MOD-43 が挙げる EXT-01 の決まりとして読み、このレビューは確かめていない（契約の層が試験の環境で確かめうる）。
 - 第 3 段階に宛てた軽微な FND-59、FND-60、FND-74 は未解決で、MOD-56 の判断表 D、MOD-26、MOD-43、MOD-56、MOD-59 が今の DEC-42 と DEC-45 のとおりに待つ。
-- 報告のモジュールの図の矢印と depends_on は、機能のディレクトリの間の循環をスクリプトで照らし、図が描かない個々の矢印までは照らしていない（図の文が略すと書く）。
+- 報告のモジュールの図の矢印と depends_on は、機能のディレクトリの間の循環をスクリプトで照らし、図が描かない個々の矢印までは照らしていない（図の文が略すと書く）。このレビューは、変わった呼び出しが depends_on の中にあることだけを見た。
