@@ -1,11 +1,11 @@
 # 概略設計: 配車サービス
 
-状態: 回答反映済み · 更新: 2026-11-13 · 入力の基準: b4918ae · 第 3 段階（全 4 段階）
+状態: 回答反映済み · 更新: 2026-11-13 · 入力の基準: 63ad346 · 第 3 段階（全 4 段階）
 
 ## 概要
-インタフェースは 25 で、ELM-03 が提供するものが 16（HTTP の操作 14、流れ 1、日々の処理 1。仕様書は POL-05 のとおりコードから生成し、スキーマは HND-16 で実装に送る）、外部のシステムが 5（EXT-01 の API と入力部品、EXT-02 の API と地図を描く部品、Web Push の配信。どれも持ち主の文書を引く）、画面が 4。手で書く仕様書はない。端から端の流れは CUJ-01〜CUJ-18 と、シナリオを持つ主な設計を動かす要求 9 と、日々の処理の DRV-23 で描いた。データの実体は 27 で、持ち主はどれも ELM-03。時間のしきい値の SLO の遅延の予算は、NFR-07（最も長い依頼の流れで 4.10 秒、余裕 0.90 秒。流れで送ったのに示した時刻が届かない相手に Web Push でも知らせる道は 4.50 秒、余裕 0.50 秒）、NFR-19（位置の古さ 10.7 秒、余裕 19.3 秒）、NFR-34（一つの取引）のどれも収まり、決済に ELM-03 が答える期限 8.8 秒は T_payment_response（10 秒）のうちにある。共通の約束事は DEC-35〜DEC-44 で、結果が分からないお金の操作の答え方は DEC-45、予算とタイムアウトの決め方は DEC-46。
+インタフェースは 25 で、ELM-03 が提供するものが 16（HTTP の操作 14、流れ 1、日々の処理 1。仕様書は POL-05 のとおりコードから生成し、スキーマは HND-16 で実装に送る）、外部のシステムが 5（EXT-01 の API と入力部品、EXT-02 の API と地図を描く部品、Web Push の配信。どれも持ち主の文書を引く）、画面が 4。手で書く仕様書はない。端から端の流れは CUJ-01〜CUJ-18 と、シナリオを持つ主な設計を動かす要求 9 と、日々の処理の DRV-23 で描いた。データの実体は 27 で、持ち主はどれも ELM-03。時間のしきい値の SLO の遅延の予算は、NFR-07（最も長い依頼の流れで 4.10 秒、余裕 0.90 秒。流れで送ったのに示した時刻が届かない相手に Web Push でも知らせる道は 4.50 秒、余裕 0.50 秒）、NFR-19（位置の古さ 10.7 秒、余裕 19.3 秒）、NFR-34（一つの取引）のどれも収まり、決済に ELM-03 が答える期限 8.8 秒は T_payment_response（10 秒）のうちにある。共通の約束事は DEC-35〜DEC-44 で、結果が分からないお金の操作と EXT-01 が処理しなかったお金の操作の答え方は DEC-45、予算とタイムアウトの決め方は DEC-46。
 
-この段階のレビューがこの段階に宛てた中の指摘 FND-22〜FND-25 と軽微な指摘 FND-26〜FND-33 は、どれも受け入れてある。受けたインスタンスが答える前に止まっても同じキーの送り直しが答えを受けるよう、キーの記録を外部を呼ぶかで分けて書き（DEC-42、DEC-45、DAT-26）、日々の処理は止まった実行を取り直す（IFC-15、DAT-27）。境界の SLI は端末が答えを受ける前の送り直しだけを一つの操作にまとめ（DEC-43 の X-Resend）、乗る場所を決め始めたことと評価を始めたことを ELM-03 に運び（IFC-03、IFC-10）、担当者がアカウントとドライバーを探して読む操作を加えた（IFC-12）。尋ねる点はなかった。一つの操作の要求にシステムが答えなかったときの数え方を QCR-07 で品質チェーンに確かめ（影響は低）、ELM-01 の functions の欠けを FND-35（軽微）で第 2 段階に出した。未確認の仮定はこの段階が書いた 6（DAS-10〜DAS-15）で、どれも暫定の決定。
+この段階に宛てた指摘は、第 3 段階のレビューの FND-22〜FND-33 と FND-36〜FND-40、第 4 段階の ELM-02 の実行の FND-41、そのレビューの中の FND-45 で、どれも受け入れてある。EXT-01 が実行の前に退けた（処理されなかった）お金の操作の試みは、何も実行されていない済まなかった試みとして終え、返金は済まなかったと示して担当者のやり直しで新しい試みを作り、決済は依頼を到着したままにしてドライバーがやり直せ、利用者が待たない押さえの解除と料金の請求は期限の処理が新しい試みを作る（DEC-45）。外部を呼ぶ操作が試みの結果として返す 503 は、同じキーで送り直さずに今の状態を読み直す（DEC-35）。受けたインスタンスは EXT-01 の待ちを冪等キーの答えの期限から結果を書く取引の分を引いた時刻までに終えて期限までに答え（DEC-42、IFC-17）、SLI-14 の区間は操作のたどる ID の最初の要求を受けた時刻から始まる（IFC-10、DAT-20）。尋ねる点はなかった。品質チェーンの QAS-54 は第 3 段階のレビューの質問 1 で成り立つと答えを受け（QCR-08 が運ぶ）、それに頼る IFC-10、IFC-11、IFC-21、DAT-20、DEC-46 がその答えを引く。一つの操作の要求にシステムが答えなかったときの境界の SLI の数え方を QCR-07 で品質チェーンに確かめ（影響は低）、ELM-01 の functions の欠けを FND-35（軽微）で第 2 段階に出した。未確認の仮定はこの段階が書いた 6（DAS-10〜DAS-15）で、どれも暫定の決定。
 
 ## 入力
 | 出どころ | 得たもの |
@@ -14,14 +14,14 @@
 | docs/design/2b-technical-policy.md、pol/、dec/ | POL-01〜POL-06。仕様書の作り方は POL-05（ELM-03 が提供する HTTP の操作と流れはコードから生成、EXT-01、EXT-02、Web Push は持ち主の文書、日々の処理を終えた記録と画面は作らない、手で書くものは今はない）。コードの中の約束事は POL-04。DEC-28〜DEC-34 |
 | docs/design/1-architecture-drivers.md、drv/ | DRV-01〜DRV-35（主なものは 12）とそのシナリオ |
 | docs/design/design-context.yaml | TC-01〜TC-18、PC-01〜PC-03、TEAM-01、STK-01〜STK-04。今の構造はなく、すべて新規 |
-| docs/design/hnd/ | この段階に宛てた未決定の申し送りはない（HND-01〜HND-06、HND-08、HND-11、HND-15 はこの段階が前に決めた） |
-| docs/design/fnd/、reviews/3-high-level-design.md | この段階のレビュー（全体のレビュー、入力の基準は 2f633f0）がこの段階に宛てた中の FND-22〜FND-25 と軽微な FND-26〜FND-33。未解決の FND-10、FND-11、FND-34（第 2 段階）と FND-19〜FND-21（第 2b 段階）は、この段階の項目を対象にしない（FND-34 は境界の SLI の見えない所で、第 2 段階の DEC-23 にかかわる） |
-| docs/design/das/、qcr/、quality-chain-requests.md | 未確認の DAS-01、DAS-02、DAS-04〜DAS-13、確認済みの DAS-03。品質チェーンへの要求 QCR-01、QCR-06（未回答）と QCR-02〜QCR-05（回答済み）。要求書に手で書かれた答えはない。前の実行の後に docs/quality/ は変わっておらず、反映された要求はない |
+| docs/design/hnd/ | この段階に宛てた未決定の申し送りはない（HND-01〜HND-06、HND-08、HND-11、HND-15 はこの段階が決めた）。この段階が書いた HND-18 は第 4 段階が ELM-02 で決めた |
+| docs/design/fnd/、reviews/3-high-level-design.md、reviews/4-detailed-design-ELM-02.md、4-detailed-design/ELM-02.md | この段階に宛てた未解決の指摘: 第 3 段階のレビュー（差分のレビュー）の軽微な FND-36〜FND-40、第 4 段階の ELM-02 の実行の軽微な FND-41、第 4 段階の ELM-02 のレビュー（全体のレビュー）の中の FND-45。第 4 段階の報告とレビューの報告は、FND-41 と FND-45 が引く所（MOD-02 の判断表、IFC-21 の push の出来事の扱い）を読んだ。未解決の FND-10、FND-11、FND-34、FND-35（第 2 段階）、FND-19〜FND-21、FND-42（第 2b 段階）、FND-43、FND-44、FND-46〜FND-48（第 4 段階）は、この段階の項目を対象にしない |
+| docs/design/das/、qcr/、quality-chain-requests.md | 未確認の DAS-01、DAS-02、DAS-04〜DAS-16、確認済みの DAS-03（DAS-16 は第 4 段階のもので、この段階の項目は依存しない）。品質チェーンへの要求 QCR-01、QCR-06、QCR-07（未回答）と QCR-02〜QCR-05、QCR-08（回答済み。QCR-08 は第 3 段階のレビューが QAS-54 の答えを運ぶもの）。要求書に手で書かれた答えはない。前の実行の後に docs/quality/ は変わっておらず、反映された要求はない |
 | docs/quality/context.yaml | USR-01〜USR-04、CUJ-01〜CUJ-18 とその手順、CON-01〜CON-08、EXT-01、EXT-02、OPF-01〜OPF-03 |
 | docs/quality/fr/ | 有効な FR 53 とその受け入れ基準とインタフェースの種類（画面、通知、EXT-01、EXT-02） |
 | docs/quality/sli/、nfr/、ebp/ | SLI-01〜SLI-06（システムの境界）、SLI-08〜SLI-13（データ）、SLI-14（利用者の側）の数える単位の出来事と数え方の規則。時間のしきい値の SLO は NFR-07、NFR-19、NFR-34（NFR-08 はしきい値が時刻の差の当たりで、流れの遅れではない）。監視の NFR-17、NFR-29 のしきい値。EBP-01 |
 | docs/quality/qr/、qas/ | データの品質とセキュリティの詳しい中身（QR-05、QR-15、QR-17、QR-19、QR-24、QR-29、QR-30、QR-33〜QR-37、QR-41、QR-42、QR-57〜QR-59 ほか）。この段階の項目が直接依存する QAS-25、QAS-32、QAS-33、QAS-54 |
-| 公開の情報（この段階が読んだ）: [Stripe の Idempotent requests](https://docs.stripe.com/api/idempotent_requests)、[Stripe の高度なエラー処理](https://docs.stripe.com/error-low-level)、[Stripe の支払い方法を保留する](https://docs.stripe.com/payments/place-a-hold-on-a-payment-method) | 同じキーの送り直しは一度目の答え（500 を含む）を返し、キーは少なくとも 24 時間持たれ、その後のキーの再利用は新しい要求になる。ネットワークの誤りと 409（同じキーが動いている）は同じキーで送り直し、500 の結果は不確定で取引を読んで確かめる。押さえの期限が切れると取引は canceled になり、一部の確定の残りは自動で解かれ、確定は一度だけ。日本に拠点があるアカウントの円の取引は最長 30 日押さえられる |
+| 公開の情報（この段階が読んだ）: [Stripe の Idempotent requests](https://docs.stripe.com/api/idempotent_requests)、[Stripe の高度なエラー処理](https://docs.stripe.com/error-low-level)、[Stripe の支払い方法を保留する](https://docs.stripe.com/payments/place-a-hold-on-a-payment-method) | 同じキーの送り直しは一度目の答え（500 を含む）を返し、キーは少なくとも 24 時間持たれ、その後のキーの再利用は新しい要求になる。結果を残すのは実行が始まった後だけで、引数の検証で退けた要求と、動いている要求と重なった要求には結果を残さず、送り直せる。ネットワークの誤りと 409（同じキーが動いている）は同じキーで送り直し、500 の結果は不確定で取引を読んで確かめる。押さえの期限が切れると取引は canceled になり、一部の確定の残りは自動で解かれ、確定は一度だけ。日本に拠点があるアカウントの円の取引は最長 30 日押さえられる |
 | 持ち主の文書（IFC が引く）: [Stripe の API](https://docs.stripe.com/api)、[Stripe の Payment Element](https://docs.stripe.com/payments/payment-element)、[Places API (New)](https://developers.google.com/maps/documentation/places/web-service/overview)、[Geocoding API](https://developers.google.com/maps/documentation/geocoding/overview)、[Routes API](https://developers.google.com/maps/documentation/routes)、[Maps JavaScript API](https://developers.google.com/maps/documentation/javascript/overview)、[RFC 8030](https://www.rfc-editor.org/rfc/rfc8030)、[RFC 8291](https://www.rfc-editor.org/rfc/rfc8291)、[RFC 8292](https://www.rfc-editor.org/rfc/rfc8292) | IFC-17〜IFC-21 の操作の名前と、設計が頼る振る舞い。詳しい項目と限りは持ち主の文書による |
 
 既存のコードはなく、読んだコードもない。何も配備しない（TC-09）ため、EXT-01 のテスト環境の応答の時間、モバイルの通信の遅れ、iOS の Safari のホーム画面に加えた Web アプリの流れと位置の振る舞い、自身の処理とデータベースの時間、Web Push の配信の時間はどれも測っておらず、予算とタイムアウトの値は暫定（DAS-10、DAS-11、DAS-15）。
@@ -47,21 +47,21 @@
 <!-- generated: decisions -->
 | DEC | 名前 | 対象 | 根拠 |
 |---|---|---|---|
-| DEC-35 | ELM-03 のどの操作も一つの形で誤りを返し、状態の組と安定した符号で利用側のすることを分ける | DRV-02、DRV-24、DRV-12、DRV-29 | 推定 |
+| DEC-35 | ELM-03 のどの操作も一つの形で誤りを返し、状態の組と安定した符号で利用側のすることを分ける | DRV-02、DRV-24、DRV-12、DRV-29、FND-45 | 推定 |
 | DEC-36 | 公開する ID は種類の接頭辞と ULID で ELM-03 が作り、端末は操作ごとの UUID を作り、サインインの ID は別の短い文字列にする | DRV-28、DRV-29、DRV-02、DRV-24 | 推定 |
 | DEC-37 | 時刻は UTC で表し、日で数えるものは Asia/Tokyo の日付で数え、端末の時刻は送った時刻と往復の時間からサーバーの時刻に直す | DRV-26、DRV-27、DRV-04、DRV-21、SLI-10、SLI-14 | 推定 |
 | DEC-38 | 額は円の整数と通貨の符号で表し、端数を丸めるのは料金を求めるときの一度だけにする | DRV-07、DRV-31、SLI-11、SLI-12 | 推定 |
 | DEC-39 | 一覧はどれも不透明な cursor と limit で区切り、並べ方を一覧ごとに一つに決め、個人の情報で探す一覧は本文で条件を送る | DRV-24、DRV-29、FR-31、FR-38、FR-50、FND-33 | 仮定 |
 | DEC-40 | 本人の確かめの印は ELM-03 が持つセッションの ID を入れた __Host- のクッキーだけにし、状態を変える要求は Origin を確かめる | DRV-28、DRV-29、FR-48、FR-49 | 推定 |
 | DEC-41 | ELM-03 の操作は経路に /v1 を持って足すだけで変え、流れと知らせは種類ごとの版を持ち、Web アプリは ELM-03 の版が変われば読み直す | DRV-12、DRV-13、FR-36 | 推定 |
-| DEC-42 | 状態を変える要求は Idempotency-Key に操作ごとの UUID を付け、同じキーには最初の答えを返し、外部を呼ばない操作は結果とキーを一つの取引で書き、外部を呼ぶ操作は答えの期限の後に試みから答える | DRV-02、DRV-07、DRV-32、FR-30、FR-40、FND-22 | 仮定 |
+| DEC-42 | 状態を変える要求は Idempotency-Key に操作ごとの UUID を付け、同じキーには最初の答えを返し、外部を呼ばない操作は結果とキーを一つの取引で書き、外部を呼ぶ操作は答えの期限の後に試みから答える | DRV-02、DRV-07、DRV-32、FR-30、FR-40、FND-22、FND-37、FND-39 | 仮定 |
 | DEC-43 | 端末は操作ごとのたどる ID を X-Trace-Id で、送り直しの別を X-Resend で、ELM-03 は要求ごとの ID を X-Request-Id で渡し、ログのどの行も SLI と調べに要る項目を持つ | DRV-24、DRV-25、DRV-29、FR-34、FR-52、SLI-01、SLI-02、SLI-03、SLI-04、SLI-05、SLI-06、FND-23 | 推定 |
 | DEC-44 | 経路は /v1/ の後の kebab-case の複数形の名詞とし、一つしかない資源だけ単数にし、項目は camelCase、符号は UPPER_SNAKE_CASE とし、個人の情報は経路と問い合わせに入れない | DRV-12、DRV-29、DRV-34、FND-31 | 推定 |
-| DEC-45 | EXT-01 の答えを四つに分け、押さえは結果が分からなければしなかったことにし、決済と返金と登録は結果が分からないと答えて確かめ続ける | DRV-07、DRV-32、DRV-01、DRV-02、FR-29、FR-30、FR-39、FR-40、FR-46、FR-54、FND-22 | 推定 |
+| DEC-45 | EXT-01 の答えを四つに分け、押さえは結果が分からなければしなかったことにし、決済と返金と登録は結果が分からないと答えて確かめ続け、処理されなかった試みは済まなかったとして新しい試みでやり直す | DRV-07、DRV-32、DRV-01、DRV-02、FR-29、FR-30、FR-39、FR-40、FR-46、FR-50、FR-54、FND-22、FND-45 | 推定 |
 | DEC-46 | 時間のしきい値の SLO はホップごとに裾の分け前で予算を割り、タイムアウトは呼ばれる側の最悪の待ちより長くし、端末は ELM-03 の期限に通信の余裕を足す | NFR-07、NFR-19、NFR-34、NFR-29、DRV-03、DRV-04、DRV-07、DRV-01、FND-26、FND-29 | 仮定 |
 <!-- /generated -->
 
-DEC-35〜DEC-44 は共通の約束事。DEC-45 は、DEC-10 のお金の操作の原則を利用側への答え（状態の組と符号）に移したもので、受けたインスタンスが答える前に止まったときの同じキーの送り直しへの答えも持つ。DEC-46 は、予算とタイムアウトの決め方（送り直さない位置の送りの決め方を含む）と、どの呼び出しにも属さない値（予算のホップ、Web Push の配信のホップ、通信の余裕、外部を呼ばない操作の答えの期限、期限の来た処理を拾う間隔）を持つ。
+DEC-35〜DEC-44 は共通の約束事。DEC-45 は、DEC-10 のお金の操作の原則を利用側への答え（状態の組と符号）に移したもので、受けたインスタンスが答える前に止まったときの同じキーの送り直しへの答えと、EXT-01 が実行の前に退けた（処理されなかった）試みの出口も持つ。DEC-46 は、予算とタイムアウトの決め方（送り直さない位置の送りの決め方を含む）と、どの呼び出しにも属さない値（予算のホップ、Web Push の配信のホップ、通信の余裕、外部を呼ばない操作の答えの期限、期限の来た処理を拾う間隔）を持つ。
 
 ## インタフェース
 <!-- generated: interfaces -->
@@ -76,7 +76,7 @@ DEC-35〜DEC-44 は共通の約束事。DEC-45 は、DEC-10 のお金の操作�
 | IFC-07 | 支払い方法の登録 | HTTP | ELM-03 | ELM-01 | FR-46 | HND-16 | 推定 |
 | IFC-08 | 乗客の閾値とドライバーの条件 | HTTP | ELM-03 | ELM-01 | FR-16、FR-32 | HND-16 | 推定 |
 | IFC-09 | 乗車の履歴、評価、苦情と返金の求め | HTTP | ELM-03 | ELM-01 | FR-15、FR-31、FR-37 | HND-16 | 推定 |
-| IFC-10 | 端末からの報告と知らせの宛先 | HTTP | ELM-03 | ELM-01、ELM-02 | FR-45、FR-52、FR-53 | HND-16 | 仮定 |
+| IFC-10 | 端末からの報告と知らせの宛先 | HTTP | ELM-03 | ELM-01、ELM-02 | FR-45、FR-52、FR-53 | HND-16 | 推定 |
 | IFC-11 | 変化の流れ | イベント | ELM-03 | ELM-01、ELM-02 | FR-04、FR-05、FR-06、FR-07、FR-08、FR-09、FR-10、FR-11、FR-13、FR-18、FR-20、FR-21、FR-22、FR-23、FR-24、FR-26、FR-27、FR-29、FR-31、FR-33、FR-36、FR-37、FR-39、FR-44、FR-46、FR-47 | HND-16 | 仮定 |
 | IFC-12 | 運営・サポートの担当者の操作 | HTTP | ELM-03 | ELM-02 | FR-09、FR-37、FR-38、FR-41、FR-42、FR-43、FR-44、FR-45、FR-50、FR-51 | HND-16 | 推定 |
 | IFC-13 | 返金 | HTTP | ELM-03 | ELM-02 | FR-39、FR-40、FR-50 | HND-16 | 推定 |
@@ -96,7 +96,7 @@ DEC-35〜DEC-44 は共通の約束事。DEC-45 は、DEC-10 のお金の操作�
 
 ELM-03 が提供する HTTP の操作と流れ（IFC-01〜IFC-14、IFC-16）と日々の呼び出しの入口（IFC-15）は、POL-05 の一つ目の項に当たる。両側を同じ開発者が作り、ほかの者がこのシステムの決まりに合わせて作るインタフェースはないため、手で書く仕様書（POL-05 の八つ目の項）はどれにも当たらず、ifc/specs/ には何も書いていない。IFC はそれぞれの操作、誤りとその符号、冪等キーの意味、結果が分からないときの答え、利用側に見える状態と出来事を持ち、要求、応答、出来事の中身のスキーマは HND-16 で実装に送った（@hono/zod-openapi が経路の定義から生成する）。IFC-15 は日々の処理（バッチ）で、その呼び出しの入口のスキーマも HND-16 に含めた。
 
-外部のシステムのインタフェース（IFC-17〜IFC-21）は持ち主の文書（「入力」に挙げた）を引き、設計が頼る振る舞いと、このシステムからの呼び出しのタイムアウトと待ち（お金の道の IFC-17）か、その枠（ほか）を持つ。EXT-01 の答えの分け方（済んだ、はっきりした拒否、結果が分からない、処理されなかった）は IFC-17 にあり、同じキーの 500 が繰り返し返る（Stripe の文書）ため、500 の後の確かめは読み出しで行う。画面（IFC-22〜IFC-25）は文書を作らず、IFC が決まり（POL-05 の七つ目の項）。
+外部のシステムのインタフェース（IFC-17〜IFC-21）は持ち主の文書（「入力」に挙げた）を引き、設計が頼る振る舞いと、このシステムからの呼び出しのタイムアウトと待ち（お金の道の IFC-17）か、その枠（ほか）を持つ。EXT-01 の答えの分け方（済んだ、はっきりした拒否、結果が分からない、処理されなかった）は IFC-17 にあり、同じキーの 500 が繰り返し返る（Stripe の文書）ため、500 の後の確かめは読み出しで行う。処理されなかったとするのは、状態を変える呼び出しを EXT-01 が実行の前に退けたと答えが示すときだけで（Stripe はそのキーに結果を残さない）、確かめの読み出しと送り直しで受けたときは結果が分からないままにする。画面（IFC-22〜IFC-25）は文書を作らず、IFC が決まり（POL-05 の七つ目の項）。
 
 ELM-01 と ELM-02 から ELM-03 への一つのつなぎを、業務の機能（依頼と乗車、受付、位置、支払い方法など）ごとに IFC に分けた。一つの IFC の操作は ELM-03 の一つの機能のディレクトリ（POL-02 の例）にほぼ当たり、第 4 段階のモジュールがそれぞれの操作を一つずつ受け持てる。誤りの符号は共通のもの（DEC-35、DEC-42）を各 IFC で繰り返さず、その IFC に固有のものだけを書いた。
 
@@ -122,8 +122,8 @@ ELM-01 と ELM-02 から ELM-03 への一つのつなぎを、業務の機能（
 どの SLI にも既存の出どころはなく、出来事を出す仕組みはこの段階が設計した。品質チェーンへの要求に代えた SLI はない。境界の SLI の数え方の一つの場合は、QCR-07 で品質チェーンに確かめる（下の一つ目）。
 
 - システムの境界の SLI-01〜SLI-06 は、ELM-03 の入口が要求ごとに書く境界の出来事（DAT-19）で数える（DEC-23）。受けたときに書いて答えたときに結果を足すので、答えずに止まった要求も結果のない記録として残る。「応えを待たずに送り直したものは一つ」は、同じたどる ID の要求を DEC-43 の決まりでまとめて数える。端末は送り直すときに、前の要求に答えを受けたかを X-Resend で添え（no_answer、in_progress、after_answer）、答えを受ける前の送り直しと 409 OPERATION_IN_PROGRESS の後の送り直しだけが同じ操作で、500 や 503 などの答えを受けた後の送り直しは新しい操作になる。一つの操作のどれかの要求が答えのないままか、システム自身の誤りか外部の失敗の答えを受けていれば、後の送り直しが結果を受けてもその操作は GOOD でない（GOOD の定義を要求ごとに読んだもので、規則がこの場合を述べていないため QCR-07 で確かめる。どちらの読み方でも同じ項目から数えられる）。境界の出来事は ELM-03 が受けた要求だけを持つため、ELM-03 が止まっている間にプラットフォームが答えた要求は数えに入らない（第 2 段階の DEC-23 にかかわる軽微な FND-34 が第 2 段階で待つ）。乗客の操作か、どの画面の操作かは、アカウントの種類と、受けたときの依頼の状態（ridePhase）で分ける（迎車中の表示は SLI-02、乗車中の表示は SLI-03）。失敗の出どころ（failureOrigin）で、EXT-01 と EXT-02 の失敗と無応答を GOOD から外し、拒否の知らせを GOOD に残す。SLI-01、SLI-02、SLI-03 が数える知らせ（配車の確定、迎車の到着、到着）は、ELM-03 が流れか Web Push で届けた記録（DAT-20）で数える。
-- 利用者の側の SLI-14 は、相手の端末が示した時刻を送る報告（IFC-10）で数え、区間の始まりは境界の出来事の受けた時刻か、迎車の到着を決めた位置を受けた時刻。端末の時刻は DEC-37 でサーバーの時刻に直す。示せなかったと記録するのは、ELM-03 が届けるときに相手の流れが開いていなかったときだけで、流れで送ったのに示した時刻が来ない変化は数えから外さず、2 秒待って Web Push でも知らせ、その知らせを示した時刻で数える（IFC-11）。
-- データの SLI-08〜SLI-13 は保存した記録を問い合わせる（DAT-07、DAT-11、DAT-13、DAT-14、DAT-21）。SLI-10 は、ELM-03 がデモの回の間 1 分ごとに最新の位置を確かめて書く記録（DAT-21）で数え、どのインスタンスも動いていなかった分の確かめは、起き直した ELM-03 が要求を受け始める前に、止まっていた間は変わらない状態と最後に受けた位置から書く（落ちた分も古い位置として数えに入る）。SLI-12 は日々の処理の照合（IFC-15、DAT-13）で、処理を行った日の値をその 2 日後に決める。
+- 利用者の側の SLI-14 は、相手の端末（乗客とドライバーの ELM-01）が示した時刻を送る報告（IFC-10）で数え、区間の始まりは、操作による変化はその操作のたどる ID（DEC-43）の境界の出来事のうち最も早く受けた時刻（受けたインスタンスが止まった後の送り直しで書いた変化も、最初の要求を受けた時刻から数え、止まって遅れた分を数えから消さない）、迎車の到着はそれを決めた位置を受けた時刻。端末の時刻は DEC-37 でサーバーの時刻に直す。示せなかったと記録するのは、ELM-03 が届けるときに相手の流れが開いていなかったときだけで、流れで送ったのに示した時刻が来ない変化は数えから外さず、2 秒待って Web Push でも知らせ、その知らせを示した時刻で数える（IFC-11）。
+- データの SLI-08〜SLI-13 は保存した記録を問い合わせる（DAT-07、DAT-11、DAT-13、DAT-14、DAT-21）。SLI-10 は、ELM-03 がデモの回の間 1 分ごとに最新の位置を確かめて書く記録（DAT-21）で数え、どのインスタンスも動いていなかった分の確かめは、起き直した ELM-03 が要求を受け始める前に、止まっていた間は変わらない状態と最後に受けた位置から書く（落ちた分も古い位置として数えに入る）。SLI-12 は日々の処理の照合（IFC-15、DAT-13）で、処理を行った日の値をその 2 日後に決め、処理されなかった後に新しい試みで続けた処理は試みがいくつあっても一つと数える。
 - 試験用のアカウントは、その時点の区別を記録に写して外す（FR-42、QR-47）。模擬の利用による確かめはこの設計にはなく、置くときは試験用のアカウントで行う。負荷の試験はない（POL-03）。本番の環境の記録だけを数え、環境の名前（DEC-43 の env）で分ける。
 
 ## 端から端の流れ
@@ -178,6 +178,10 @@ sequenceDiagram
     PAY-->>S: 402 card_error
     S->>DB: 試みを拒否、依頼を受け付けなかった、キーの答え
     S-->>P: 402 PAYMENT_DECLINED（理由）
+  else 実行の前に退けられた（処理されなかった）
+    PAY-->>S: 401、403 か実行の前の 400
+    S->>DB: 試みを処理されなかったで終え、依頼を受け付けなかった、キーの答え、異常
+    S-->>P: 503 PAYMENT_SERVICE_UNAVAILABLE（何も押さえていない。同じキーでは送り直さず、依頼し直すときは新しいキー）
   else 8.5 秒のうちに分からない
     S->>PAY: 0.5 秒後に同じキーで送り直すか読む
     S->>DB: 依頼を受け付けなかった、試みは分からないまま、キーの答え
@@ -247,8 +251,12 @@ sequenceDiagram
   P->>S: 登録を始める POST /v1/payment-method-setups（IFC-07）冪等キー
   S->>DB: 登録を始めた
   S->>PAY: 登録の取引を作る POST /v1/setup_intents（IFC-17）
-  PAY-->>S: client secret
-  S-->>P: client secret
+  alt 作れた
+    PAY-->>S: client secret
+    S-->>P: client secret
+  else 作らなかった（処理されなかった）か答えない
+    S-->>P: 503 PAYMENT_SERVICE_UNAVAILABLE（同じキーでは送り直さず、始め直すときは新しいキーで新しい取引）
+  end
   P->>SE: 入力部品を示し、カードの情報を入れる（IFC-18）
   SE->>PAY: カードの情報を直接送り、確かめる（ELM-01 のコードにも ELM-03 にも触れない）
   P->>S: completion POST …/completion（IFC-07）
@@ -258,7 +266,7 @@ sequenceDiagram
     S-->>P: 200 登録できた
   else 拒否された
     S-->>P: 402 PAYMENT_METHOD_DECLINED（別の支払い方法を求める）
-  else 8.5 秒のうちに分からない
+  else 8.5 秒のうちに分からないか、読み出しが処理されなかった（登録の結果は分からない）
     S-->>P: 202 PAYMENT_METHOD_PENDING（分かるまで使えない）
     S-)P: 後で payment_method.settled（IFC-11）
   end
@@ -369,6 +377,8 @@ sequenceDiagram
     S->>PAY: 前の押さえを解く（IFC-17、期限の処理）
   else 拒否された
     S-->>P: 402 PAYMENT_DECLINED（降りる場所と確定額は変わらない）
+  else 処理されなかった（実行の前に退けられた）
+    S-->>P: 503 PAYMENT_SERVICE_UNAVAILABLE（変えなかった。何も押さえていない）
   else 8.5 秒のうちに分からない
     S-->>P: 503 REHOLD_UNCONFIRMED（変えなかった。押さえが済んでいたら解く）
   end
@@ -584,6 +594,13 @@ sequenceDiagram
     S-)D: ride.payment_method_changed（IFC-11。今の状態の決済の状態も、やり直せる）
     D->>S: 決済のやり直し（新しい冪等キー）
     S->>PAY: 新しい押さえの capture（新しい試みのキー）
+  else 処理されなかった（実行の前に退けられた）
+    PAY-->>S: 401、403 か実行の前の 400
+    S->>DB: 試みを処理されなかったで終え、異常（何も請求していない。依頼は到着したまま）
+    S-->>D: 503 PAYMENT_SERVICE_UNAVAILABLE（済んでいない。同じキーでは送り直さない）
+    S-)P: ride.charge_settled（済んでいない。決済サービスが処理しなかった）
+    D->>S: 決済のやり直し（新しい冪等キー。乗客は支払い方法を変えなくてよい）
+    S->>PAY: 同じ押さえの capture（新しい試みのキー）
   else 8.5 秒のうちに分からない
     S->>PAY: 0.5 秒後に同じキーで送り直すか読む
     S->>DB: 決済の結果待ち
@@ -598,7 +615,7 @@ sequenceDiagram
   end
   opt ドライバーがやり直した
     D->>S: 同じか新しい冪等キーの決済
-    S-->>D: 済んでいれば最初の結果、分からなければ同じ試みを確かめた結果（FR-30）
+    S-->>D: 済んでいれば最初の結果、分からなければ同じ試みを確かめた結果、処理されなかった後なら新しい試みの結果（FR-30）
   end
 ```
 
@@ -751,8 +768,15 @@ sequenceDiagram
       S-->>O: 201 済んだ
       S-)P: refund.settled（IFC-11 か IFC-21）
     else 拒否された
+      S->>DB: 試みを拒否、返金を済まなかった（理由）、操作の記録
       S-->>O: 402 REFUND_DECLINED（理由）
-      O->>S: やり直し POST /v1/console/refunds/…/retry（新しい試み）
+      O->>S: やり直し POST /v1/console/refunds/…/retry（新しい冪等キー。残りの額を確かめ直して新しい試み）
+    else 処理されなかった（実行の前に退けられた）
+      PAY-->>S: 401、403 か実行の前の 400
+      S->>DB: 試みを処理されなかったで終え、返金を済まなかった（理由）、操作の記録、異常
+      S-->>O: 503 PAYMENT_SERVICE_UNAVAILABLE と refundId（同じキーの送り直しは同じ答え）
+      O->>S: 一覧を読み直す GET …/refunds（IFC-13）
+      O->>S: やり直し POST …/retry（新しい冪等キー。残りの額を確かめ直して新しい試み）
     else 8.5 秒のうちに分からない
       S-->>O: 202 REFUND_PENDING
       Note over S,PAY: 確かめ続け、分かったら refund.settled を担当者と乗客に
@@ -869,13 +893,14 @@ sequenceDiagram
   S1->>DB: 境界の出来事（受けた）
   alt 外部を呼ばない操作（取り消し、許諾、乗車の開始、到着の確認、評価）
     Note over S1: 結果とキーの答えを一つの取引で書く前に落ちる（DAS-02）。何も効いていない
-    A->>S2: タイムアウト（10 秒）の後、同じキーで送り直す（X-Resend は no_answer）
+    A->>S2: タイムアウト（取り消し、許諾、評価は 10 秒。乗車の開始と到着の確認は第 4 段階が HND-17 で決める値）の後、同じキーで送り直す（X-Resend は no_answer）
     S2->>DB: キーの記録はない
     S2->>DB: 操作を初めから行い、今の状態を条件に、結果とキーの答えを一つの取引で書く
     S2-->>A: 操作の答え（その間に相手が状態を変えていれば 409 の各符号）
+    Note over A,S2: この送り直しで書いた変化の SLI-14 の区間は、同じたどる ID の最初の要求を受けた時刻から（IFC-10、DAT-20）
   else 外部を呼ぶ操作（依頼の押さえ、押さえ直し、決済、返金、登録）
     S1->>DB: 取引 A 試み（結果が分からない、nextCheckAt）とキー（動いている、答えの期限）
-    S1->>PAY: 呼び出し（試みのキー）
+    S1->>PAY: 呼び出し（試みのキー。待ちは答えの期限から結果の取引の 0.1 秒を引いた時刻までに終える、IFC-17）
     Note over S1: 結果を書く前に落ちる（DAS-02）。EXT-01 では効いたかもしれない
     A->>S2: タイムアウト（15 秒）の後、同じキーで送り直す（X-Resend は no_answer）
     S2->>DB: キーの記録を読む
@@ -883,7 +908,10 @@ sequenceDiagram
       S2-->>A: 409 OPERATION_IN_PROGRESS（Retry-After 1 秒）
     else 答えの期限を過ぎた
       S2->>DB: 試みの状態から DEC-45 の答えを決め、キーがまだ動いているときだけ答えを書く
-      S2-->>A: 押さえと押さえ直しは 503 HOLD_UNCONFIRMED か REHOLD_UNCONFIRMED（はっきり拒否なら 402）、決済、返金、登録は試みの今の結果か 202
+      S2-->>A: 押さえと押さえ直しは 503 HOLD_UNCONFIRMED か REHOLD_UNCONFIRMED（はっきり拒否なら 402、処理されなかったなら 503 PAYMENT_SERVICE_UNAVAILABLE）、決済、返金、登録は試みの今の結果か 202
+    end
+    opt 受けたインスタンスは止まらずに遅れ、結果の取引が答えの期限を過ぎた
+      Note over S1,S2: キーがまだ動いているときだけ答えを書くので、先に書いた答えが残る。送り直しの答えが先なら、押さえは受け付けなかったとして済んでいれば解く（DEC-42）
     end
     Note over S2,PAY: 期限の処理が試みを nextCheckAt に確かめ、受け付けなかった依頼の押さえが済んでいれば解く
   end
@@ -927,9 +955,12 @@ sequenceDiagram
   S->>PAY: 状態を変える呼び出し（4 秒、同じキーで一度だけ送り直す）
   alt 済んだか拒否
     S->>DB: 結果と、依頼の状態（一つの取引）
+  else 処理されなかった（実行の前に退けられた）
+    S->>DB: 試みを済まなかったで終え、異常。利用者が待つ操作は 503 PAYMENT_SERVICE_UNAVAILABLE で、やり直しは新しい試み
+    S->>PAY: 利用者が待たない解除と料金の請求は、期限の処理が確かめと同じ間隔で新しい試みを送る
   else 分からない
     S->>DB: 分からないまま、次に確かめる時刻
-    S->>PAY: 23 時間のうちは同じキー、500 の後と 23 時間の後は読み出しで確かめる
+    S->>PAY: 23 時間のうちは同じキー、500 の後と 23 時間の後は読み出しで確かめる（確かめが処理されなかったら分からないまま）
   end
   J->>S: 毎日 04:00 POST /internal/jobs/daily（IFC-15）
   S->>PAY: 2 日前から作られた取引と返金の一覧（IFC-17）
@@ -1156,7 +1187,7 @@ SLI-14 の見る位置は利用者の側で、区間は ELM-03 が操作を受�
 失敗したときの流れとエラーバジェット: NFR-07 の許される遅れは、ウィンドウの状態の変化と相手の組の 5% で、28 日に入る乗車 2〜6 回（OPF-01、OPF-02）では 1 件に満たない（NFR-07 自身の計算）。スクリプトの計算では、一つの乗車で数える組は 3（依頼をドライバーに、許諾を乗客に、迎車の到着を乗客に。ドライバーは 1 人、OPF-03）で、ウィンドウの組は 6〜18、許される遅れは 0.30〜0.90 件。そのため、次のどの失敗の流れも一度起きればエラーバジェットを 1 件で使い切り（111〜667%）、EBP-01 の最後の規則（悪いイベントを 1 件ずつ振り返る）で扱う。これは品質チェーンが NFR-07 の計算と、品質チェーンの第 4 段階の報告（docs/quality/4-nfr-slo.md）の「未解決の点」で既に挙げていることで、設計で避けられる量ではない。
 
 - EXT-01 の押さえが予算の 2 秒を超える（押さえは 8.5 秒まで待つ、IFC-17）。依頼の変化はその分遅れて示される。
-- ELM-03 のインスタンスが落ちる（DAS-02）。落ちる前に書いた変化はつなぎ直したときに続きから届くが遅れ、答えのない要求を含む操作は SLI-01〜SLI-06 の悪いイベントになる（同じキーの送り直しは答えを受ける、DEC-42）。
+- ELM-03 のインスタンスが落ちる（DAS-02）。落ちる前に書いた変化はつなぎ直したときに続きから届くが遅れ、答えのない要求を含む操作は SLI-01〜SLI-06 の悪いイベントになる（同じキーの送り直しは答えを受ける、DEC-42）。受けたインスタンスが答える前に止まった取り消しと許諾は、端末のタイムアウトの後の送り直しで書かれるが、SLI-14 の区間は同じたどる ID の最初の要求を受けた時刻から数えるので、数えから消えずに悪いイベントになる（IFC-10、DAT-20。下の計算）。
 - 相手の流れが開いているのに端末が止まっている（画面から外れた直後）。2 秒の待ちの後の Web Push が配信の予算 1.0 秒のうちに届いて示されれば GOOD になり、遅れるか届かなければ悪いイベントになる（IFC-11、IFC-21）。
 
 ### NFR-19（SLI-10、T_vehicle_location_lag）
@@ -1249,6 +1280,9 @@ NFR-08 のしきい値 T_arrival_estimate_gap は、乗客が承認した到着�
    threshold                                           5.00 s  fits
    normal display report reaches ELM-03 after the stream write: 0.5 + 0.3 + 0.5 + 0.1 + 0.1 = 1.5 s < wait 2.0 s: ok
    Web Push call worst case (one send, 1 s gap, one re-send): 5 + 1 + 5 = 11 s; no caller waits for it (sent after the commit)
+   start of a change made by an operation: the earliest receivedAt of the boundary events (DAT-19) with its trace ID
+   cancel or accept whose receiving instance stopped: first request 0.0 s, device re-sends after its 10.0 s timeout,
+   change written at >= 10.2 s, shown at >= 10.0 + 0.1 + 0.1 + 0.5 + 0.3 = 11.0 s > 5.0 s: counted as one bad event, not dropped
 
 ### NFR-07 error budget (failure paths)
    rides 2 x 3 changes = 6 valid events; error budget 5%: 0.30 events; one bad = 333% of the budget
@@ -1288,8 +1322,14 @@ NFR-08 のしきい値 T_arrival_estimate_gap は、乗客が承認した到着�
    position send (not re-sent; the next send replaces it): deadline 2.0 + round trip 1.0 = 3.0 s < timeout 5 s <= send interval 5 s: ok
    order along the path: device 15 > ELM-03 8.8 > EXT-01 wait 8.5 > one EXT-01 call 4.0
    key in progress (external calls): a same-key re-send after the answer deadline 8.8 s is answered from the attempt (DEC-42, DEC-45); the device re-sends after its 15 s timeout
+   EXT-01 wait ends at min(first send + 8.5, answerDueAt - result txn 0.1) (IFC-17, DEC-42); answerDueAt = receipt + 8.8 s:
+     txn A 0.1 s, result txn 0.1 s: first send 0.2 s, wait ends 8.7 s, answer at 8.8 s -> by answerDueAt
+     txn A 0.3 s, result txn 0.1 s: first send 0.4 s, wait ends 8.7 s, answer at 8.8 s -> by answerDueAt
+     txn A 0.5 s, result txn 0.1 s: first send 0.6 s, wait ends 8.7 s, answer at 8.8 s -> by answerDueAt
+     txn A 0.3 s, result txn 0.3 s: first send 0.4 s, wait ends 8.7 s, answer at 9.0 s -> after answerDueAt by 0.2 s: a re-send in between answers from the attempt; the first answer written stays
    stream: heartbeat 15 s; the device reconnects after 35 s of silence (= 2 x 15 + 5)
    unknown attempts re-checked [30, 60, 120, 240, 480, 600] s after the wait, then every 600 s; worker pickup 5 s <= shortest gap 30 s: fits
+   releases and fee captures not processed by EXT-01: a new attempt at the same intervals [30, 60, 120, 240, 480, 600] s, then every 600 s
    same-key re-send only within 23 h of the first send (EXT-01 keeps keys 24 h)
 ```
 
@@ -1298,13 +1338,13 @@ NFR-08 のしきい値 T_arrival_estimate_gap は、乗客が承認した到着�
 
 | 呼び出しの道 | 値（IFC） | 呼ぶ側が待つ最悪 |
 |---|---|---|
-| 依頼の押さえ: ELM-01 → ELM-03 POST /v1/rides → ELM-05 | ELM-03 から ELM-05 へ一回 4 秒、0.5 秒置いて同じキーで一度だけ送り直すか読む、最初に送ってから 8.5 秒で分からなければしなかったことにする（IFC-17）。ELM-03 の答えの期限 8.8 秒、ELM-01 のタイムアウト 15 秒（IFC-03） | ELM-03 は 8.8 秒（0.1 + 0.1 + 4.0 + 0.5 + 4.0 + 0.1）。ELM-01 の 15 秒はそれに通信の余裕 5 秒を足した 13.8 秒より長い |
+| 依頼の押さえ: ELM-01 → ELM-03 POST /v1/rides → ELM-05 | ELM-03 から ELM-05 へ一回 4 秒、0.5 秒置いて同じキーで一度だけ送り直すか読む、最初に送ってから 8.5 秒か、冪等キーの答えの期限から結果を書く取引の 0.1 秒を引いた時刻の早い方までに分からなければしなかったことにする（IFC-17）。ELM-03 の答えの期限 8.8 秒、ELM-01 のタイムアウト 15 秒（IFC-03） | ELM-03 は 8.8 秒（0.1 + 0.1 + 4.0 + 0.5 + 4.0 + 0.1）。ELM-01 の 15 秒はそれに通信の余裕 5 秒を足した 13.8 秒より長い |
 | 降りる場所の変更の承認と依頼の支払い方法の変更（押さえ直し） | 依頼の押さえと同じ（IFC-03、IFC-17） | 同じ 8.8 秒と 15 秒 |
 | 決済: ELM-01 → ELM-03 POST …/payment → ELM-05 | 依頼の押さえと同じ値で、分からなければ 202 PAYMENT_PENDING（IFC-03、IFC-17） | 8.8 秒で、NFR-29 がシステムの境界で数える T_payment_response（10 秒）のうちで余裕 1.2 秒（HND-01） |
 | 返金: ELM-02 → ELM-03 POST …/refunds → ELM-05 | 決済と同じ値で、分からなければ 202 REFUND_PENDING（IFC-13、IFC-17）。ELM-02 のタイムアウト 15 秒 | 8.8 秒と 15 秒 |
 | 支払い方法の登録の読み直し: ELM-01 → ELM-03 completion → ELM-05 | 読み出し 4 秒と一度の読み直し、待ち 8.5 秒、分からなければ 202 PAYMENT_METHOD_PENDING（IFC-07、IFC-17） | 8.7 秒と 15 秒 |
-| 外部を呼ぶ操作の冪等キー（依頼、押さえ直し、決済、返金、登録の同じキーの送り直し） | 答えの期限（8.8 秒か 8.7 秒）のうちは 409 OPERATION_IN_PROGRESS と Retry-After 1 秒、期限を過ぎても答えがなければ試みの状態から DEC-45 のとおりに答える（DEC-42、DAT-26） | 端末は 15 秒のタイムアウトの後に送り直すので、受けたインスタンスが止まっても送り直しは期限の後に届いて答えを受ける |
-| 料金の請求と押さえを解くこと（期限の処理 → ELM-05） | 期限の処理が 5 秒ごとに拾い（DEC-46）、一回 4 秒で送る（IFC-17） | 利用者は待たない |
+| 外部を呼ぶ操作の冪等キー（依頼、押さえ直し、決済、返金、登録の同じキーの送り直し） | 答えの期限（8.8 秒か 8.7 秒）のうちは 409 OPERATION_IN_PROGRESS と Retry-After 1 秒、期限を過ぎても答えがなければ試みの状態から DEC-45 のとおりに答える（DEC-42、DAT-26）。受けたインスタンスは EXT-01 の待ちを期限から結果を書く取引の 0.1 秒を引いた時刻までに終える（IFC-17） | 端末は 15 秒のタイムアウトの後に送り直すので、受けたインスタンスが止まっても送り直しは期限の後に届いて答えを受ける。止まらずに取引 A が予算を超えても、結果を書く取引が予算のうちなら期限までに答える。結果を書く取引が予算を超えて期限を過ぎ、その間に送り直しが届いたときは、先に書いた答えが残る（DEC-42。下の計算） |
+| 料金の請求と押さえを解くこと（期限の処理 → ELM-05） | 期限の処理が 5 秒ごとに拾い（DEC-46）、一回 4 秒で送る。処理されなかったら、結果が分からない試みの確かめと同じ間隔で新しい試みを送る（IFC-17、DEC-45） | 利用者は待たない |
 | 結果が分からない試みの確かめ（期限の処理と日々の処理 → ELM-05） | 待ちの後 30 秒、1、2、4、8 分、以後 10 分ごと。同じキーは最初に送ってから 23 時間のうち、500 の後と 23 時間の後は読み出し（IFC-17）。インスタンスが 0 の間は毎日 04:00 の日々の処理（IFC-15、DEC-18） | 拾う間隔 5 秒は最も短い確かめの間隔 30 秒より短い（HND-11） |
 | 照合（日々の処理 → ELM-05） | 毎日 04:00（Asia/Tokyo）、2 日前の 00:00 から当日の 00:00 までに作られた取引と返金、一覧の 1 ページ 10 秒（IFC-15、IFC-17） | 日 d の値は d の 2 日後に決まる（HND-06） |
 | 取り消し、ドライバーの取り消し、乗客の不在: ELM-01 → ELM-03 | ELM-03 の答えの期限 2 秒、ELM-01 のタイムアウト 10 秒（IFC-03、DEC-46） | 2 秒と 10 秒（2 秒と余裕 5 秒の和より長い） |
@@ -1340,6 +1380,7 @@ flowchart TD
   quote -->|進んでいる依頼がある| active["進んでいる依頼を示す"]
   quote -->|押さえを拒否された| declined["理由。支払い方法を変える"]
   quote -->|押さえが分からない| unconfirmed["受け付けなかった。押さえが済んでいたら解く"]
+  quote -->|決済サービスが押さえを処理しなかった| notprocessed["受け付けなかった。何も押さえていない。改めて依頼できる"]
   wait -->|T_wait_prompt| prompt["待ち続けるか取り消すか"]
   prompt -->|待つ| wait
   prompt -->|取り消す| cancelled["取り消した（無料）"]
@@ -1374,11 +1415,12 @@ flowchart TD
   change -->|承認| riding
   change -->|承認しない| riding
   change -->|場所か道がない、地図のサービスが答えない、到着を確認した後| nochange["示せないか変えられない。降りる場所と確定額は変わらない"]
-  change -->|押さえ直せない、分からない| nohold["変えなかった（理由か、押さえが済んでいたら解く）"]
+  change -->|押さえ直せない、決済サービスが処理しなかった、分からない| nohold["変えなかった（理由か、押さえが済んでいたら解く）"]
   riding -->|到着を確認された| arrived["到着した場所"]
   arrived -->|決済が済んだ| after["乗車後: 支払った額（CUJ-04）"]
   arrived -->|拒否された| retry["済んでいない。支払い方法を変える"]
   arrived -->|分からない| pending["済んだかどうか分からない。分かったら示す"]
+  arrived -->|決済サービスが処理しなかった| notprocessed["済んでいない。ドライバーがやり直す（支払い方法は変えなくてよい）"]
 ```
 
 ### CUJ-04 ドライバーの評価
@@ -1437,6 +1479,8 @@ flowchart TD
   pay -->|拒否された| declined["済んでいない理由。乗客の支払い方法の変更を待つ"]
   declined -->|乗客が支払い方法を変えて押さえ直した（ride.payment_method_changed）| pay
   pay -->|分からない| pending["分からない。分かったら示す"]
+  pay -->|決済サービスが処理しなかった| notprocessed["済んでいない。やり直せる"]
+  notprocessed -->|やり直す| pay
   done -->|もう一度決済| done
 ```
 
@@ -1495,7 +1539,7 @@ flowchart TD
   refund -->|済んだ| done["済んだ"]
   refund -->|残りを超える| over["返金できる残りの額"]
   refund -->|決済が済んでいない| none["返金できない"]
-  refund -->|拒否された| declined["済んでいない理由。やり直す"]
+  refund -->|拒否された、決済サービスが処理しなかった| declined["済んでいない理由。やり直す（残りの額を確かめ直す）"]
   declined -->|やり直す| refund
   refund -->|分からない| pending["分からない。やり直すと同じ返金を確かめる"]
 ```
@@ -1595,7 +1639,7 @@ DAT-23（振る舞いの切り替え）と DAT-27（日々の処理の記録）�
 | DAT-17 | 操作の記録 | ELM-03 | ELM-04 | 個人情報 | 推定 |
 | DAT-18 | たどる記録 | ELM-03 | ELM-04 | 個人情報 | 推定 |
 | DAT-19 | 境界の出来事 | ELM-03 | ELM-04 | 社内 | 推定 |
-| DAT-20 | 届けと示した時刻の記録 | ELM-03 | ELM-04 | 社内 | 仮定 |
+| DAT-20 | 届けと示した時刻の記録 | ELM-03 | ELM-04 | 社内 | 推定 |
 | DAT-21 | 現在地の確かめ | ELM-03 | ELM-04 | 社内 | 推定 |
 | DAT-22 | 異常 | ELM-03 | ELM-04 | 社内 | 推定 |
 | DAT-23 | 振る舞いの切り替え | ELM-03 | ELM-04 | 社内 | 推定 |
@@ -1639,7 +1683,7 @@ flowchart LR
 stateDiagram-v2
   [*] --> holding: ELM-03 が依頼を受け、押さえを送る（ELM-01 の操作、IFC-03）
   holding --> searching: EXT-01 が押さえた（IFC-17）
-  holding --> not_accepted: 拒否されたか、8.5 秒のうちに分からない（ELM-03。受けたインスタンスが止まったときは、同じキーの送り直しか期限の処理）
+  holding --> not_accepted: 拒否されたか、処理されなかったか、8.5 秒のうちに分からない（ELM-03。受けたインスタンスが止まったときは、同じキーの送り直しか期限の処理）
   searching --> assigned: 許諾（ELM-01 のドライバー、IFC-04）
   searching --> cancelled_free: 乗客の取り消し（ELM-01）
   searching --> expired: T_no_accept（ELM-03 の期限の処理）
@@ -1655,10 +1699,11 @@ stateDiagram-v2
   destination_arrived --> completed: 決済が済んだ（EXT-01）
   destination_arrived --> payment_pending: 決済の結果が 8.5 秒のうちに分からない
   destination_arrived --> payment_declined: 決済がはっきり拒否された
+  destination_arrived --> destination_arrived: 決済が処理されなかった（何も請求していない。ドライバーのやり直しを待つ）
   payment_pending --> completed: 確かめて済んでいた（ELM-03）
   payment_pending --> payment_declined: 確かめて拒否されていた
   payment_declined --> destination_arrived: 乗客が支払い方法を変えて押さえ直した（IFC-03）
-  not_accepted --> [*]: 押さえの試みが済んだか拒否で終わり、押さえていれば解いた
+  not_accepted --> [*]: 押さえの試みが済んだか拒否か処理されなかったで終わり、押さえていれば解いた
   cancelled_free --> [*]: 押さえを解いた（期限の処理、IFC-17）
   expired --> [*]: 押さえを解いた
   cancelled_fee --> [*]: キャンセル料を一部の確定で請求した（残りは EXT-01 が解く）
@@ -1666,7 +1711,7 @@ stateDiagram-v2
   completed --> [*]
 ```
 
-受けたインスタンスが押さえの答えを書く前に止まった依頼は、答えの期限を過ぎた同じキーの送り直しか、試みの nextCheckAt に確かめる期限の処理が not_accepted に移す（DEC-45、DAT-11）ので、holding にとどまらない。holding から not_accepted に移った依頼で、押さえの試みが分からないまま残るときは、依頼は終わっても押さえが動きうるため、試みが済むか拒否で終わるまで終わりにしない（押さえていれば解く試みを作る）。cancelled_free、expired、cancelled_fee、no_show も、押さえを解く試みか料金の試みが済むまで終わりにしない（moneySettled、DAT-07）。決済が拒否された依頼は、乗客が支払い方法を変えるまで payment_declined にとどまり、乗車の履歴に済んでいないことを示す（FR-31 の 4）。終わった後の返金は返金（DAT-12）の状態で扱う。依頼の支払い方法の変更（PUT …/payment-method）も、押さえ直しが済んでから前の押さえを解き、済まなければ変えない（降りる場所の変更と同じ）。重なった許諾と取り消しは今の状態を条件に書くので、どの移り変わりも先に書けた一つだけが通る（DEC-08）。
+受けたインスタンスが押さえの答えを書く前に止まった依頼は、答えの期限を過ぎた同じキーの送り直しか、試みの nextCheckAt に確かめる期限の処理が not_accepted に移す（DEC-45、DAT-11）ので、holding にとどまらない。holding から not_accepted に移った依頼で、押さえの試みが分からないまま残るときは、依頼は終わっても押さえが動きうるため、試みが済むか拒否で終わるまで終わりにしない（押さえていれば解く試みを作る）。cancelled_free、expired、cancelled_fee、no_show も、押さえを解く試みか料金の試みが済むまで終わりにしない（moneySettled、DAT-07）。それらの試みが処理されなかったときは、期限の処理が確かめと同じ間隔で新しい試みを作る（DEC-45）。決済が処理されなかった依頼は destination_arrived にとどまり（何も請求していない）、ドライバーのやり直しが同じ押さえに新しい試みを作る。決済が拒否された依頼は、乗客が支払い方法を変えるまで payment_declined にとどまり、乗車の履歴に済んでいないことを示す（FR-31 の 4）。終わった後の返金は返金（DAT-12）の状態で扱う。依頼の支払い方法の変更（PUT …/payment-method）も、押さえ直しが済んでから前の押さえを解き、済まなければ変えない（降りる場所の変更と同じ）。重なった許諾と取り消しは今の状態を条件に書くので、どの移り変わりも先に書けた一つだけが通る（DEC-08）。
 
 ### お金の操作の試み（DAT-11）
 ```mermaid
@@ -1674,14 +1719,14 @@ stateDiagram-v2
   [*] --> unknown: 送る前に書く（ELM-03）
   unknown --> succeeded: 求めた状態の答え（EXT-01）
   unknown --> refused: はっきりした拒否（EXT-01）
-  unknown --> not_processed: 実行の前に退けられた（EXT-01）
+  unknown --> not_processed: 状態を変える呼び出しを実行の前に退けられた（EXT-01。何も実行されていない。確かめの読み出しと送り直しで受けたときは unknown のまま）
   unknown --> unknown: まだ分からない。30 秒、1、2、4、8 分、以後 10 分ごとに確かめる（ELM-03）
   succeeded --> [*]
   refused --> [*]
   not_processed --> [*]
 ```
 
-unknown は、送っている間と、答えがなかった後の両方を含み、ELM-03 が送る前に止まった試みも unknown のまま確かめる（同じキーを 23 時間のうちに送れば、送られていなかった試みもそこで一度だけ行われる）。確かめは、取引の ID が分かれば読み出し、分からなければ同じキーの送り直し（23 時間のうち、500 の後を除く）か、顧客と期間の一覧から attemptId で探すことで行い、見つからなければ作られていないとして refused にする。済んだ押さえが受け付けなかった依頼か押さえ直しのものだったときは、解く試みを新しく作る。
+unknown は、送っている間と、答えがなかった後の両方を含み、ELM-03 が送る前に止まった試みも unknown のまま確かめる（同じキーを 23 時間のうちに送れば、送られていなかった試みもそこで一度だけ行われる）。確かめは、取引の ID が分かれば読み出し、分からなければ同じキーの送り直し（23 時間のうち、500 の後を除く）か、顧客と期間の一覧から attemptId で探すことで行い、見つからなければ作られていないとして refused にする。済んだ押さえが受け付けなかった依頼か押さえ直しのものだったときは、解く試みを新しく作る。not_processed は済まなかった終わりで、済んだか結果が分からない試みの数に入らず、やり直しは新しい試み（利用者が改めて操作したときで、利用者が待たない解除と料金の請求は期限の処理が作る、DEC-45）。処理されなかったとするのは EXT-01 が実行を始めていないと答えが示すときだけで、見分けられない答えは unknown のまま。
 
 ### 外部を呼ぶ操作の冪等キー（DAT-26）
 端末が持つ冪等キーと ELM-03 の記録にまたがり、お金の操作の結果が分からない状態を持つ。外部を呼ばない操作のキーは、操作の結果と同じ取引で答えとともに書くため、動いている状態を持たない（DEC-42）。
@@ -1695,7 +1740,7 @@ stateDiagram-v2
   answered --> [*]: 最初に受けてから 24 時間（DAS-13）
 ```
 
-in_progress のうちの同じキーの送り直しは 409 OPERATION_IN_PROGRESS を受ける。受けたインスタンスが止まっても answerDueAt で in_progress を出られるため、送り直しが答えを受けられないことはない。answered の後も試み（DAT-11）は確かめ続けられ、お金が動きうる間は試みの状態が終わらない。
+in_progress のうちの同じキーの送り直しは 409 OPERATION_IN_PROGRESS を受ける。受けたインスタンスが止まっても answerDueAt で in_progress を出られるため、送り直しが答えを受けられないことはない。受けたインスタンスは EXT-01 の待ちを answerDueAt から結果を書く取引の 0.1 秒を引いた時刻までに終えるので、止まっていなければ、結果を書く取引が予算のうちなら answerDueAt までに答えを書く（IFC-17）。それを超えて送り直しと重なっても、キーがまだ in_progress のときだけ書くので、先に書いた答えが残る（DEC-42）。answered の後も試み（DAT-11）は確かめ続けられ、お金が動きうる間は試みの状態が終わらない。
 
 ### 返金（DAT-12）
 ```mermaid
@@ -1703,33 +1748,33 @@ stateDiagram-v2
   [*] --> refunding: 担当者が認めた（ELM-02、IFC-13。試みを作る）
   refunding --> refunded: 試みが済んだ（EXT-01）
   refunding --> refund_unknown: 試みが 8.5 秒のうちに分からない
-  refunding --> refund_failed: 試みがはっきり拒否された
+  refunding --> refund_failed: 試みがはっきり拒否されたか、処理されなかった（EXT-01 が実行の前に退け、何も実行されていない）
   refund_unknown --> refunded: 確かめて済んでいた（ELM-03）
   refund_unknown --> refund_failed: 確かめて拒否か、返金がなかった
-  refund_failed --> refunding: 担当者のやり直し（新しい試み、IFC-13）
+  refund_failed --> refunding: 担当者のやり直し（残りの額を確かめ直して新しい試み、IFC-13）
   refunded --> [*]
 ```
 
-refund_failed は、担当者がやり直せばお金が動くため終わりにしない（出口はやり直し）。返金できる残りの額は refunded と refund_unknown の合計で数える（FR-40、DEC-10）。
+refund_failed は、担当者がやり直せばお金が動くため終わりにしない（出口はやり直し）。拒否の理由か、決済サービスが処理しなかったことを示す（FR-39 の 2、FR-50 の 3）。処理されなかった試みは何も実行されていないので、やり直しの新しい試みで二重にならない。返金できる残りの額は refunded と refund_unknown の合計で数え（FR-40、DEC-10）、やり直しは新しい試みを書く取引で確かめ直す（DAT-12）。
 
 ### 支払い方法の登録（DAT-05）
 ```mermaid
 stateDiagram-v2
-  [*] --> started: ELM-03 が登録の取引を作った（ELM-01 の操作、IFC-07）
+  [*] --> started: ELM-03 が登録を始め、登録の記録を書いてから EXT-01 に登録の取引を作る（ELM-01 の操作、IFC-07）
   started --> checking: ELM-01 が入力部品で確かめて completion を呼んだ（IFC-18）
   checking --> usable: EXT-01 の取引が succeeded（ELM-03 が読み直す）
   checking --> declined: 拒否された
-  checking --> registration_unknown: 8.5 秒のうちに分からない
+  checking --> registration_unknown: 8.5 秒のうちに分からないか、読み出しが処理されなかった
   registration_unknown --> usable: 確かめて済んでいた
   registration_unknown --> declined: 確かめて拒否か、取引がなかった
-  started --> abandoned: 確かめられないまま有効期限を過ぎた（値は第 4 段階）
+  started --> abandoned: 登録の取引が作られなかった（処理されなかった）か、確かめられないまま有効期限を過ぎた（値は第 4 段階）
   usable --> replaced: 新しい支払い方法が使えるようになった
   declined --> [*]
   abandoned --> [*]
   replaced --> [*]
 ```
 
-registration_unknown の間、その支払い方法では依頼させず（FR-46 の 4）、押さえにも使わない。
+registration_unknown の間、その支払い方法では依頼させず（FR-46 の 4）、押さえにも使わない。読み出しが処理されなかったときは、乗客が入力部品で確かめた結果を ELM-03 が読めなかっただけなので、登録の結果は分からないとして確かめ続ける（DEC-45）。
 
 ### 降りる場所の変更（DAT-08）
 ```mermaid
@@ -1738,9 +1783,9 @@ stateDiagram-v2
   quoted --> reholding: 乗客の承認（ELM-01）
   quoted --> lapsed: 承認がないまま有効期限を過ぎた
   reholding --> applied: 新しい押さえが済んだ。降りる場所と確定額を変え、前の押さえを解く試みを作る
-  reholding --> not_applied: 拒否されたか、8.5 秒のうちに分からない
+  reholding --> not_applied: 拒否されたか、処理されなかったか、8.5 秒のうちに分からない
   applied --> [*]
-  not_applied --> [*]: 押さえ直しの試みが済んだか拒否で終わり、押さえていれば解いた
+  not_applied --> [*]: 押さえ直しの試みが済んだか拒否か処理されなかったで終わり、押さえていれば解いた
   lapsed --> [*]
 ```
 
@@ -1842,7 +1887,7 @@ stateDiagram-v2
 | FR-29 | 1 | IFC-03、IFC-11、IFC-17、IFC-22、IFC-23 | CUJ-08 降車（ドライバー）（決済が済んだ） |
 | FR-29 | 2 | IFC-03、IFC-11、IFC-17、IFC-22、IFC-23 | CUJ-08 降車（ドライバー）（押さえの全額、確定額で） |
 | FR-29 | 3 | IFC-03、IFC-11、IFC-17、IFC-22、IFC-23 | CUJ-08 降車（ドライバー）（乗客の操作がない） |
-| FR-29 | 4 | IFC-03、IFC-11、IFC-17、IFC-22、IFC-23 | CUJ-08 降車（ドライバー）（拒否、支払い方法の変更と押さえ直し、ride.payment_method_changed、やり直し） |
+| FR-29 | 4 | IFC-03、IFC-11、IFC-17、IFC-22、IFC-23 | CUJ-08 降車（ドライバー）（拒否、支払い方法の変更と押さえ直し、ride.payment_method_changed、やり直し。決済サービスが処理しなかった決済は PAYMENT_SERVICE_UNAVAILABLE と ride.charge_settled で示し、ドライバーがそのままやり直す） |
 | FR-29 | 5 | IFC-03、IFC-11、IFC-17、IFC-22、IFC-23 | CUJ-08 降車（ドライバー）（PAYMENT_PENDING と確かめ） |
 | FR-30 | 1 | IFC-03、IFC-17、IFC-22、IFC-23 | CUJ-08 降車（ドライバー）（済んだ決済のやり直しは最初の結果） |
 | FR-30 | 2 | IFC-03、IFC-17、IFC-22、IFC-23 | CUJ-08 降車（ドライバー）（分からない決済のやり直しは同じ試みを確かめる） |
@@ -1875,7 +1920,7 @@ stateDiagram-v2
 | FR-38 | 3 | IFC-12、IFC-24 | CUJ-14 苦情への対応（照会が料金を請求した依頼も返す、IFC-12） |
 | FR-38 | 4 | IFC-12、IFC-24 | CUJ-14 苦情への対応と画面（当てはまるものがなければ空の items、IFC-12） |
 | FR-39 | 1 | IFC-11、IFC-13、IFC-17、IFC-21、IFC-22、IFC-24 | CUJ-15 返金への対応（済んだ、refund.settled） |
-| FR-39 | 2 | IFC-11、IFC-13、IFC-17、IFC-21、IFC-22、IFC-24 | CUJ-15 返金への対応（拒否と分からないとやり直し） |
+| FR-39 | 2 | IFC-11、IFC-13、IFC-17、IFC-21、IFC-22、IFC-24 | CUJ-15 返金への対応（拒否、処理されなかった返金の PAYMENT_SERVICE_UNAVAILABLE、分からない返金と、やり直し） |
 | FR-39 | 3 | IFC-11、IFC-13、IFC-17、IFC-21、IFC-22、IFC-24 | CUJ-15 返金への対応（料金を請求した依頼にも、IFC-13） |
 | FR-39 | 4 | IFC-11、IFC-13、IFC-17、IFC-21、IFC-22、IFC-24 | CUJ-15 返金への対応（NOTHING_TO_REFUND） |
 | FR-39 | 5 | IFC-11、IFC-13、IFC-17、IFC-21、IFC-22、IFC-24 | CUJ-15 返金への対応（返金ごとの記録） |
@@ -1910,7 +1955,7 @@ stateDiagram-v2
 | FR-46 | 1 | IFC-03、IFC-07、IFC-11、IFC-17、IFC-18、IFC-22 | CUJ-01 支払い方法の登録（入力部品と completion） |
 | FR-46 | 2 | IFC-03、IFC-07、IFC-11、IFC-17、IFC-18、IFC-22 | CUJ-01 支払い方法の登録（カードの情報は IFC-18 から EXT-01 へ） |
 | FR-46 | 3 | IFC-03、IFC-07、IFC-11、IFC-17、IFC-18、IFC-22 | CUJ-01 支払い方法の登録（PAYMENT_METHOD_DECLINED） |
-| FR-46 | 4 | IFC-03、IFC-07、IFC-11、IFC-17、IFC-18、IFC-22 | CUJ-01 支払い方法の登録（PAYMENT_METHOD_PENDING と payment_method.settled） |
+| FR-46 | 4 | IFC-03、IFC-07、IFC-11、IFC-17、IFC-18、IFC-22 | CUJ-01 支払い方法の登録（PAYMENT_METHOD_PENDING と payment_method.settled。読み出しが処理されなかったときも分からないとする） |
 | FR-46 | 5 | IFC-03、IFC-07、IFC-11、IFC-17、IFC-18、IFC-22 | CUJ-01 支払い方法の登録と CUJ-08（依頼の支払い方法の変更と押さえ直し） |
 | FR-47 | 1 | IFC-02、IFC-03、IFC-11、IFC-19、IFC-21、IFC-22、IFC-23 | CUJ-03 降車（乗客）（POST …/destination-changes） |
 | FR-47 | 2 | IFC-02、IFC-03、IFC-11、IFC-19、IFC-21、IFC-22、IFC-23 | CUJ-03 降車（乗客）（承認、押さえ直し、ride.destination_changed） |
@@ -1928,7 +1973,7 @@ stateDiagram-v2
 | FR-49 | 4 | IFC-01、IFC-22、IFC-23、IFC-24、IFC-25 | CUJ-10 障害の原因の特定（disclosures だけ） |
 | FR-50 | 1 | IFC-12、IFC-13、IFC-24 | CUJ-14〜CUJ-18（操作の記録を一つの取引で） |
 | FR-50 | 2 | IFC-12、IFC-13、IFC-24 | CUJ-18 の画面（操作の記録の検索、IFC-12） |
-| FR-50 | 3 | IFC-12、IFC-13、IFC-24 | CUJ-15 返金への対応（済まなかった返金も記録） |
+| FR-50 | 3 | IFC-12、IFC-13、IFC-24 | CUJ-15 返金への対応（拒否された返金と処理されなかった返金も、済まなかったこととともに記録） |
 | FR-51 | 1 | IFC-01、IFC-12、IFC-14、IFC-15 | DRV-23 日々の処理（FR-51 のとおりに変え、その日の鍵を捨てる）と DRV-29 |
 | FR-51 | 2 | IFC-01、IFC-12、IFC-14、IFC-15 | CUJ-10 障害の原因の特定と画面（RECORD_ANONYMIZED、IFC-14） |
 | FR-51 | 3 | IFC-01、IFC-12、IFC-14、IFC-15 | DRV-23 日々の処理（記録した日を Asia/Tokyo で数える、DEC-37） |
@@ -1971,9 +2016,16 @@ stateDiagram-v2
 | FND-32 | IFC-02 と DAT-07 が、頼っている CON-01 と TC-12 を前提に挙げていない | 軽微 | design-review | architecture-to-high-level-design | 受け入れ | DAT-07、IFC-02 |
 | FND-33 | DEC-39 の一覧の大きさと DEC-42 の待つ時間が、parameters にも仮定にもない暫定の値になっている | 軽微 | design-review | architecture-to-high-level-design | 受け入れ | DEC-39、DEC-42 |
 | FND-35 | ELM-01 の functions に、乗客の画面が担う FR-05 と FR-45 がない | 軽微 | architecture-to-high-level-design | architecture-drivers-to-architecture | 未解決 | IFC-22 |
+| FND-36 | 受けたインスタンスが止まった後の送り直しで行った変化について、SLI-14 の区間をどの要求を受けた時刻から始めるかが決まっていない | 軽微 | design-review | architecture-to-high-level-design | 受け入れ | DAT-20、IFC-10 |
+| FND-37 | 外部を呼ぶ操作のキーの answerDueAt に余裕がなく、取引が予算を超えて遅れただけのインスタンスの答えを、期限の後の送り直しが置き換える | 軽微 | design-review | architecture-to-high-level-design | 受け入れ | DAT-26、DEC-42、IFC-17 |
+| FND-38 | IFC-11、IFC-21、DEC-46 は、示した時刻の記録（QAS-54）と T_dispatch_propagation の値（QAS-25）に頼る流れの後の Web Push を決めたが、前提に挙げていない | 軽微 | design-review | architecture-to-high-level-design | 受け入れ | DEC-46、IFC-11、IFC-21 |
+| FND-39 | DEC-42 の Idempotent-Replayed のヘッダーが、DEC-44 に加えたヘッダーの名付けの決まりに合わない | 軽微 | design-review | architecture-to-high-level-design | 受け入れ | DEC-42、DEC-44 |
+| FND-40 | 報告の DRV-01 の流れが、乗車の開始と到着の確認の端末のタイムアウトを 10 秒と描くが、IFC-03 はその値を第 4 段階に送っている | 軽微 | design-review | architecture-to-high-level-design | 受け入れ | IFC-03 |
+| FND-41 | IFC-21 の push の出来事が ELM-02 のサービスワーカーにも示した時刻をためて送らせるが、それを使う機能も受ける記録もない | 軽微 | high-level-design-to-detailed-design | architecture-to-high-level-design | 受け入れ | IFC-10、IFC-21、MOD-05 |
+| FND-45 | EXT-01 が実行の前に退けた返金は refunding のまま残り、済みもせず済まなかったとも示されず、担当者がやり直す道がない | 中 | design-review | architecture-to-high-level-design | 受け入れ | DAT-07、DAT-11、DAT-12、DAT-13、DEC-35、DEC-45、IFC-03、IFC-07、IFC-11、IFC-13、IFC-17 |
 <!-- /generated -->
 
-この段階に宛てた指摘は、この段階のレビューが出した中の FND-22〜FND-25 と軽微な FND-26〜FND-33 で、どれも受け入れてある（変えた項目は表のとおりで、何をどう変えたかは各指摘の resolution）。この段階が出した指摘は FND-35（軽微、第 2 段階宛て）で、乗客の画面（IFC-22）が担う FR-05 の 4（閾値を変えて依頼し直す）と FR-45 の 1 と 4（乗る場所を決め始めた時刻と評価を始めたことを送る）が ELM-01 の functions にない。`scripts/check.py` はその問題を FND-35 待ちとして示す。技術方針は、どのインタフェースの種類にも仕様書の作り方の項を持ち（POL-05）、コードの中の約束事（POL-04）はインタフェースの決まりを守れる。第 2 段階宛ての軽微な FND-34（ELM-03 が止まっている間にプラットフォームが答えた要求が境界の SLI に入らない、DEC-23）は、この段階の項目を対象にせず、第 2 段階の次の実行が取り上げる。
+この段階に宛てた指摘は、第 3 段階のレビューが出した中の FND-22〜FND-25 と軽微な FND-26〜FND-33、FND-36〜FND-40、第 4 段階の ELM-02 の実行が出した軽微な FND-41、第 4 段階の ELM-02 のレビューが出した中の FND-45 で、どれも受け入れてある（変えた項目は表のとおりで、何をどう変えたかは各指摘の resolution）。FND-36 は、案の DEC-43 の操作のまとめ方ではなく、同じたどる ID の境界の出来事のうち最も早く受けた時刻を SLI-14 の区間の始まりにした（DEC-43 のまとめ方では、システムの誤りの答えの後に端末が同じキーで送り直して書いた変化で、誤りから送り直しまでの時間が数えから消える）。FND-37 は、答えの期限に余裕を足さず、受けたインスタンスの EXT-01 の待ちを答えの期限で切った。FND-39 は、ヘッダーの名前を DEC-44 の決まりに合わせた。FND-45 は、返金に加えて、同じ DEC-45 の決まりの下にある押さえ、押さえ直し、決済、押さえの解除と料金の請求、支払い方法の登録の、処理されなかった試みにも出口を決めた。この段階が出した指摘は FND-35（軽微、第 2 段階宛て）で、乗客の画面（IFC-22）が担う FR-05 の 4（閾値を変えて依頼し直す）と FR-45 の 1 と 4（乗る場所を決め始めた時刻と評価を始めたことを送る）が ELM-01 の functions にない。`scripts/check.py` はその問題を FND-35 待ちとして示す。技術方針は、どのインタフェースの種類にも仕様書の作り方の項を持ち（POL-05）、コードの中の約束事（POL-04）はインタフェースの決まりを守れる。第 2 段階宛ての軽微な FND-34（ELM-03 が止まっている間にプラットフォームが答えた要求が境界の SLI に入らない、DEC-23）は、この段階の項目を対象にせず、第 2 段階の次の実行が取り上げる。
 
 ## 申し送り
 <!-- generated: handoffs -->
@@ -1989,37 +2041,37 @@ stateDiagram-v2
 | HND-11 | 期限の来た処理を拾う間隔 | architecture-drivers-to-architecture | architecture-to-high-level-design | — | 決定済み | DEC-46 |
 | HND-15 | Web アプリが起動のときに読む環境ごとの値を、ELM-03 が渡す操作 | architecture-to-technical-policy | architecture-to-high-level-design | — | 決定済み | IFC-01 |
 | HND-16 | ELM-03 が提供する HTTP と流れのインタフェースのスキーマ | architecture-to-high-level-design | implementation | ELM-03 | 未決定 | — |
-| HND-17 | ELM-01 の呼び出しのうち、時間のしきい値の SLO とお金の道にないもののタイムアウト | architecture-to-high-level-design | high-level-design-to-detailed-design | ELM-01 | 未決定 | — |
-| HND-18 | ELM-02 の呼び出しのうち、時間のしきい値の SLO とお金の道にないもののタイムアウト | architecture-to-high-level-design | high-level-design-to-detailed-design | ELM-02 | 未決定 | — |
+| HND-17 | ELM-01 の呼び出しのうち、時間のしきい値の SLO とお金の道にないもののタイムアウト | architecture-to-high-level-design | high-level-design-to-detailed-design | ELM-01 | 未決定 | FND-40 |
+| HND-18 | ELM-02 の呼び出しのうち、時間のしきい値の SLO とお金の道にないもののタイムアウト | architecture-to-high-level-design | high-level-design-to-detailed-design | ELM-02 | 決定済み | MOD-01 |
 | HND-19 | ELM-03 の値のうち、時間のしきい値の SLO とお金の道にないもの | architecture-to-high-level-design | high-level-design-to-detailed-design | ELM-03 | 未決定 | FND-26 |
 <!-- /generated -->
 
-この段階に宛てた申し送り 9 は、どれも決めてあり、未決定のものはない。品質チェーンの項目が設計に確かめを求めた点は、HND-01（QR-24。EXT-01 のテスト環境の速さによらず、決済の答えを T_payment_response のうちに示せる）と HND-02（SLI-09。二つの位置は WGS84 で同じ基準）で、どちらも確かめられ、品質チェーンへの要求にはならなかった。この段階が書いたのは、ELM-03 が提供する HTTP と流れのスキーマを実装に送る HND-16 と、時間のしきい値の SLO とお金の道にない呼び出しの値を第 4 段階に送る HND-17（ELM-01）、HND-18（ELM-02）、HND-19（ELM-03）。流れの後の Web Push の待ちと Web Push を送る呼び出しの値は NFR-07 の道の上にあるため HND-19 に含めず、IFC-11、IFC-21 が持つ。HND-19 は、日々の処理の時間の上限（取った実行を止まったとみなすまでの長さ）と、呼び出し手の再試行がその後にも届く枠を持つ。HND-17 の枠は、流れで受けた変化を示した時刻の報告をためずに送ること（IFC-10）を含む。HND-07（EXT-02 の呼び出し）、HND-09、HND-10、HND-12、HND-13、HND-14 は第 2 段階と第 2b 段階が第 4 段階の ELM-03 の実行に送ったもので、この段階の項目はその枠を変えない。
+この段階に宛てた申し送り 9 は、どれも決めてあり、未決定のものはない。品質チェーンの項目が設計に確かめを求めた点は、HND-01（QR-24。EXT-01 のテスト環境の速さによらず、決済の答えを T_payment_response のうちに示せる）と HND-02（SLI-09。二つの位置は WGS84 で同じ基準）で、どちらも確かめられ、品質チェーンへの要求にはならなかった。この段階が書いたのは、ELM-03 が提供する HTTP と流れのスキーマを実装に送る HND-16 と、時間のしきい値の SLO とお金の道にない呼び出しの値を第 4 段階に送る HND-17（ELM-01）、HND-18（ELM-02）、HND-19（ELM-03）で、HND-18 は第 4 段階が ELM-02 の実行で決めた。流れの後の Web Push の待ちと Web Push を送る呼び出しの値は NFR-07 の道の上にあるため HND-19 に含めず、IFC-11、IFC-21 が持つ。HND-19 は、日々の処理の時間の上限（取った実行を止まったとみなすまでの長さ）と、呼び出し手の再試行がその後にも届く枠を持つ。HND-17 の枠は、流れで受けた変化を示した時刻の報告をためずに送ること（IFC-10）を含む。HND-07（EXT-02 の呼び出し）、HND-09、HND-10、HND-12、HND-13、HND-14 は第 2 段階と第 2b 段階が第 4 段階の ELM-03 の実行に送ったもので、この段階の項目はその枠を変えない。表の HND-17 と HND-19 の「決めた項目」の FND-40 と FND-26 は、その申し送りを引く指摘で、申し送りを決めたものではない（どちらも第 4 段階で未決定）。
 
 ## 決めたこと
 | # | 質問 | 回答 | 項目 |
 |---|---|---|---|
 
-この段階は質問をしていない。尋ねる基準（影響の広さか重大さが高、入力の食い違い、入力が名指して中身を与えない法令と決まり、影響が高の品質チェーンへの要求）に当たる点がなかった。共通の約束事（影響の広さは高）はどれも入力と技術方針から選び方が決まり、確かでないものはない。受けたインスタンスが答える前に止まったときのキーの記録の書き方（DEC-42）は、外部を呼ぶかで分ける案と、どの操作にも動いている印を書いて止まったとみなす時刻で取り直す案があり、前者は DEC-08、DEC-10、DEC-45 から、NFR-07 の道の取引を増やさず、止まったとみなす余裕という値も要らないため選べ、利用側に見える答えはどちらでも変わらない。境界の SLI の一つの操作の数え方（DEC-43）のうち、規則が述べていない場合は品質チェーンへの要求 QCR-07 にし、影響は低（同じ項目からどちらの読み方でも数えられ、インタフェースと記録が変わらない）のため尋ねていない。タイムアウト、待ち、間隔、予算のホップ、一覧の件数は暫定の決定として DAS-10〜DAS-15 にした（どれも影響の広さは中か低、重大さは低）。未回答の QCR-01 は、この段階の IFC-04、IFC-08、DAT-04 も依存するが、道のりになっても EXT-02 の道を押さえと並べて加えれば済み、主な設計を動かす要求の応答は変わらないため、影響は低のまま（impact_note を書き足した）。
+この段階は質問をしていない。尋ねる基準（影響の広さか重大さが高、入力の食い違い、入力が名指して中身を与えない法令と決まり、影響が高の品質チェーンへの要求）に当たる点がなかった。共通の約束事（影響の広さは高）はどれも入力と技術方針から選び方が決まり、確かでないものはない。外部を呼ぶ操作の 503 を同じキーで送り直さないこと（DEC-35）は DEC-42 の同じキーに最初の答えを返す決まりから、最初の答えを示すヘッダーの名前（DEC-42）は DEC-44 の決まりから、一つに決まる。受けたインスタンスが答える前に止まったときのキーの記録の書き方（DEC-42）は、外部を呼ぶかで分ける案と、どの操作にも動いている印を書いて止まったとみなす時刻で取り直す案があり、前者は DEC-08、DEC-10、DEC-45 から、NFR-07 の道の取引を増やさず、止まったとみなす余裕という値も要らないため選べ、利用側に見える答えはどちらでも変わらない。受けたインスタンスの EXT-01 の待ちを答えの期限で切ることも、同じ理由で余裕を足す案より選べる（DEC-42）。EXT-01 が処理しなかった試みの出口（DEC-45）は、処理されなかった試みは何も実行されておらず、済んだか結果が分からない試みの数で一度だけを守る DEC-10 のまま新しい試みを作れることと、FR-29、FR-39、FR-50、FR-54 が求める出口から選び方が決まり、処理されなかったとする答えの範囲は Stripe の文書（実行が始まる前に退けた要求には結果を残さない）による。SLI-14 の区間の始まり（IFC-10、DAT-20）は、SLI-14 の数え方の規則の「システムがその操作を受けた時刻」を、同じたどる ID（利用者の一回の操作）の最初の要求として読んだもので、規則を変えない。境界の SLI の一つの操作の数え方（DEC-43）のうち、規則が述べていない場合は品質チェーンへの要求 QCR-07 にし、影響は低（同じ項目からどちらの読み方でも数えられ、インタフェースと記録が変わらない）のため尋ねていない。タイムアウト、待ち、間隔、予算のホップ、一覧の件数は暫定の決定として DAS-10〜DAS-15 にした（どれも影響の広さは中か低、重大さは低）。未回答の QCR-01 は、この段階の IFC-04、IFC-08、DAT-04 も依存するが、道のりになっても EXT-02 の道を押さえと並べて加えれば済み、主な設計を動かす要求の応答は変わらないため、影響は低のまま。QAS-54 は、それに頼る項目が七つになって影響の広さが高だが、第 3 段階のレビューの質問 1 で成り立つと答えを受けている（QCR-08）ため、尋ね直していない。
 
 ## 未確認の仮定
 <!-- generated: assumptions -->
 | ID | 名前 | 種類 | 影響の広さ | 重大さ | 依存する項目 |
 |---|---|---|---|---|---|
+| QAS-54 | 状態の変化を相手の画面に示した時刻の記録（FRP-11）を今期作る | 暫定の決定 | 高 | 中 | DAT-20、DEC-46、DRV-03、DRV-26、IFC-10、IFC-11、IFC-21 |
 | DAS-13 | 端末が送り直す操作は 24 時間のうちに送られるとみて、冪等キーを 24 時間持つ | 暫定の決定 | 低 | 低 | DEC-42 |
 | DAS-10 | EXT-01 への呼び出しのタイムアウト、同じキーでのやり直し、待ち、確かめの間隔を暫定に採る | 暫定の決定 | 中 | 低 | DEC-46、IFC-17 |
 | DAS-11 | 端末、通信、自身の処理の時間と、流れ、位置、着く見込みの間隔を暫定に採る | 暫定の決定 | 中 | 低 | DEC-46、IFC-05、IFC-11、IFC-19 |
 | DAS-12 | 日々の処理の時刻と照合で読む期間、期限の来た処理を拾う間隔を暫定に採る | 暫定の決定 | 中 | 低 | DAT-13、DEC-46、IFC-15 |
 | DAS-14 | 一覧の既定と最大の件数と、動いているキーへの送り直しに待たせる時間を暫定に採る | 暫定の決定 | 中 | 低 | DEC-39、DEC-42 |
 | DAS-15 | 流れで送った変化を Web Push でも知らせるまでの待ちと、Web Push を送る呼び出しと配信の時間を暫定に採る | 暫定の決定 | 中 | 低 | DEC-46、IFC-11、IFC-21 |
-| QAS-25 | 依頼の状態の変化を届ける速さのしきい値と最初の目標値 | 暫定の決定 | 中 | 低 | DEC-46、DRV-03 |
+| QAS-25 | 依頼の状態の変化を届ける速さのしきい値と最初の目標値 | 暫定の決定 | 中 | 低 | DEC-46、DRV-03、IFC-11 |
 | QAS-32 | 決済の記録と決済サービスの処理の一致の最初の目標値と突き合わせの時点 | 暫定の決定 | 中 | 低 | DAT-13、DRV-07、IFC-15 |
 | QAS-33 | 決済の結果を示すまでの速さのしきい値 | 暫定の決定 | 中 | 低 | DEC-46、DRV-07、IFC-03 |
 | DAS-06 | EXT-01 のテスト環境で、後で確定する押さえ、一部の確定、取り消し、返金を円で使える | 判断 | 中 | 中 | DEC-09、ELM-05、IFC-17 |
-| QAS-54 | 状態の変化を相手の画面に示した時刻の記録（FRP-11）を今期作る | 暫定の決定 | 中 | 中 | DAT-20、DRV-03、DRV-26、IFC-10 |
 <!-- /generated -->
 
-この段階が書いた仮定は DAS-10〜DAS-15 で、どれも暫定の決定。DAS-10 は EXT-01 の呼び出しの値、DAS-11 は端末と通信と自身の処理の時間と流れと位置と着く見込みの値、DAS-12 は日々の処理の時刻と照合の期間と期限の処理の間隔、DAS-13 は冪等キーを持つ期間、DAS-14 は一覧の件数と動いているキーへの送り直しに待たせる時間、DAS-15 は流れの後の Web Push の待ちと Web Push を送る呼び出しと配信の時間。この段階の項目が直接依存する第 2 段階の仮定は DAS-06（IFC-17）で、評価は中、中のまま（依存は DEC-09、ELM-05、IFC-17 の三つ）。品質チェーンの仮定のうち、QAS-25（NFR-07 のしきい値と目標）と QAS-33（T_payment_response）は予算と決済の期限の比べるもと、QAS-32（SLI-12 の突き合わせの時点）は照合の時刻、QAS-54（FR-53 を今期作る）は SLI-14 の出どころ。QAS-25、QAS-32、QAS-33 は値が変わっても予算と期限と照合の時刻を直すだけのため、この段階の評価は影響の広さが中、重大さが低。QAS-54 は覆れば、IFC-10 の示した時刻の報告、DAT-20、SLI-14 の出どころ、NFR-07 の予算と流れの後の Web Push の待ち（IFC-11）をやり直すため、影響の広さが中、重大さが中。どの仮定にも答えは要らない。訂正があれば、回答と同じように次の実行で反映する。
+この段階が書いた仮定は DAS-10〜DAS-15 で、どれも暫定の決定。DAS-10 は EXT-01 の呼び出しの値（処理されなかった押さえの解除と料金の請求の新しい試みの間隔も、確かめと同じ値で含む）、DAS-11 は端末と通信と自身の処理の時間と流れと位置と着く見込みの値、DAS-12 は日々の処理の時刻と照合の期間と期限の処理の間隔、DAS-13 は冪等キーを持つ期間、DAS-14 は一覧の件数と動いているキーへの送り直しに待たせる時間、DAS-15 は流れの後の Web Push の待ちと Web Push を送る呼び出しと配信の時間。この段階の項目が直接依存する第 2 段階の仮定は DAS-06（IFC-17）で、評価は中、中のまま（依存は DEC-09、ELM-05、IFC-17 の三つ）。品質チェーンの仮定のうち、QAS-25（NFR-07 のしきい値と目標）と QAS-33（T_payment_response）は予算と決済の期限の比べるもと、QAS-32（SLI-12 の突き合わせの時点）は照合の時刻、QAS-54（FR-53 を今期作る）は SLI-14 の出どころと流れの後の Web Push。QAS-25、QAS-32、QAS-33 は値が変わっても予算と期限と照合の時刻と流れの後の Web Push の待ち（IFC-11）を直すだけのため、この段階の評価は影響の広さが中、重大さが低。QAS-54 は、覆れば IFC-10 の示した時刻の報告、DAT-20、SLI-14 の出どころ、IFC-11 の流れの後の Web Push と示せなかった記録、IFC-21 の送る呼び出しの値、DEC-46 の NFR-07 の予算の Web Push の道と、第 1 段階の DRV-03、DRV-26 をやり直すため、影響の広さが高、重大さが中。第 3 段階のレビューの質問 1 で成り立つと答えを受け（QCR-08 が品質チェーンに運ぶ）、それに頼る項目はその答えを引くので、品質チェーンが当てるまで前提に残したまま、IFC-10 と DAT-20 は仮定でない。どの仮定にも答えは要らない。訂正があれば、回答と同じように次の実行で反映する。
 
 ## 未定の値
 | 名前 | 意味 | 使う所 |
@@ -2047,4 +2099,4 @@ stateDiagram-v2
 - 運営・サポートの担当者とエンジニアのアカウントを最初に作ること: 開発者の作業（実装の種の台本）。参加者のアカウントは IFC-12 で作る。
 
 ## 次
-この段階は、中の指摘 FND-22〜FND-25 を受け入れて項目が変わったため、別の文脈で `design-review` をこの段階に実行する（前のレビュー（入力の基準 2f633f0）からの差分のレビュー）。レビューがこの段階に重大か中の指摘を出したら、この段階を再実行する（軽微な指摘のためには走らせない）。この段階が第 2 段階に出した FND-35 は軽微で、第 2 段階を走らせる理由にはならず、第 2 段階がほかの理由で走るときに FND-34 とともに取り上げる。そのあと、`high-level-design-to-detailed-design` をコンポーネントごとに、ELM-03（配車サーバー）、ELM-01（乗客とドライバーの Web アプリ）、ELM-02（担当者とエンジニアの Web アプリ）の順に実行する。第 4 段階は、ELM-03 で HND-07、HND-09、HND-10、HND-12、HND-13、HND-14、HND-19 を、ELM-01 で HND-17 を、ELM-02 で HND-18 を取り上げ、実装は HND-16 でスキーマを生成する。品質チェーンへの要求は `docs/design/quality-chain-requests.md` が挙げる（QCR-01、QCR-06、QCR-07 は未回答、QCR-02〜QCR-05 は回答済み）。それを品質チェーンに渡すかどうかと、その時期は利用者が決める。
+この段階は、中の指摘 FND-45 を受け入れて項目が変わったため、別の文脈で `design-review` をこの段階に実行する（前のレビューからの差分のレビュー）。レビューがこの段階に重大か中の指摘を出したら、この段階を再実行する（軽微な指摘のためには走らせない）。この段階が第 2 段階に出した FND-35 は軽微で、第 2 段階を走らせる理由にはならず、第 2 段階がほかの理由で走るときに FND-34 とともに取り上げる。そのあと、`high-level-design-to-detailed-design` をコンポーネントごとに、ELM-03（配車サーバー）、ELM-01（乗客とドライバーの Web アプリ）と、ELM-02（担当者とエンジニアの Web アプリ。この実行が変えた DEC-35、DEC-42、DEC-45、IFC-13、IFC-21 と、宛てられた中の FND-43、FND-44 を取り上げる）に実行する。この実行が変えた共通の約束事（DEC-35、DEC-42、DEC-44、DEC-45）はどのコンポーネントにもかかわり、ELM-01 は IFC-03、IFC-07、IFC-10、IFC-11、IFC-21、ELM-03 は IFC-17、DAT-07、DAT-11、DAT-12、DAT-20、DAT-26 の変わったところに従う。第 4 段階は、ELM-03 で HND-07、HND-09、HND-10、HND-12、HND-13、HND-14、HND-19 を、ELM-01 で HND-17 を取り上げ、実装は HND-16 でスキーマを生成する。品質チェーンへの要求は `docs/design/quality-chain-requests.md` が挙げる（QCR-01、QCR-06、QCR-07 は未回答、QCR-02〜QCR-05、QCR-08 は回答済み）。それを品質チェーンに渡すかどうかと、その時期は利用者が決める。

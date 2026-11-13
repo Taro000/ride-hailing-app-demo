@@ -1,17 +1,17 @@
 id: DAT-20
 title: 届けと示した時刻の記録
 status: active
-basis: assumed
-basis_note: 相手の端末が変化を示した時刻を送り、サーバーがつながっていない相手へ示せなかったことを記録することは DEC-23 と FR-53（入力。FR-53 を今期作ることは QAS-54 による品質チェーンの暫定の決定）。出来事と相手の組ごとの行を出来事と同じ取引で作ること、届けた道と結果を持つこと、示せなかったと記録するのを相手の流れが開いていなかったときだけにすることは推定
+basis: inferred
+basis_note: 相手の端末が変化を示した時刻を送り、サーバーがつながっていない相手へ示せなかったことを記録することは DEC-23 と FR-53（入力。FR-53 を今期作ることは QAS-54 による品質チェーンの暫定の決定で、第 3 段階のレビューの質問 1 で成り立つと答えを受けた。QCR-08 が品質チェーンに運び、当てられるまで前提に残す）。出来事と相手の組ごとの行を出来事と同じ取引で作ること、届けた道と結果を持つこと、示せなかったと記録するのを相手の流れが開いていなかったときだけにすることは推定。操作による変化の changeReceivedAt を、その変化を書いた要求ではなく、同じたどる ID の境界の出来事（DAT-19）のうち最も早く受けた時刻にし、たどる ID を持つことは FND-36 を受けた（推定）
 premises: [QAS-54]
 entity: 出来事を相手に届けた記録と、相手が示した時刻（FR-53）
 owner: ELM-03
 store: ELM-04
-key_attributes: [eventId, recipientAccountId, changeKind, rideId, changeReceivedAt, deliveredVia, deliveryOutcome, failureOrigin, notDisplayed, displayedAt, displayedAtDevice, displayedWhere, recipientTestAccount, requestTestAccount]
+key_attributes: [eventId, recipientAccountId, changeKind, rideId, traceId, changeReceivedAt, deliveredVia, deliveryOutcome, failureOrigin, notDisplayed, displayedAt, displayedAtDevice, displayedWhere, recipientTestAccount, requestTestAccount]
 relations:
   - {to: DAT-09, kind: many-to-one, note: 届けた出来事}
   - {to: DAT-07, kind: many-to-one, note: 依頼と乗車}
-consistency: 出来事を書く取引で、届ける相手ごとに一行を作る。届けたとき（流れか Web Push）に結果を足し、相手の流れが開いていなければ notDisplayed を真にする（FR-53 の 2）。示した時刻は端末の報告（IFC-10）の最初のものだけを書き、DEC-37 で直した時刻と直す前の時刻を持つ
+consistency: 出来事を書く取引で、届ける相手ごとに一行を作る。changeReceivedAt は、操作による変化ではその変化を書いた要求と同じたどる ID（DEC-43。利用者の一回の操作で、同じ冪等キーの送り直しを含む）の境界の出来事（DAT-19）のうち ELM-03 の入口が最も早く受けた時刻（受けたインスタンスが止まった後の送り直しで書いた変化も最初の要求の時刻）、迎車の到着では乗る場所から D_pickup_position_gap のうちの迎車の位置を受けた時刻。届けたとき（流れか Web Push）に結果を足し、相手の流れが開いていなければ notDisplayed を真にする（FR-53 の 2）。示した時刻は端末の報告（IFC-10）の最初のものだけを書き、DEC-37 で直した時刻と直す前の時刻を持つ
 retention: SLO のウィンドウ（直近 28 日、NFR-07）と N_trace_retention_days の長い方を過ぎたら日々の処理が消す
 classification: internal
 drivers: [DRV-26, DRV-03, DRV-25]

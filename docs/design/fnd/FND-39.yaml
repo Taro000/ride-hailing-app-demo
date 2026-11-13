@@ -1,6 +1,6 @@
 id: FND-39
 title: DEC-42 の Idempotent-Replayed のヘッダーが、DEC-44 に加えたヘッダーの名付けの決まりに合わない
-status: open
+status: accepted
 basis: inferred
 basis_note: DEC-42 と DEC-44 の文は入力。二つが食い違うことは、このレビューの読み
 premises: []
@@ -11,4 +11,4 @@ targets: [DEC-42, DEC-44]
 severity: minor
 evidence: FND-31 を受けて DEC-44 は、HTTP のヘッダーは標準のもの（Idempotency-Key）のほかは X- で始まる語を - でつなぐ（X-Trace-Id、X-Request-Id、X-Resend）と決めた。DEC-42 は、同じ範囲の同じ要求に最初の答えを Idempotent-Replayed の true のヘッダーとともに返す。Idempotent-Replayed は DEC-44 が挙げる標準のものでも X- で始まる名前でもなく、利用側に見せる同じヘッダーについて二つの共通の約束事が食い違う
 suggestion: DEC-44 の標準のものに Idempotent-Replayed を加える（EXT-01 の答えと同じ名前にそろえる理由とともに）か、DEC-42 のヘッダーを X- で始まる名前に改める
-resolution: null
+resolution: "受け入れ。DEC-42 のヘッダーを DEC-44 の決まりの X-Idempotent-Replayed に改め、DEC-44 の X- で始まるヘッダーの例に加えた。EXT-01 の名前にそろえて例外にする案は、利用側がこのシステムの Web アプリだけで、標準でもない名前を例外にする理由がないため採らなかった"

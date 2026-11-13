@@ -2,11 +2,11 @@ id: DEC-35
 title: ELM-03 のどの操作も一つの形で誤りを返し、状態の組と安定した符号で利用側のすることを分ける
 status: active
 basis: inferred
-basis_note: インタフェースが利用側に見せる約束事のうちエラーの形と項目の誤りの符号は、第 3 段階の確定の種類（推定）。コードの中でエラーをどう渡し、境界の一か所でこの形に変えるかは POL-04 の規則（入力）に従い、ここでは決めない。画面が人に見せる文を自身の文言のファイルから符号で引くことは POL-04（入力）。他人の依頼と乗車の存在を明かさず 404 で答えることは FR-49 の 2 と QR-57（入力）からの推定
+basis_note: インタフェースが利用側に見せる約束事のうちエラーの形と項目の誤りの符号は、第 3 段階の確定の種類（推定）。コードの中でエラーをどう渡し、境界の一か所でこの形に変えるかは POL-04 の規則（入力）に従い、ここでは決めない。画面が人に見せる文を自身の文言のファイルから符号で引くことは POL-04（入力）。他人の依頼と乗車の存在を明かさず 404 で答えることは FR-49 の 2 と QR-57（入力）からの推定。503 を同じキーで送り直してよいのを、外部を呼ばない操作と読むだけの操作に限り、外部を呼ぶ操作が試みの結果として返す 503 はキーの答え（DEC-42）なので送り直さずに今の状態を読み直すとしたことは FND-45 を受けた
 premises: []
 stage: high-level-design
 question: ELM-03 の HTTP の操作が失敗したとき、誤りをどの形と状態で返し、利用側がそれぞれ何をするかをどう示すか
-addresses: [DRV-02, DRV-24, DRV-12, DRV-29]
+addresses: [DRV-02, DRV-24, DRV-12, DRV-29, FND-45]
 options:
   - name: 一つの JSON の形（code、message、requestId、traceId、項目ごとの details、retryAfterSeconds）を HTTP の状態の組と組み合わせ、符号は大文字の英語の名前で固定する
     effect: 利用側は状態の組で動き方を、符号で個々の場面を決め、要求の ID とたどる ID から一件の操作をたどれる
@@ -17,8 +17,8 @@ options:
   - name: Hono と @hono/zod-openapi の既定の形のまま返す
     effect: 作る手間がない
     cost: 操作とライブラリによって形が変わり、項目の誤りの符号と要求の ID を返せない
-chosen: 一つの JSON の形で返す。本文は code（大文字の英語の名前の安定した符号）、message（開発者に向けた短い日本語の説明で、個人の情報を入れず、画面には示さない）、requestId と traceId（DEC-43）、details（項目の誤りのときだけ、field と code の組の並び。code は REQUIRED、INVALID_FORMAT、OUT_OF_RANGE、TOO_LONG、TOO_LARGE、NOT_ALLOWED_VALUE、UNKNOWN_FIELD、DUPLICATE のどれか）、retryAfterSeconds（待つ時間があるときだけで、Retry-After のヘッダーも付ける）。状態の組と共通の符号は、400 VALIDATION_FAILED（要求の形の誤り。直して送り、同じものは送り直さない）、401 NOT_SIGNED_IN（サインインし直す）、403 NOT_ALLOWED（その種類の利用者に許していない機能か、Origin の違う要求。止める）、404 NOT_FOUND（ないか、見せる範囲の外。他人の依頼と乗車の存在は明かさない）、409 と各 IFC の符号（今の状態が許さない。読み直して決め直す）、402 と各 IFC の符号（EXT-01 がお金の操作をはっきり拒否した。理由を示し、CUJ が許す次の操作を示す）、422 と各 IFC の符号（業務の決まりで受け付けない。理由を示し、要求を変えて新しい操作として送る）、423 ACCOUNT_LOCKED（示された時間を待つ）、429 TOO_MANY_REQUESTS（入口で回数を限った。示された時間を待つ）、500 INTERNAL_ERROR（システム自身の誤り。状態を変える操作は同じ冪等キーで送り直してよい）、503 と各 IFC の符号（依存先が失敗したか答えない。MAP_SERVICE_UNAVAILABLE、PAYMENT_SERVICE_UNAVAILABLE、SERVICE_UNAVAILABLE。読むだけの操作と冪等キーのある操作だけを送り直す）。冪等キーにかかわる 409 OPERATION_IN_PROGRESS と 422 IDEMPOTENCY_KEY_REUSED は DEC-42、お金の操作の結果が分からないときの 202 と 503 は DEC-45。利用側は知らない符号を状態の組で扱い、人に見せる文は Web アプリが符号から自身の文言のファイルで引く（POL-04）
-rationale: 二つ目は標準に沿うが、type の URI と title の決まりを増やすだけで、両側を同じ開発者が作り生成した型で呼ぶ（DEC-33）このシステムでは得るものがなく、DRV-16 で劣る。三つ目は操作ごとに形が違い、利用側が送り直してよいかを決められず DRV-02 を弱め、要求の ID がなく DRV-24 のたどりが切れる。一つ目は、状態の組が送り直してよいか（冪等な操作の 5xx）、読み直すか（409）、直すか（400、422）を決め、符号が CUJ ごとの場面（取り消し、拒否、受けられない依頼）を分ける。404 で他人の依頼と乗車の存在を明かさないのは、見せる範囲の外の資源があるかないかも個人の情報に近いため（DRV-29、FR-49）。message は開発者に向け、画面の文は符号から Web アプリが引くので、文を変えても符号は変わらない（DRV-12）
+chosen: 一つの JSON の形で返す。本文は code（大文字の英語の名前の安定した符号）、message（開発者に向けた短い日本語の説明で、個人の情報を入れず、画面には示さない）、requestId と traceId（DEC-43）、details（項目の誤りのときだけ、field と code の組の並び。code は REQUIRED、INVALID_FORMAT、OUT_OF_RANGE、TOO_LONG、TOO_LARGE、NOT_ALLOWED_VALUE、UNKNOWN_FIELD、DUPLICATE のどれか）、retryAfterSeconds（待つ時間があるときだけで、Retry-After のヘッダーも付ける）。状態の組と共通の符号は、400 VALIDATION_FAILED（要求の形の誤り。直して送り、同じものは送り直さない）、401 NOT_SIGNED_IN（サインインし直す）、403 NOT_ALLOWED（その種類の利用者に許していない機能か、Origin の違う要求。止める）、404 NOT_FOUND（ないか、見せる範囲の外。他人の依頼と乗車の存在は明かさない）、409 と各 IFC の符号（今の状態が許さない。読み直して決め直す）、402 と各 IFC の符号（EXT-01 がお金の操作をはっきり拒否した。理由を示し、CUJ が許す次の操作を示す）、422 と各 IFC の符号（業務の決まりで受け付けない。理由を示し、要求を変えて新しい操作として送る）、423 ACCOUNT_LOCKED（示された時間を待つ）、429 TOO_MANY_REQUESTS（入口で回数を限った。示された時間を待つ）、500 INTERNAL_ERROR（システム自身の誤り。状態を変える操作は同じ冪等キーで送り直してよい）、503 と各 IFC の符号（依存先が失敗したか答えない。MAP_SERVICE_UNAVAILABLE、PAYMENT_SERVICE_UNAVAILABLE、SERVICE_UNAVAILABLE。読むだけの操作と、外部のシステムを呼ばない冪等キーのある操作だけを同じキーで送り直す。外部を呼ばない操作は結果とキーを一つの取引で書くので、503 のときはキーに何も書かれておらず、送り直しが初めから行う（DEC-42）。外部を呼ぶ操作が試みの結果として返す 503（PAYMENT_SERVICE_UNAVAILABLE、HOLD_UNCONFIRMED、REHOLD_UNCONFIRMED）は ELM-03 がキーの答えとして持つので、同じキーの送り直しは同じ答えを受けるだけで、利用側は送り直さずに今の状態を読み直して示し、し直すのは利用者が改めて操作したときに新しいキーで送る（DEC-45））。冪等キーにかかわる 409 OPERATION_IN_PROGRESS と 422 IDEMPOTENCY_KEY_REUSED は DEC-42、お金の操作の結果が分からないときの 202 と 503 は DEC-45。利用側は知らない符号を状態の組で扱い、人に見せる文は Web アプリが符号から自身の文言のファイルで引く（POL-04）
+rationale: 二つ目は標準に沿うが、type の URI と title の決まりを増やすだけで、両側を同じ開発者が作り生成した型で呼ぶ（DEC-33）このシステムでは得るものがなく、DRV-16 で劣る。三つ目は操作ごとに形が違い、利用側が送り直してよいかを決められず DRV-02 を弱め、要求の ID がなく DRV-24 のたどりが切れる。一つ目は、状態の組が送り直してよいか（冪等な操作の 500 と、外部を呼ばない操作の 503）、読み直すか（409 と、外部を呼ぶ操作が試みの結果として返す 503）、直すか（400、422）を決め、符号が CUJ ごとの場面（取り消し、拒否、受けられない依頼）を分ける。404 で他人の依頼と乗車の存在を明かさないのは、見せる範囲の外の資源があるかないかも個人の情報に近いため（DRV-29、FR-49）。message は開発者に向け、画面の文は符号から Web アプリが引くので、文を変えても符号は変わらない（DRV-12）
 rejected:
   - option: RFC 9457 の problem+json（type、title、status、detail、instance）に、符号とたどる ID を足す
     reason: 両側を同じ開発者が作るこのシステムでは type と title を読む者がおらず、決まりを増やすだけで DRV-16 で劣る
