@@ -10,5 +10,5 @@ to: architecture-to-high-level-design
 targets: [IFC-11, IFC-21, DEC-46]
 severity: minor
 evidence: FND-26 を受けて、IFC-11 は流れで送った出来事の示した時刻が流れに書いてから 2 秒のうちに届かなければ Web Push でも知らせると決め、IFC-21 はその知らせを送る呼び出しのタイムアウト 5 秒と一度だけの送り直しを、DEC-46 はその配信のホップ 1.0 秒を、NFR-07 の道の値として決めた。この道は相手の端末が示した時刻を送ること（FR-53）があって初めて働き、FR-53 を今期作ることは QAS-54 による品質チェーンの暫定の決定（FR-53 の premises）。IFC-11 は示せなかった記録（FR-53 の 2）にも頼り、2 秒は待ちと Web Push の配信が T_dispatch_propagation（QAS-25）に収まる長さとして選んだ（IFC-11 の timing）。第 3 段階の報告の「未確認の仮定」も、QAS-54 が覆れば流れの後の Web Push の待ち（IFC-11）と NFR-07 の予算をやり直すと書く。それでも IFC-11 の premises には QAS-54 も QAS-25 もなく、IFC-21 と DEC-46 の premises には QAS-54 がない。三つとも FR-53 を functions にも addresses にも持たないため FR-53 からたどっても見つからず、QAS-54 に答えが出たときに premises で探すと漏れる
-suggestion: IFC-11 の premises に QAS-54 と QAS-25 を、IFC-21 と DEC-46 の premises に QAS-54 を加える。QAS-54 に答えが出たら、その答えをこの三つの basis_note にも引く
+suggestion: IFC-11 の premises に QAS-54 と QAS-25 を、IFC-21 と DEC-46 の premises に QAS-54 を加える。QAS-54 の答え（第 3 段階のレビューの質問 1。成り立つ。QCR-08 が品質チェーンに運ぶ）を、品質チェーンが当てるまで QAS-54 を premises に残したまま、この三つの basis_note に引く
 resolution: null
