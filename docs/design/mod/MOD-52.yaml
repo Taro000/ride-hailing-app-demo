@@ -2,7 +2,7 @@ id: MOD-52
 title: 届いた依頼と許諾
 status: active
 basis: inferred
-basis_note: 受付の切り替え、届いている依頼の一覧（届ける相手の規則をその時点の値で当て、現在地が分からないときはそのことを返して距離の条件のある依頼を除く）、依頼を選ぶ操作（走っていなければ内容を返し、示した金額を記録する）、許諾（規則と走っているかを当て直し、今の状態を条件に割り当て、許諾したときの速さ、評価、閾値を記録する）と答えは IFC-04、一覧の変化を offer.added と offer.removed で届け、走っているドライバーにも届けることは IFC-11 と FR-22 の 1、規則は DEC-24、走っているかの判断は DEC-22、重なった許諾は先に書けた一つだけが割り当てられることは DEC-08 と FR-21、停止した時から許諾させないことは QR-49、依頼を届けた先とそのときの条件と停止、選んだことと許諾とそのときの評価と閾値と速さを依頼の経過に残すことは FR-45 の 2、3、FR-22 の 4、DAT-09（どれも入力）。許諾の当て直しと割り当てを一つの書き込みの取引で行い、停止と受付と条件をその取引の中で読むことは MOD-25 の取引の決まりからの推定。依頼の内容の移動時間を、見積もり（DAT-06）か押さえ直した降りる場所の変更（DAT-08）が持つ道の時間から示し、EXT-02 を呼ばないことは推定（その時間は EXT-02 で求めたもの、IFC-19）。受付をしている人を MOD-49 に渡す口を実装することは推定
+basis_note: 受付の切り替え、届いている依頼の一覧（届ける相手の規則をその時点の値で当て、現在地が分からないときはそのことを返して距離の条件のある依頼を除く）、依頼を選ぶ操作（走っていなければ内容を返し、示した金額を記録する）、許諾（規則と走っているかを当て直し、今の状態を条件に割り当て、許諾したときの速さ、評価、閾値を記録する）と答えは IFC-04、一覧の変化を offer.added と offer.removed で届け、走っているドライバーにも届けることは IFC-11 と FR-22 の 1、規則は DEC-24、走っているかの判断は DEC-22、重なった許諾は先に書けた一つだけが割り当てられることは DEC-08 と FR-21、停止した時から許諾させないことは QR-49、依頼を届けた先とそのときの条件と停止、選んだことと許諾とそのときの評価と閾値と速さを依頼の経過に残すことは FR-45 の 2、3、FR-22 の 4、DAT-09（どれも入力）。許諾の当て直しと割り当てを一つの書き込みの取引で行い、停止と受付と条件をその取引の中で読むことは MOD-25 の取引の決まりからの推定。依頼の内容の移動時間を、見積もり（DAT-06）か押さえ直した降りる場所の変更（DAT-08）が持つ道の時間から示し、EXT-02 を呼ばないことは推定（その時間は EXT-02 で求めたもの、IFC-19）。受付をしている人を MOD-49 に渡す口を実装することは推定。迎車中か乗車中のドライバーにも依頼を届けて一覧と内容を示し、許諾だけを判断表 A の 3 行目で DRIVER_ALREADY_ASSIGNED で退けること（MOD-51 の規則で除かない）は、DEC-24、IFC-04、FR-18 の 1（入力）に従うよう FND-68 を受けて直し、post と verification の表の名前を報告の判断表 A に合わせた
 premises: [QCR-01]
 component: ELM-03
 name: 届いた依頼と許諾
@@ -21,11 +21,11 @@ interface:
     errors: ["NOT_ACCEPTING_REQUESTS: 409", "DRIVER_SUSPENDED: 403"]
   - operation: "selectOffer(actor: Actor, rideId: RideId, now: Instant) -> OfferDetail"
     pre: null
-    post: GET /v1/offers/{rideId} で、判断表 B で答え、渡せるなら金額（確定額）、乗車場所、現在地から乗車場所までの直線の距離、降りる場所、移動時間の見込みを返し、示した金額と選んだことを依頼の経過に書く（SLI-11 の amountShownToDriver）
+    post: GET /v1/offers/{rideId} で、判断表 A で答え、渡せるなら金額（確定額）、乗車場所、現在地から乗車場所までの直線の距離、降りる場所、移動時間の見込みを返し、示した金額と選んだことを依頼の経過に書く（SLI-11 の amountShownToDriver）
     errors: ["DRIVER_MOVING: 409", "OFFER_NO_LONGER_AVAILABLE: 409 と reason（taken、cancelled、not_eligible、ended）", "NOT_ACCEPTING_REQUESTS: 409", "DRIVER_SUSPENDED: 403"]
   - operation: "accept(actor: Actor, rideId: RideId, key: IdempotencyKey) -> Assigned"
     pre: null
-    post: POST /v1/offers/{rideId}/acceptance で、一つの書き込みの取引の中で、受付、停止、登録、迎車中か乗車中の依頼、評価、閾値、条件、最新の位置を読んで MOD-51 で当て直し、MOD-48 で走っているかを決め、判断表 B で答える。割り当てるなら MOD-45 の accept、許諾したときの速さが V_moving_lock を下回っていたか、評価、閾値の依頼の経過、ほかに届けたドライバーへの offer.removed（taken）、冪等キーの答えを同じ取引で書く
+    post: POST /v1/offers/{rideId}/acceptance で、一つの書き込みの取引の中で、受付、停止、登録、迎車中か乗車中の依頼、評価、閾値、条件、最新の位置を読んで MOD-51 で当て直し、MOD-48 で走っているかを決め、判断表 A で答える。割り当てるなら MOD-45 の accept、許諾したときの速さが V_moving_lock を下回っていたか、評価、閾値の依頼の経過、ほかに届けたドライバーへの offer.removed（taken）、冪等キーの答えを同じ取引で書く
     errors: ["DRIVER_MOVING: 409", "OFFER_NO_LONGER_AVAILABLE: 409 と reason", "DRIVER_SUSPENDED: 403", "DRIVER_ALREADY_ASSIGNED: 409", "NOT_ACCEPTING_REQUESTS: 409"]
   - operation: "offerToEligible(tx: Tx, ride: OfferFacts) -> AccountId[]"
     pre: MOD-45 が、依頼が searching になる取引（押さえた、届け直した）の中で、起動のときに渡された口から呼ぶ
@@ -55,7 +55,7 @@ drivers: [DRV-02, DRV-03, DRV-08, DRV-11, DRV-35]
 decisions: [DEC-08, DEC-22, DEC-24]
 behaviour: "報告書の節: MOD-52 届いた依頼と許諾"
 verification:
-  - checks: 判断表 B の行ごと（受付、停止、登録、走っている、分からない、searching でない理由、迎車中のドライバー）
+  - checks: 判断表 A〜C の行ごと（受付、停止、登録、走っている、分からない、searching でない理由、迎車中か乗車中のドライバーは選ぶ操作で内容を受け、許諾で DRIVER_ALREADY_ASSIGNED を受け、届けと一覧から除かれない）
     how: 単体の層（MOD-45、MOD-48、MOD-51 の偽物）
   - checks: 二人の許諾、許諾と取り消し、許諾と停止を差し込みで重ね、どの順でも一人に定まり、ほかは OFFER_NO_LONGER_AVAILABLE か DRIVER_SUSPENDED を受ける（FR-21 の 2、3、FR-44 の 2、QR-49、NFR-11）
     how: 結合の層（依頼の状態を書くポートの差し込み）

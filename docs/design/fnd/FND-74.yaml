@@ -1,0 +1,14 @@
+id: FND-74
+title: DEC-42 は 409 OPERATION_IN_PROGRESS を同じキーの送り直しにだけ書くが、ELM-03 は同じ依頼か登録へのほかのキーの操作が動いている間にも返す
+status: open
+basis: inferred
+basis_note: DEC-42 の chosen（期限のうちの同じキーの送り直しに 409 OPERATION_IN_PROGRESS と Retry-After 1 秒を返し、利用側は待って同じキーで送り直す）、第 3 段階の報告の DAT-26 の状態遷移、DEC-43 の操作のまとめ方（409 OPERATION_IN_PROGRESS の後の送り直しは同じ操作）、IFC-03 と IFC-07 の errors と idempotency は入力。ELM-03 がほかのキーの操作にもこの符号で答える所は、第 4 段階の ELM-03 の MOD-59 の判断表 A、MOD-56 の判断表 B、MOD-43 の判断表 B（第 4 段階の ELM-03 のレビューの指摘を受けた変更）
+premises: []
+raised_by: high-level-design-to-detailed-design
+raised_in: 4-detailed-design/ELM-03.md
+to: architecture-to-high-level-design
+targets: [DEC-42, IFC-03, IFC-07]
+severity: minor
+evidence: DEC-42 と DAT-26 の状態遷移は、409 OPERATION_IN_PROGRESS を、外部を呼ぶ操作のキーが動いている（in_progress）間の同じキーの送り直しへの答えとしてだけ書き、IFC-03 と IFC-07 の誤りもその符号を DEC-42 の場合として引く。第 4 段階の ELM-03 は、同じ依頼か登録へのほかのキーの操作が答えの期限のうちに動いている間に受けた操作にも、何も書かずに（そのキーを記録せず、同じキーの送り直しが初めから行う）409 OPERATION_IN_PROGRESS と Retry-After 1 秒で答える。降りる場所の変更の承認で、同じ変更のほかのキーの承認か同じ依頼のほかの押さえ直しが動いているとき（MOD-59）、依頼の支払い方法の変更で、同じ依頼のほかの押さえ直しが動いているとき（MOD-56。FND-61 を受けて、依頼の押さえ直しを一つずつにし、後の押さえ直しが前の結果を古い確定額か支払い方法の押さえで置き換えないようにした）、支払い方法の登録の completion で、同じ登録のほかのキーの completion の読み直しが動いているとき（MOD-43、FND-67）。利用側のすること（Retry-After を待って同じキーで送り直す）と DEC-43 の数え方（その送り直しは同じ操作）はそのまま合い、何も失敗しないが、DEC-42 と IFC-03、IFC-07 の誤りの決まりはこの場合を挙げないため、第 4 段階の ELM-01 の設計とインタフェースを読む人には見えない
+suggestion: DEC-42 の 409 OPERATION_IN_PROGRESS の場合に、同じ依頼の押さえを替える操作（降りる場所の変更の承認と依頼の支払い方法の変更）と同じ登録の completion が、ほかのキーの同じ種類の操作が答えの期限のうちに動いている間に受けたものを加え、そのときは新しいキーを記録せず、同じキーの送り直しが初めから行うと書く。IFC-03 の承認と支払い方法の変更、IFC-07 の completion の誤りにもその場合を書く。別の符号にするなら、第 4 段階の ELM-03 がそれに従う
+resolution: null

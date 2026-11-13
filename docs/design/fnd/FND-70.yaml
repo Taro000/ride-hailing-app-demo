@@ -1,6 +1,6 @@
 id: FND-70
 title: 日々の呼び出しの道で、想定の本番の Cloud Run の要求の時間の上限をどの項目も決めておらず、MOD-32 の呼び出しの期限と時間の上限がその前で切られうる
-status: open
+status: accepted
 basis: inferred
 basis_note: MOD-32 の parameters、IFC-15 の timing、HND-19、DEC-05（CPU を常に割り当て、回の外はインスタンス 0）、DEC-18、POL-02 の infra/gcp/ の決まり、報告の「設計上の値」の計算は入力。Cloud Run の要求の時間の上限の既定が 300 秒であることは Cloud Run の公開の文書による推定
 premises: []
@@ -11,4 +11,4 @@ targets: [MOD-32]
 severity: minor
 evidence: MOD-32 は日々の処理の時間の上限を 20 分、Cloud Scheduler の呼び出しの期限を 25 分（Cloud Scheduler の上限 30 分のうち）とし、IFC-15 の枠（呼び出しの期限は時間の上限より長い）と再試行の計算をそれに置く。日々の呼び出しは Cloud Scheduler から Cloud Run のサービスを通って ELM-03 に届くが、その間の Cloud Run の要求の時間の上限は、MOD-32 の parameters にも、infra/gcp/ の定義を決めるどの項目にもない。既定（300 秒）のままなら、5 分を超える日々の処理の呼び出しは 25 分の期限の前に切られて Cloud Scheduler には失敗になり、回の外（インスタンス 0、DEC-05）では要求のなくなったインスタンスが止められうるので、報告の「設計上の値」の時間の上限と再試行の計算が前提にする時間の順が成り立たない。同じ上限は IFC-11 の流れも決まった間隔で切る
 suggestion: MOD-32 の parameters（infra/gcp/ の Cloud Run のサービスの定義）に、要求の時間の上限を Cloud Scheduler の呼び出しの期限（25 分）より長く置き、報告の計算に加える。あわせて、その上限で流れが切られる間隔が IFC-11 のつなぎ直しで足りるかを見る
-resolution: null
+resolution: 受け入れ。MOD-32 の parameters に、日々の呼び出しが通る想定の本番の Cloud Run のサービスの要求の時間の上限（infra/gcp/ の Cloud Run のサービスの定義）30 分を置き（DAS-20）、時間の上限 20 分、呼び出しの期限 25 分、要求の時間の上限 30 分の順を報告の計算に加えた。同じ上限で IFC-11 の流れは 30 分ごとに切られるが、端末は IFC-11 のつなぎ直しで続きから受ける
