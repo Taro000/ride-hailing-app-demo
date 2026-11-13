@@ -1,0 +1,14 @@
+id: FND-73
+title: 報告の割り当てと MOD-27 の functions が、FR-24 で食い違う
+status: open
+basis: inferred
+basis_note: 報告の「割り当て」の FR-24 の 5 の行と MOD-27 の functions は入力。このレビューのスクリプトが割り当ての行と各モジュールの functions を照らした
+premises: []
+raised_by: design-review
+raised_in: reviews/4-detailed-design-ELM-03.md
+to: high-level-design-to-detailed-design
+targets: [MOD-27]
+severity: minor
+evidence: 報告の「割り当て」は FR-24 の 5（取り消した後は乗車場所と乗客の現在地を示さない）を MOD-60、MOD-27、MOD-45 に割り当てるが、MOD-27 の functions は FR-25、FR-35、FR-49、FR-52 で、FR-24 を持たない
+suggestion: MOD-27 の functions に FR-24 を加えるか、割り当ての行から MOD-27 を外す
+resolution: null

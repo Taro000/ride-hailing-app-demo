@@ -1,0 +1,14 @@
+id: FND-71
+title: 確定のモジュールの値のうち四つが、parameters にも DAS にもない
+status: open
+basis: inferred
+basis_note: 報告の MOD-23 の判断表 A、MOD-32 の判断表 B、「キャッシュ」のメモリの構造、「設計上の値」の文、各 MOD の parameters、DAS-17、DAS-18、DAS-20、DAS-21 は入力
+premises: []
+raised_by: design-review
+raised_in: reviews/4-detailed-design-ELM-03.md
+to: high-level-design-to-detailed-design
+targets: [MOD-20, MOD-23, MOD-32, MOD-33]
+severity: minor
+evidence: 報告は「どの値も確定の深さのモジュールのもので、運用の中で直す暫定の決定（DAS-17〜DAS-26、DAS-28）」とするが、MOD-23 の判断表 A の作りかけを読み直す 200 ミリ秒と 3 回、MOD-32 の判断表 B の期限を過ぎた処理を拾う終わり（時間の上限から 5 分を引いた時刻）、メモリの構造の MOD-33 の流れの組のタイマーの上限 1000 と MOD-20 の送り元の上限 10000 は、それぞれのモジュールの parameters になく、DAS-17、DAS-18、DAS-20、DAS-21 の statement にもない
+suggestion: 四つの値を、もとと一緒にそれぞれのモジュールの parameters に置き、DAS-17、DAS-18、DAS-20、DAS-21 の statement に加える（FND-63 を受けて MOD-23 の読み直しが変われば、その値を置く）
+resolution: null

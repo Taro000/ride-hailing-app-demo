@@ -1,0 +1,14 @@
+id: FND-72
+title: MOD-39 は版の決まりの最も安い料金を QCR-05 の答えに頼るが、premises に QCR-05 がない
+status: open
+basis: inferred
+basis_note: MOD-39 の premises、decisions、basis_note、報告の MOD-39 の振る舞いと「データ」の fare_tables の行、QCR-05、DEC-09 の premises は入力
+premises: []
+raised_by: design-review
+raised_in: reviews/4-detailed-design-ELM-03.md
+to: high-level-design-to-detailed-design
+targets: [MOD-39]
+severity: minor
+evidence: MOD-39 の版の決まりは F0 ≥ 500 で、報告はそれを「模擬の運賃表の最も安い料金は CON-08 の 500 円以上、QCR-05 の答え」とし、「データ」の fare_tables の check も QCR-05 の答えを挙げる。QCR-05 は回答済みで品質チェーンがまだ当てていないが、MOD-39 の premises は QCR-09 だけで、decisions（DEC-17、DEC-38）にも QCR-05 を premises に持つ DEC-09 がなく、basis_note も QCR-05 を引かない。QCR-05 が当てられたとき、変わりうる MOD-39 が見つからない。fare_tables の行の「決まりの形は質問 1 の答えで変わりうる」も、質問 1 に答えのある今の状態と合わない
+suggestion: MOD-39 の premises に QCR-05 を加えて basis_note でその答えを引き、fare_tables の行の文を今の状態に直す
+resolution: null

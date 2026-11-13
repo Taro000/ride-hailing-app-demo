@@ -1,0 +1,14 @@
+id: FND-66
+title: MOD-56 の判断表 C に、解除の済んだ押さえの精算を済ませる行と押さえの試みが分からない依頼の行がなく、精算が済むとする行が開いた試みの残る依頼にも当たる
+status: open
+basis: inferred
+basis_note: MOD-56 の判断表 C、followUp の post、不変条件、報告の「データ」の rides の moneySettled の不変条件、DAT-07 の consistency、MOD-45 の不変条件は入力。行の数え方は推定
+premises: []
+raised_by: design-review
+raised_in: reviews/4-detailed-design-ELM-03.md
+to: high-level-design-to-detailed-design
+targets: [MOD-56]
+severity: minor
+evidence: 判断表 C は上から当てる。(1) 押さえの済んだ cancelled_free、expired、not_accepted の依頼で、目的 ended の解除が succeeded になった組の行がない（「解除がないか、最後が not_processed」にも、押さえていない行にも、unknown の行にも当たらない）ので、ふだんの無料の終わりの精算がどの行でも済まない。(2) not_accepted の依頼の押さえの試み（hold）と、終わった依頼に残る押さえ直しの試み（rehold_*）が unknown の組の行がない（Again の行は料金と解除だけ）。(3) cancelled_fee と no_show の「料金 succeeded → 精算が済む」、completed の「替わった前の押さえの解除がどれも succeeded か refused → 精算が済む」ほかが Again の行より上にあり、ほかの解除や押さえの試みが unknown でも精算を済ませる。followUp の post（開いた試みがあれば Again）、「データ」の不変条件（開いた試みがないことを同じ取引で読んでから money_settled を真にする）、DAT-07 の consistency（結果が分からないお金の試みが残る間は moneySettled は偽）と合わない。お金は MOD-42 の確かめと MOD-56 の applyResult（found_late の解除）で動き続けるので、崩れるのは moneySettled と後の処理の終わり方
+suggestion: 判断表 C を、試みを作る行と、開いた試み（押さえ、押さえ直し、料金、解除）が残る間の Again の行を先に置き、最後の一行（開いた試みがなく、要る解除と料金が済んだか拒否で終わった → 精算が済む）で精算を決める形にし、解除の済んだ押さえと、押さえの試みが分からない依頼の組をその中に入れる
+resolution: null
