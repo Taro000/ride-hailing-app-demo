@@ -1,0 +1,14 @@
+id: FND-47
+title: MOD-02 の読み込み中に、一覧の読みが 429 か知らない符号の 4xx で答えたときの移り先がない
+status: open
+basis: inferred
+basis_note: null
+premises: []
+raised_by: design-review
+raised_in: reviews/4-detailed-design-ELM-02.md
+to: high-level-design-to-detailed-design
+targets: [MOD-02]
+severity: minor
+evidence: MOD-02 の状態遷移図は、読み込み中の一覧の読み（GET /v1/console/rides/{rideId}/refunds を MOD-01 の read で）の答えを、答えた、答えがないか 5xx、404、403、401 で分けるが、DEC-35 の共通の符号の 429 TOO_MANY_REQUESTS（read は retryAfterSeconds つきの error を返す）と、DEC-41 で状態の組で扱う知らない符号の 4xx には移り先がない。状態ごとの出来事の表も一覧の答えを挙げない
+suggestion: 読み込み中に、429 は示された時間の後に読み直す（読めないに移る）こと、ほかの 4xx は状態の組の文を示して読めないに移ることを加える
+resolution: null

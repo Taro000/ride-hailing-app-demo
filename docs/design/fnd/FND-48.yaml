@@ -1,0 +1,14 @@
+id: FND-48
+title: 報告の割り当てと MOD-01、MOD-09 の functions が、FR-49 で食い違う
+status: open
+basis: inferred
+basis_note: null
+premises: []
+raised_by: design-review
+raised_in: reviews/4-detailed-design-ELM-02.md
+to: high-level-design-to-detailed-design
+targets: [MOD-01, MOD-09]
+severity: minor
+evidence: 報告の「割り当て」は FR-49 の 1 を MOD-10 と MOD-01（403 NOT_ALLOWED を refused で返す）に割り当てるが、MOD-01 の functions に FR-49 はない。MOD-09 の functions は FR-49 を持つが、「割り当て」は FR-49 のどの基準も MOD-09 に割り当てない
+suggestion: どちらかに合わせる。MOD-01 の行を外して MOD-09（使える機能を読む me）を FR-49 の 1 に挙げるか、MOD-01 の functions に FR-49 を加えて MOD-09 から外す
+resolution: null
