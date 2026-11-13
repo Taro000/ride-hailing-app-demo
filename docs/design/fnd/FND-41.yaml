@@ -1,0 +1,14 @@
+id: FND-41
+title: IFC-21 の push の出来事が ELM-02 のサービスワーカーにも示した時刻をためて送らせるが、それを使う機能も受ける記録もない
+status: open
+basis: inferred
+basis_note: null
+premises: []
+raised_by: high-level-design-to-detailed-design
+raised_in: 4-detailed-design/ELM-02.md
+to: architecture-to-high-level-design
+targets: [IFC-21]
+severity: minor
+evidence: IFC-21 の「push の出来事」は、ELM-01 と ELM-02 のサービスワーカーが知らせを示し、示した時刻と出来事の ID をためて後で ELM-03 に送る（IFC-10、FR-53）とする。FR-53 は乗客とドライバーの画面に示した時刻の記録で、ELM-02 の functions にも、ELM-02 が提供する IFC-24、IFC-25 の functions にもない。SLI-14 が数えるのも乗客とドライバーに示した変化（IFC-10 の出どころ）で、DAT-20 は依頼の経過の出来事（DAT-09）を届けた記録。担当者とエンジニアへの知らせ（anomaly.detected、complaint.received、refund.settled）を示した時刻は、どの機能、SLI、データの実体も使わず、NFR-38 も知らせが Web Push の偽物に届くまでを測る（POL-03）。ELM-02 のサービスワーカーにためさせると、ページと並んで動くサービスワーカーとの間に報告の待ち行列を持つことになる（POL-04 はサービスワーカーに、知らせの受け取りと押したときの扱いだけをさせる）うえ、送っても ELM-03 にそれを受ける記録がない。第 4 段階の ELM-02 の実行は、MOD-05 で知らせを示すことと押したときの扱いだけを行い、示した時刻をためていない
+suggestion: IFC-21 の push の出来事のうち、示した時刻をためて送る部分を ELM-01 のサービスワーカーに限る（ELM-02 のサービスワーカーは示して、押すと対応する画面を開くだけ）。ELM-02 の示した時刻が要るなら、それを使う機能か SLI と、受ける記録を示す
+resolution: null

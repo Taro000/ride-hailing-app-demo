@@ -1,0 +1,93 @@
+id: MOD-01
+title: ELM-03 の呼び出し
+status: active
+basis: assumed
+basis_note: 状態を変える利用者の一回の操作ごとに冪等キーを作り、答えを受けるまで同じキーで送り直すことは DEC-08 と DEC-42、たどる ID と送り直しの別（X-Resend）は DEC-43、誤りの形と状態の組ごとの扱いは DEC-35、知らない符号と項目を状態の組で扱うことは DEC-41、端末の時刻に添える往復の時間は DEC-37、本人の確かめの印をクッキーで自動で付けることは DEC-40 で、どれも入力。生成した型と openapi-fetch で呼ぶことと、外への呼び出しを src/platform/ にだけ置くことは POL-01 と POL-02（入力）。予期しない答えを原因をつけて投げることは POL-04（入力）。読むだけの操作を送り直さないこと、同じ内容の定まっていない操作を一つにすること、返金の操作をタブの保存に持ってタブを読み直した後も同じキーで続けること、401 の前の送りの答えを呼ぶ側に渡すことは推定。タイムアウト、自動の送り直しの回数と間合い、409 OPERATION_IN_PROGRESS の後の送り直しの上限、持つ長さと数は HND-18 を決めたもので、DAS-16 による暫定の決定。IFC-13 の呼び出しは IFC-13 の timing の 15 秒をそのまま使い、ここでは決めない。流れ（IFC-11）はここを通らない（MOD-03）
+premises: [DAS-16, OPF-02, OPF-03]
+component: ELM-02
+name: ELM-03 の呼び出し
+depth: full
+depth_reason: ELM-02 から ELM-03 の状態を変えるどの呼び出しもここが送り、答えを失った操作を同じ冪等キーで送り直して一つの結果に定める（結果が分からない状態を確かめる）。担当者が認めた返金（お金を動かす操作）の送り直しもここを通る
+responsibility: ELM-03 の操作を呼び、状態を変える利用者の一回の操作を、答えを受けるまで同じ冪等キーで送って一つの結果に定める
+visibility: internal
+interface:
+  - operation: "useAccount(accountId: AccountId or none) -> none"
+    pre: MOD-09 だけが、サインインして GET /v1/me で分かったアカウントか、使い終えたときの none を渡す
+    post: 渡したアカウントが前と違えば（none を含む）、前のアカウントの操作をメモリとタブの保存からすべて捨て、前のアカウントの要求の答えが後から届いても捨てる。前と同じなら何も捨てない
+    errors: []
+  - operation: "read(operation: ReadOperationName, input: Input) -> ReadResult"
+    pre: operation は読むだけの操作（GET と、DEC-42 が冪等キーを求めない探すだけの POST …/search）
+    post: 新しいたどる ID を X-Trace-Id に付けて一つの要求を送り、タイムアウトのうちに答えがなければ noAnswer を返す。タイムアウトは IFC-13 の操作なら IFC-13 の 15 秒、ほかは parameters の値。2xx なら ok と本文を、ほかの答えは DEC-35 の本文を ApiError にして error を返し、401 なら onNotSignedIn の聞き手にも知らせる。送り直さない（読み直すかどうかは呼ぶ側が決める）
+    errors:
+      - "UnexpectedAnswer: 答えの本文が生成した型に合わない。原因をつけて投げ、画面の境（MOD-10）が受ける"
+  - operation: "begin(operation: ChangeOperationName, input: Input, keepAcrossReload: boolean) -> Operation"
+    pre: 利用者の一回の操作につき一度だけ呼ぶ（同じ操作を送り直すときは send を呼び、begin を呼び直さない）。keepAcrossReload を真にする操作の本文は個人の情報を持たない
+    post: 同じ操作の名前、経路の値、本文の、まだ定まっていない操作がこのタブにあれば、それを返す。なければ新しい操作を作り、DEC-42 が冪等キーを求める操作には新しい冪等キーを、どの操作にも新しいたどる ID を割り当て、useAccount のアカウントを写す。keepAcrossReload が真なら、送る前にタブの保存に書く
+    errors:
+      - "NotSignedIn: useAccount にアカウントがない。サインインを求める"
+      - "TooManyOperations: 定まっていない操作が上限にある。呼ぶ側は先の操作を定めるよう示す"
+  - operation: "send(operation: Operation) -> Outcome"
+    pre: operation は begin が返したもので、まだ定まっておらず捨ててもいない
+    post: 状態遷移図と判断表のとおりに送り、Outcome を返す。done は 2xx（202 の PENDING を含む）、refused は 401 と 409 OPERATION_IN_PROGRESS と 429 のほかの 4xx、failed は 5xx と 429、notSignedIn は 401（その前の送りの答えが、なかった、失敗の答えだった、どちらでもない、を添える）、unanswered は自動の送り直しを使い切っても答えがないとき。一つの操作のどの要求も、同じ冪等キー（キーを求める操作）と同じたどる ID を持ち、送り直しには X-Resend を前の要求の答えに合わせて付ける（DEC-43）。done と refused で操作は定まり、タブの保存から消す。failed、unanswered、notSignedIn では操作を持ち続け、呼ぶ側の send で同じキーで送る。送っている操作の send は新しい要求を出さず、同じ Outcome を待たせる
+    errors:
+      - "UnexpectedAnswer: 答えの本文が生成した型に合わない。原因をつけて投げ、操作は失敗の答えを受けたものとして持つ"
+  - operation: "kept() -> [Operation]"
+    pre: null
+    post: このタブの保存にある、useAccount のアカウントの、まだ定まっていない keepAcrossReload の操作を、最後に受けた答えの種類（答えがない、失敗の答え、401 だけ）とともに返す。送っている途中か待っている途中でタブを読み直した操作は、答えがないものとして返す。最初に送ってから持つ長さを過ぎたものは捨てて返さない
+    errors: []
+  - operation: "discard(operation: Operation) -> none"
+    pre: 呼ぶ側は、答えを受けていない操作を捨てた後に、同じ利用者の操作を新しいキーで送らない（同じ操作が二度効きうる）
+    post: 操作をメモリとタブの保存から消す。その後に届いたその操作の答えは捨てる
+    errors: []
+  - operation: "onNotSignedIn(listener: () -> none) -> Unsubscribe"
+    pre: null
+    post: どの要求が 401 NOT_SIGNED_IN を受けても聞き手に知らせる
+    errors: []
+  - operation: "lastRoundTripMs() -> integer or none"
+    pre: null
+    post: 直前に答えを受けた ELM-03 への要求の往復の時間を返す（DEC-37 の報告に添える）。まだ答えを受けていなければ none
+    errors: []
+invariants:
+  - 一つの操作のどの要求も、同じ冪等キー（DEC-42 がキーを求める操作）と同じたどる ID を持つ
+  - 定まっていない操作の冪等キーは、操作が定まるか、捨てられるか、持つ長さを過ぎるか、アカウントが変わるまで変わらず、同じ内容の定まっていない操作に二つ目のキーを作らない
+  - 答えを受けていない送りがある操作を、done とも refused とも返さない
+  - タブの保存には keepAcrossReload の操作だけを、アカウントの ID、操作の名前、経路の値、本文、冪等キー、たどる ID、最初に送った時刻だけで書き、個人の情報を書かない
+  - 前のアカウントの操作を、ほかのアカウントのサインインの後に送らない
+depends_on: [MOD-07]
+functions: [FR-40, FR-48]
+realizes: []
+drivers: [DRV-24, DRV-28]
+decisions: [DEC-08, DEC-33, DEC-35, DEC-36, DEC-37, DEC-40, DEC-41, DEC-42, DEC-43, DEC-46]
+behaviour: "報告書の節: MOD-01 ELM-03 の呼び出し"
+verification:
+  - checks: 状態遷移図のどの遷移も（2xx、4xx、401、409 OPERATION_IN_PROGRESS、429、5xx、タイムアウト、つながらない、持つ長さを過ぎる、アカウントが変わる）
+    how: 単体の層（Vitest の Browser Mode、Chromium）。テストが渡す fetch の偽物で答えを落とし、遅らせ、各状態の組を返し、時計の偽物（MOD-07）で時間を進める
+  - checks: 判断表の各行の Outcome と、送り直しの冪等キー、たどる ID、X-Resend の値（DEC-42、DEC-43）
+    how: 単体の層。fetch の偽物が受けた要求のヘッダーを比べる。判断表から作る
+  - checks: 同じ内容の定まっていない操作の二度目の begin が同じ操作を返し、送っている操作の send が新しい要求を出さない（二度押し）
+    how: 単体の層
+  - checks: keepAcrossReload の操作がタブを読み直した後も同じキーで続き、ほかのアカウントでは返らず、持つ長さを過ぎると捨てられ、タブの保存に決めた項目のほかを書かない
+    how: 単体の層（タブの保存を残したままモジュールを作り直し、保存の中身を調べる）
+  - checks: DEC-35 の誤りの本文を ApiError に変え、知らない符号と項目を状態の組で扱う（DEC-41）。答えが生成した型に合わなければ投げる
+    how: 単体の層
+  - checks: 401 で聞き手に知らせ、その前の送りの答えを正しく添える
+    how: 単体の層
+  - checks: 答えを失った返金が、送り直しで一度だけ行われる（FR-40 の 3、QR-45）
+    how: 端から端の層（試験の環境の偽物の設定）。報告書の「確かめ方」の返金の場面
+parameters:
+  - name: ELM-03 の操作を待つタイムアウト（IFC-01、IFC-10、IFC-12、IFC-14）
+    value: 15 秒
+    basis: HND-18 の枠（DEC-46。ELM-03 の答えの期限と通信の余裕 5 秒の和より長い）。ELM-03 の期限（HND-19）はまだ決まっていないため、期限を 10 秒より短くすることを第 4 段階の ELM-03 の実行に求める値として選び、返金の呼び出しの 15 秒（IFC-13）とそろえた暫定の値（DAS-16）
+  - name: 答えがないときの自動の送り直し
+    value: 3 回まで。前の要求をやめてから 1 秒、2 秒、4 秒置く
+    basis: 担当者のコンピューターの短いつながりの切れを越え、一つの操作を自動で待つのを最悪 67 秒に収める暫定の値（DAS-16）。その後は画面が答えのないことを示し、担当者が同じキーで送り直す
+  - name: 409 OPERATION_IN_PROGRESS の後の送り直しの上限
+    value: 20 回（間は ELM-03 が返す Retry-After。DEC-42 では 1 秒）
+    basis: 返金の答えの期限 8.8 秒（IFC-13）を Retry-After 1 秒で割った 8.8 回より多く、期限の後に ELM-03 が試みから答えるまで待てる暫定の値（DAS-16）
+  - name: 答えのない操作をタブの保存に持つ長さ
+    value: 最初に送ってから 23 時間
+    basis: ELM-03 が冪等キーと最初の答えを持つ 24 時間（DEC-42）より 1 時間短くし、ELM-03 がキーを忘れた後に同じキーで送って新しい操作になることを避ける暫定の値（DAS-16）
+  - name: 定まっていない操作の数の上限
+    value: メモリに 50、タブの保存に 20
+    basis: 担当者が一度に扱う操作は数件で（OPF-02、OPF-03）、タブの保存の大きさの限りに遠い暫定の値（DAS-16）
+as_is: new
