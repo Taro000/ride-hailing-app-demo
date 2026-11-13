@@ -564,7 +564,7 @@ kept operation dropped before ELM-03 forgets its key: 23 h < 24 h: True (margin 
 | FND-47 | MOD-02 の読み込み中に、一覧の読みが 429 か知らない符号の 4xx で答えたときの移り先がない | 軽微 | design-review | high-level-design-to-detailed-design | 受け入れ | MOD-02 |
 | FND-48 | 報告の割り当てと MOD-01、MOD-09 の functions が、FR-49 で食い違う | 軽微 | design-review | high-level-design-to-detailed-design | 受け入れ | MOD-09 |
 | FND-50 | 冪等キーの範囲はアカウントを含むが、セッションのクッキーは同じ origin のどのタブと二つの Web アプリにも共通で、端末は一つの操作のどの要求も同じアカウントで送ることを確かめられても保てない | 軽微 | high-level-design-to-detailed-design | architecture-to-high-level-design | 未解決 | MOD-01 |
-| FND-51 | IFC-01 の GET /v1/me が返すものに、本人のアカウントの ID がない | 軽微 | high-level-design-to-detailed-design | architecture-to-high-level-design | 未解決 | MOD-01 |
+| FND-51 | IFC-01 の GET /v1/me が返すものに、本人のアカウントの ID がない | 軽微 | high-level-design-to-detailed-design | architecture-to-high-level-design | 未解決 | MOD-01、MOD-37 |
 | FND-52 | MOD-01 の kept() が、最初の変える要求の答えを待っている返金の操作を evidence が notDone のため捨て、画面を開き直すと新しい返金を受け付ける | 中 | design-review | high-level-design-to-detailed-design | 受け入れ | MOD-01、MOD-02 |
 | FND-53 | MOD-02 の判断表 C に、evidence が unanswered の操作で送る前の確かめが 503 か 4xx で答えた failed の行がない | 軽微 | design-review | high-level-design-to-detailed-design | 受け入れ | MOD-01、MOD-02 |
 | FND-54 | 報告の割り当ての FR-50 の 1 が MOD-01 を挙げるが、MOD-01 の functions に FR-50 がない | 軽微 | design-review | high-level-design-to-detailed-design | 受け入れ | MOD-01 |
@@ -597,7 +597,7 @@ kept operation dropped before ELM-03 forgets its key: 23 h < 24 h: True (margin 
 | QAS-54 | 状態の変化を相手の画面に示した時刻の記録（FRP-11）を今期作る | 暫定の決定 | 低 | 低 | DAT-20、DEC-46、DRV-03、DRV-26、IFC-10、IFC-11、IFC-21 |
 | DAS-11 | 端末、通信、自身の処理の時間と、流れ、位置、着く見込みの間隔を暫定に採る | 暫定の決定 | 中 | 低 | DEC-46、IFC-05、IFC-11、IFC-19 |
 | DAS-15 | 流れで送った変化を Web Push でも知らせるまでの待ちと、Web Push を送る呼び出しと配信の時間を暫定に採る | 暫定の決定 | 中 | 低 | DEC-46、IFC-11、IFC-21 |
-| DAS-16 | ELM-02 の呼び出しのタイムアウトと、答えのない操作の送り直し、持つ長さと数を暫定に採る | 暫定の決定 | 中 | 低 | MOD-01 |
+| DAS-16 | ELM-02 の呼び出しのタイムアウトと、答えのない操作の送り直し、持つ長さと数を暫定に採る | 暫定の決定 | 中 | 低 | MOD-01、MOD-20 |
 <!-- /generated -->
 
 この段階が書いた仮定は DAS-16（暫定の決定、中、低）。送る前の確かめを足しても、kept() が送っている途中の操作を返すようにしても、値を変えても同じ冪等キーで送り直す決まりと操作の定まり方は変わらず、運用の中で直せるので、評価し直して中、低のまま。MOD-01 の持つ長さ 23 時間がその 24 時間に頼る第 3 段階の DAS-13（DEC-42 の前提で、表にない）は、このコンポーネントのレビューが中、低に評価し直したとおりで、MOD-01 が 23 時間で捨てるため ELM-02 の返金は 24 時間を過ぎて送られない。DAS-11 と DAS-15 は第 3 段階のもので、MOD-03 が IFC-11 の流れの値を、MOD-05 が IFC-21 の中身を使うため、ELM-02 にも届く。値が変わっても ELM-02 は IFC の値に従うだけなので、評価し直して中、低のまま。QAS-54 は IFC-10、IFC-11、IFC-21 の前提で、ELM-02 は示した時刻の報告を送らない（IFC-10、IFC-21）ため、このコンポーネントの評価は低、低。QAS-25 は IFC-11 の前提（T_dispatch_propagation）で、ELM-02 は IFC-11 の流れの値に従うだけなので、このコンポーネントの評価は低、低。ELM-02 の要素と DEC-03、DEC-20 が依存する DAS-04（主なブラウザの入ったコンピューター）と DAS-05（エンジニアは異常の知らせを Web Push と一覧で受ける）も評価し直し、中、低と低、低のまま（DAS-04 のブラウザはどれもタブの間の知らせを持つ）。どの仮定にも答えは要らない。訂正があれば、回答と同じように次の実行で反映する。

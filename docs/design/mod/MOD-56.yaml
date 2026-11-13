@@ -1,0 +1,69 @@
+id: MOD-56
+title: 依頼のお金
+status: active
+basis: inferred
+basis_note: 依頼ごとに確定額を後で確定する取引で押さえ、確定額か支払い方法が変わったら新しい取引で押さえ直してから前の取引を取り消し、決済はその時の押さえの全額の確定、料金は押さえの一部の確定、無料の終わりは取り消しで解くことは DEC-09、押さえ、押さえ直し、決済の答えと、結果が分からない決済に同じ試みを確かめた結果を答えること、処理されなかった決済をドライバーのやり直しで新しい試みにし、拒否の後は乗客が押さえ直したときだけ新しい試みを作ることは IFC-03 と DEC-45、料金の請求と押さえを解くことは期限の処理が送り、処理されなかったら確かめと同じ間隔で新しい試みを作ることは IFC-03、IFC-17、DEC-45、キャンセル料と不在の料金は CON-08 の 500 円で、確定額はそれを下回らないことは CON-08 と DEC-09（QCR-05 の答え）、一つの依頼の押さえ、押さえ直し、確定、解除の順は IFC-17 の ordering、依頼ごとに押さえた額、請求した額とその種類、解いた額を残すことは FR-54 の 10 と DAT-11（SLI-11）（どれも入力）。IFC-17 の ordering の「前の試み」を、同じ押さえの取引にかかわる試みとして読み、押さえ直しの後の前の押さえの解除は今の押さえの決済を待たせないこと（DEC-09 の順を保つ）は推定。決済の結果が分からない依頼の支払い方法の変更は、IFC-03 に答えがないため RIDE_ALREADY_ARRIVED で受け付けず、FND-57 で第 3 段階に出した
+premises: [CON-08]
+component: ELM-03
+name: 依頼のお金
+depth: full
+depth_reason: 依頼の押さえ、押さえ直し、決済、キャンセル料と不在の料金、押さえを解くことを EXT-01 の試みで動かし（お金を動かす）、決済の結果が分からないときは同じ試みを確かめて答える（結果が分からない状態を確かめる）
+responsibility: 依頼のお金を、確定額と決まりの料金どおりに一度だけ動かす
+visibility: public
+interface:
+  - operation: "hold(tx: Tx, ride: RideRef, amount: Money, method: PaymentMethodRef) -> Attempt"
+    pre: 呼ぶのは MOD-58 だけで、依頼を holding で書く取引 A の中
+    post: 押さえの試み（hold、乗客の支払い方法、確定額）を MOD-42 で作る
+    errors: []
+  - operation: "pay(actor: Actor, rideId: RideId, key: IdempotencyKey) -> PaymentAnswer"
+    pre: null
+    post: POST /v1/rides/{rideId}/payment で、判断表 A で答え、新しい試みを作るなら取引 A で決済の試み（capture_payment、今の押さえの全額）と冪等キー（MOD-26）を書いて MOD-42 の sendWaiting で送る。済めば completed、拒否なら payment_declined、処理されなかったなら到着したまま、分からなければ payment_pending と 202 にし、ride.charge_settled を乗客とドライバーに、依頼の経過の「決済が済んだ（その額）」と乗客に示した支払った額を書く
+    errors: ["PAYMENT_DECLINED: 402 と reason", "PAYMENT_METHOD_CHANGE_REQUIRED: 409", "PAYMENT_SERVICE_UNAVAILABLE: 503（何も請求していない。同じキーで送り直さない）", "PAYMENT_PENDING: 202", "RIDE_NOT_ARRIVED: 409", "RIDE_ALREADY_ENDED: 409", "NOT_FOUND: 404", "OPERATION_IN_PROGRESS: 409（MOD-26）"]
+  - operation: "changeMethod(actor: Actor, rideId: RideId, key: IdempotencyKey) -> MethodChanged"
+    pre: null
+    post: PUT /v1/rides/{rideId}/payment-method で、判断表 B で答え、押さえ直すなら取引 A で新しい支払い方法（MOD-43 の usableMethod）の押さえの試み（rehold_method）を書いて送り、済めば同じ取引で依頼の支払い方法を変え、前の押さえを解く試みを作り（sendLater）、拒否の後の依頼なら到着したままに戻して ride.payment_method_changed をドライバーに書く。済まなければ何も変えない
+    errors: ["PAYMENT_DECLINED: 402 と reason", "REHOLD_UNCONFIRMED: 503", "PAYMENT_SERVICE_UNAVAILABLE: 503", "PAYMENT_METHOD_REQUIRED: 409（使える支払い方法がない）", "RIDE_ALREADY_ARRIVED: 409（決済の結果を確かめている依頼。FND-57）", "RIDE_ALREADY_ENDED: 409", "NOT_FOUND: 404"]
+  - operation: "rehold(tx: Tx, rideId: RideId, amount: Money, purpose: ReholdPurpose) -> Attempt"
+    pre: 呼ぶのは MOD-59 だけで、降りる場所の変更を reholding にする取引 A の中
+    post: 今の支払い方法で新しい確定額の押さえの試み（rehold_destination）を作る
+    errors: []
+  - operation: "followUp(rideId: RideId, now: Instant) -> Done | Again(at)"
+    pre: MOD-31 の ride_money の受け持ち
+    post: 判断表 C で、終わった依頼に要る押さえの解除と料金の請求の試みを作って送り（sendLater）、どれも済むか拒否で終われば moneySettled を真にし、ride.charge_settled（料金）を乗客に書く。開いた試みがあれば Again
+    errors: []
+  - operation: "applyResult(tx: Tx, attempt: Attempt, result: AttemptResult) -> none; nextAttempt(tx: Tx, attempt: Attempt) -> NewAttempt or none"
+    pre: MOD-42 の持ち主として（hold、rehold_method、capture_payment、capture_fee、release）
+    post: 判断表 C の行のとおり、試みの結果と同じ取引で依頼の状態（MOD-45 の settleHold と applyMoney）、出来事、届け、moneySettled を書き、処理されなかった料金と解除の次の試みを返す（決済は返さない。ドライバーのやり直しを待つ）
+    errors: []
+  - operation: "moneyOf(rideId: RideId) -> RideMoney"
+    pre: null
+    post: 押さえた額、請求した額とその種類、解いた額、支払われた額（返金できる額のもと）、決済の状態（今の状態の示し方、MOD-60、MOD-61、MOD-57）
+    errors: []
+invariants:
+  - 一つの乗車に済んだ決済は一つ。一つの依頼に済んだキャンセル料か不在の料金は一つで、許諾の前に終わった依頼には請求しない
+  - 押さえ直しは新しい押さえが済んでから前の押さえを解き、済まなければ依頼を変えない
+  - 請求する額は確定額か CON-08 の料金で、その時の押さえの額を超えない
+  - 要る押さえの解除と料金の請求が済むか拒否で終わるまで、依頼の moneySettled は偽
+depends_on: [MOD-21, MOD-25, MOD-26, MOD-28, MOD-29, MOD-31, MOD-33, MOD-42, MOD-43, MOD-45]
+functions: [FR-07, FR-26, FR-29, FR-30, FR-31, FR-45, FR-46, FR-54]
+realizes:
+  - IFC-03 POST /v1/rides/{rideId}/payment
+  - IFC-03 PUT /v1/rides/{rideId}/payment-method
+  - IFC-11 ride.charge_settled
+  - IFC-11 ride.payment_method_changed
+drivers: [DRV-01, DRV-07, DRV-27, DRV-32]
+decisions: [DEC-09, DEC-10, DEC-38, DEC-45]
+behaviour: "報告書の節: MOD-56 依頼のお金"
+verification:
+  - checks: 判断表 A、B、C の行ごと（NFR-25 の押さえた額と解いた額、確定額、請求の回数と種類、許諾の前と後の取り消しの境目（届け直している間を含む）、結び付け）
+    how: 単体の層（MOD-42 と MOD-45 の偽物。NFR-25 の出どころ）
+  - checks: 決済の結果が分からず、偽物が後で済んでいたと見せると ride.charge_settled で示し、やり直しが同じ試みを確かめる。済んだ決済の新しいキーのやり直しが最初の結果を答える（FR-29 の 5、FR-30 の 1、2）
+    how: 結合の層（EXT-01 の偽物、時計の偽物）
+  - checks: 拒否の後に乗客が支払い方法を変えて押さえ直し、ドライバーがやり直す。処理されなかった決済をドライバーがすぐやり直す（FR-29 の 4、DEC-45）
+    how: 結合の層と端から端の層
+  - checks: キャンセル料と不在の料金を一度だけ、押さえから請求して残りを解き、処理されなかった解除と料金を新しい試みで続ける（FR-54 の 6〜9）
+    how: 結合の層
+  - checks: SLI-11 の項目（押さえた額、示した額、請求した額、解いた額、数える日）がそろう
+    how: 結合の層
+parameters: []
+as_is: new

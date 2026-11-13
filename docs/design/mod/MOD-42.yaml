@@ -1,0 +1,67 @@
+id: MOD-42
+title: お金の操作の試み
+status: active
+basis: inferred
+basis_note: お金の操作の試みごとに先に記録を書き、その試みだけを覆うキーで送り、答えがなければ結果が分からない状態として持って同じキーで送り直すか読み直して確かめ、はっきり拒否された試みのやり直しは新しいキーの新しい試みにすることは DEC-10、EXT-01 の結果をこのシステムから読みに行くことは DEC-11、試みの状態と、送る前の取引で結果が分からないとして nextCheckAt とともに書き、答えを受けた後の取引で結果と持ち主の状態を一緒に書き、呼び出しをまたぐ取引を作らないこと、一つの乗車の決済、一つの依頼の料金、一つの返金に済んだか結果が分からない試みを一つまでにすること、処理されなかった試みは数に入らず、利用者が待たない押さえの解除と料金の請求は期限の処理が新しい試みを作ることは DAT-11 と DEC-45、利用者が待つ試みの一回 4 秒、0.5 秒置いて同じキーで一度の送り直しか読み直し、最初に送ってから 8.5 秒か答えの期限から結果の取引の 0.1 秒を引いた時刻の早い方で切ること、確かめの間隔（30 秒、1、2、4、8 分、以後 10 分ごと）、同じキーの送り直しは最初に送ってから 23 時間のうちだけで、500 の後と 23 時間の後は読み出しで確かめること、インスタンスが 0 の間は日々の処理が確かめることは IFC-17（DAS-10）と DEC-18（どれも入力）。持ち主を種類ごとに起動のときに登録させることと、判断表 B と C の行の分け方は推定。確定と解除の試みで、500 の後の読み出しが取引の変わっていないことを示したときは、DEC-45 のとおり結果が分からないまま確かめ続けて異常にし、そこから出る道は FND-55 で第 3 段階に出した
+premises: []
+component: ELM-03
+name: お金の操作の試み
+depth: full
+depth_reason: 結果が分からないお金の操作の試みを、同じ試みのまま確かめ続けて一つの結果に定め、利用者が待つ試みの送り直しと待ちを持つ（お金を動かし、結果が分からない状態を確かめる）。一つの操作に済んだか結果が分からない試みを一つまでにする決まりを、同時に試みを作る仕事の間で保つ（同時に動く仕事と状態を分ける）
+responsibility: お金の操作の試みを書いてから送り、結果が分かるまで同じ試みのまま確かめて、持ち主に結果を渡す
+visibility: internal
+interface:
+  - operation: "create(tx: Tx, attempt: NewAttempt) -> Attempt"
+    pre: 持ち主は、その操作のそれまでの試みがどれも refused か not_processed で終わっていることを同じ取引で読んである
+    post: 状態 unknown、試みごとの新しいキー、操作の鍵（operationKey）、額、nextCheckAt（作った時刻と待ち 8.5 秒と 30 秒の和）で書き、確かめの処理（attempt_check）を MOD-31 に書く
+    errors: ["OneOpenAttemptAlready: その操作に unknown か succeeded の試みがすでにある（一意の決まりで退けた。呼ぶ側は取引を止めて今の試みを読む）"]
+  - operation: "sendWaiting(attemptId: AttemptId, answerDueAt: Instant) -> AttemptOutcome"
+    pre: create の取引が確定した後に、利用者が待つ試み（hold、rehold_destination、rehold_method、capture_payment、refund、setup_intent、setup_result）にだけ呼ぶ
+    post: 判断表 B で送り、待ちのうちに分かれば結果の取引で試みの状態と持ち主の applyResult を一緒に書いて settled(結果) を、分からなければ試みを unknown のまま stillUnknown を返す（持ち主の applyResult は unknown の答えを書く）。firstSentAt を書く
+    errors: []
+  - operation: "sendLater(tx: Tx, attemptId: AttemptId) -> none"
+    pre: 利用者が待たない試み（capture_fee、release）
+    post: 確かめの処理をすぐの期限で書き直し、期限の来た処理が初めて送る
+    errors: []
+  - operation: "check(attemptId: AttemptId, now: Instant) -> AttemptOutcome"
+    pre: 呼ぶのは MOD-31 の attempt_check の受け持ちと expedite だけ
+    post: 判断表 C で確かめ、分かれば結果の取引で試みと持ち主の applyResult を書き、not_processed の利用者が待たない試みは同じ取引で持ち主の nextAttempt が返す新しい試みを作る。分からなければ nextCheckAt を IFC-17 の次の間隔にして書く
+    errors: []
+  - operation: "expedite(attemptId: AttemptId) -> none"
+    pre: null
+    post: 確かめの処理の期限を今にする（202 で答えたお金の操作の送り直し、DEC-42）
+    errors: []
+  - operation: "registerOwner(kind: AttemptKind, owner: AttemptOwner) -> none"
+    pre: 起動のときだけ。どの種類にも持ち主は一つ
+    post: 持ち主（applyResult(tx, attempt, result)、nextAttempt(tx, attempt) -> NewAttempt or none）を持つ
+    errors: []
+  - operation: "attemptsOf(ref: AttemptRef) -> Attempt[]; read(attemptId: AttemptId) -> Attempt"
+    pre: null
+    post: 依頼、返金、登録ごとの試みを作った順に、一つの試みを返す（MOD-44、MOD-56、MOD-57、MOD-61、MOD-66）
+    errors: []
+invariants:
+  - 一つの操作の鍵（乗車の決済、依頼の料金、返金、押さえの解除、登録の確かめ）に、状態が unknown か succeeded の試みは一つまで
+  - 試みの状態は unknown から succeeded、refused、not_processed のどれかへ一度だけ移り、戻らない
+  - 試みのキーは試みごとに一つで変わらず、試みは消えない
+  - 試みの結果と持ち主の状態の変化は同じ取引で書かれる
+depends_on: [MOD-21, MOD-25, MOD-28, MOD-31, MOD-41]
+functions: [FR-29, FR-30, FR-39, FR-40, FR-42, FR-46, FR-54]
+realizes: []
+drivers: [DRV-02, DRV-07, DRV-27, DRV-32]
+decisions: [DEC-10, DEC-11, DEC-18, DEC-45]
+behaviour: "報告書の節: MOD-42 お金の操作の試み"
+verification:
+  - checks: 判断表 B と C の行ごと（待ちのうちの済んだ、拒否、処理されなかった、二回目で分かる、分からない、23 時間のうちとその後、500 の後、作る試みが見つからない）
+    how: 単体の層（MOD-41 の答えを与える、時計の偽物。NFR-25 の出どころの一つ）
+  - checks: 結果が分からない試みを、偽物が後で済んでいたと見せ、確かめで一度だけ持ち主に結び付く。済んだ押さえが受け付けなかった依頼のものなら解く試みができる
+    how: 結合の層（EXT-01 の偽物、時計の偽物）
+  - checks: 一つの操作に二つ目の開いた試みを作れない（重ねて作る）
+    how: 結合の層
+  - checks: 処理されなかった解除と料金の請求が、確かめと同じ間隔で新しい試みで続き、済むまで依頼のお金の精算が終わらない
+    how: 結合の層
+  - checks: 受けたインスタンスが試みを書いた後に止まっても、期限の処理が nextCheckAt に確かめて持ち主の状態を決める（DEC-45）
+    how: 運用の予行の層（NFR-16 の止めて再開する予行）
+  - checks: 照合が数える処理の数と試みの数（SLI-11、SLI-12。処理されなかった後の新しい試みは一つの処理）
+    how: 結合の層
+parameters: []
+as_is: new

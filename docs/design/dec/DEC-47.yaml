@@ -1,0 +1,29 @@
+id: DEC-47
+title: EXT-01 は公式の部品を使わず、payments のつなぎ口から Node.js の fetch で Stripe の HTTPS の API を直接呼ぶ
+status: active
+basis: inferred
+basis_note: HND-14 を決めたもの。二つの案（Stripe の公式の Node.js の部品か、HTTP を直接呼ぶか）は HND-14 の what にある。部品の自動のやり直しを使わず、やり直しを IFC-17 の一か所だけで行い、二回目の呼び出しを待ちの終わりまでの残りで切ることは IFC-17 と第 3 段階の報告の「タイムアウト」、外へ HTTP を呼ぶものを payments の機能の adapters/ に限ることは POL-02、API の版を Stripe-Version で固定することは DEC-41（どれも入力）。二つの案の比べ方と選び方は推定
+premises: [TC-10]
+stage: detailed-design
+question: ELM-03 の EXT-01 のつなぎ口（MOD-41）は、何で EXT-01 を呼び、自動のやり直し、時間切れ、冪等キーの付け方をどう設定するか
+addresses: [DRV-07, DRV-32, IFC-17]
+options:
+  - name: Stripe の公式の Node.js の部品（stripe）を、自動のやり直しを 0 にし、呼び出しごとに時間切れと冪等キーを渡して使う
+    effect: 要求の組み立て、応答の型、誤りの種類を部品が持つ
+    cost: 部品が持つ自動のやり直し、時間切れ、冪等キーの既定を一つずつ止め、部品の版を上げるたびに確かめ続ける。呼び出しごとに待ちの残りで切る道と、生の状態の組とヘッダー（Idempotent-Replayed）を読む道が、部品の版に頼る
+  - name: Node.js の fetch で Stripe の HTTPS の API を直接呼ぶ（form の本文、Stripe-Version、Idempotency-Key、AbortSignal による時間切れ）
+    effect: 自動のやり直しがなく、時間切れを呼び出しごとに待ちの残りで切れ、状態の組と誤りの type と code とヘッダーをそのまま MOD-41 の判断表に渡せる
+    cost: 使う 11 の操作（IFC-17）の要求の組み立てと応答の型を自分で書いて保つ
+chosen: Node.js の fetch で Stripe の HTTPS の API を直接呼ぶ
+rationale: IFC-17 は、やり直しを一か所だけで行い、二回目の呼び出しを待ちの終わりまでの残りで切り、答えを四つに分けることを求める（DEC-45）。直接呼べば、どれも部品の既定によらずに守れ、MOD-41 の判断表が状態の組と誤りの type と code を直に読める。使う操作は 11 と少なく、form の本文の組み立ても小さい
+rejected:
+  - {option: "Stripe の公式の Node.js の部品", reason: 自動のやり直しと時間切れの既定を止め続ける要があり、呼び出しごとの待ちの残りでの切り方と生の答えの読み方が部品の版に頼るため}
+gains: [やり直しと時間切れが IFC-17 の一か所だけで決まる, MOD-41 の判断表が EXT-01 の生の答えを読める, サーバーの依存が増えない]
+costs: [11 の操作の要求と応答の型を書いて保つ, Stripe の API の変化を部品の更新で受けられない（版は Stripe-Version で固定する、DEC-41）]
+sensitive_points: []
+trade_offs: []
+assumptions: [Stripe の API は form の本文で受け、JSON で答え、誤りの本文に type と code を持ち、同じキーの送り直しの答えに Idempotent-Replayed のヘッダーを付ける（Stripe の API の文書）]
+depends_on: [DEC-10, DEC-41, DEC-45]
+parameters: []
+debt: null
+as_is: new
