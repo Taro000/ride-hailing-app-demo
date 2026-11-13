@@ -1,8 +1,8 @@
 id: FND-09
 title: 想定の本番のデモの回の外では、日々の処理が動かなかったことを誰にも知らせない
 status: accepted
-basis: assumed
-basis_note: DEC-05、DEC-18、DEC-20 の決め方、DRV-24 の環境と測定量、NFR-39 と NFR-46 の確かめ方、DAS-05 の statement、第 2 段階の報告の CUJ-10 と DRV-24 の通し確認は入力。デモの回の外のインスタンスを 0 とすることは DAS-02 による暫定の決定で、この指摘はそれに頼る。回の外に日々の処理が起きられないか知らせる前に止まると、どの仕組みも知らせないことはこのレビューの推定
+basis: inferred
+basis_note: DEC-05、DEC-18、DEC-20 の決め方、DRV-24 の環境と測定量、NFR-39 と NFR-46 の確かめ方、DAS-05 の statement、第 2 段階の報告の CUJ-10 と DRV-24 の通し確認は入力。デモの回の外のインスタンスを 0 とすることは DAS-02 による決定（第 3 段階のレビューの質問 2 で確認済み）で、この指摘はそれに頼る。回の外に日々の処理が起きられないか知らせる前に止まると、どの仕組みも知らせないことはこのレビューの推定
 premises: [DAS-02]
 raised_by: design-review
 raised_in: reviews/2-architecture.md
