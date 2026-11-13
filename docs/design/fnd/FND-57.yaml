@@ -1,6 +1,6 @@
 id: FND-57
 title: IFC-03 の依頼の支払い方法の変更が、決済の結果が分からない依頼（payment_pending）への答えを持たない
-status: open
+status: accepted
 basis: inferred
 basis_note: IFC-03 の PUT …/payment-method の does と誤りの表、IFC-17 の ordering（一つの依頼の押さえ、押さえ直し、確定、解除は、前の試みが終わってから次を送る）、DAT-07 の状態は入力。答えの欠けは MOD-56 の判断表 B をこの段階が書いて分かった
 premises: []
@@ -11,4 +11,4 @@ targets: [IFC-03]
 severity: minor
 evidence: 乗客は進んでいる依頼の支払い方法を変えられ（IFC-03 の PUT …/payment-method）、決済が拒否された依頼ではそれで押さえ直してドライバーがやり直せる。決済の結果が分からない依頼（payment_pending）では、その決済の試みが終わるまで押さえ直しを送れない（IFC-17 の ordering）が、IFC-03 の誤りの表はそのときの符号と利用側のすることを挙げない。MOD-56 は今、到着を確認した後の変更として 409 RIDE_ALREADY_ARRIVED（IFC-03 の降りる場所の変更の符号）で答えている。決済の結果が分かれば、拒否なら乗客は改めて変えられ、済めば変える要がないので、何も失われないため軽微とした
 suggestion: IFC-03 の PUT …/payment-method の誤りの表に、決済の結果を確かめている依頼の支払い方法の変更（たとえば 409 PAYMENT_PENDING_CONFIRMATION、利用側は流れの ride.charge_settled を待ってから決め直す）を加えるか、RIDE_ALREADY_ARRIVED をこの場合にも使うと書く
-resolution: null
+resolution: 受け入れ。IFC-03 の誤りの表に、決済の試みが動いているか結果が分からない（payment_pending）依頼の支払い方法の変更への 409 PAYMENT_PENDING_CONFIRMATION（利用側は ride.charge_settled を待ってから決め直す。IFC-17 の ordering）を加え、PUT …/payment-method の does と IFC-22 の誤りの表にも書いた。RIDE_ALREADY_ARRIVED は降りる場所の変更の符号のまま

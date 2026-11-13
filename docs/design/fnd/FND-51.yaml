@@ -1,6 +1,6 @@
 id: FND-51
 title: IFC-01 の GET /v1/me が返すものに、本人のアカウントの ID がない
-status: open
+status: accepted
 basis: inferred
 basis_note: IFC-01 の中身は入力。ELM-02 がアカウントの ID でセッションのアカウントの変化を見分けることは第 4 段階の ELM-02 の推定
 premises: []
@@ -11,4 +11,4 @@ targets: [IFC-01]
 severity: minor
 evidence: IFC-01 の GET /v1/me は、本人のアカウントの種類、本人の名前、使える機能の一覧、試験用かどうか、止めた機能を返すとし、アカウントの ID を挙げない。第 4 段階の ELM-02 では、MOD-09 が GET /v1/me で分かったアカウントを MOD-01 の useAccount に渡し、MOD-01 は冪等キーのある操作の要求を出す前とタブが前に出たときに、GET /v1/me のアカウントを操作とタブのアカウントと比べて、ほかのタブでセッションのアカウントが変わったかを見分ける（FND-44）。種類と名前ではアカウントを見分けられない。要求と応答のスキーマは HND-16 で実装が生成するが、IFC が挙げない項目に利用側が頼れるとは読めない。ELM-01 も、サインインしているアカウントを見分けるのに同じものを要する。生成した型で呼ぶ（DEC-33）ため、欠けていれば ELM-02 の実装が型の確かめで気づき、黙って誤ることはない
 suggestion: GET /v1/me の does に、本人のアカウントの ID（DEC-36 の不透明な ID）を返すことを加える
-resolution: null
+resolution: 受け入れ。IFC-01 の GET /v1/me が本人のアカウントの ID（DEC-36 の不透明な ID）を返すとした
