@@ -1,0 +1,14 @@
+id: FND-36
+title: 受けたインスタンスが止まった後の送り直しで行った変化について、SLI-14 の区間をどの要求を受けた時刻から始めるかが決まっていない
+status: open
+basis: inferred
+basis_note: DEC-42、DEC-43、IFC-03、IFC-04 の timing、IFC-10 の sli_bindings、DAT-20 と SLI-14 の数え方の規則は入力。送り直しで行った変化の区間が送り直しを受けた時刻から始まりうることは、このレビューの推定
+premises: []
+raised_by: design-review
+raised_in: reviews/3-high-level-design.md
+to: architecture-to-high-level-design
+targets: [IFC-10, DAT-20]
+severity: minor
+evidence: FND-22 を受けて DEC-42 は、外部を呼ばない操作（乗客とドライバーの取り消し、許諾など）を受けたインスタンスが結果を書く前に止まったとき、同じキーの送り直しがその操作を初めから行うと決めた。端末はタイムアウト（10 秒、IFC-03、IFC-04）の後に送り直すので、その変化は ELM-03 が最初の要求を受けてから 10 秒より後に書かれる。DEC-43 はこの送り直し（X-Resend が no_answer）を最初の要求と同じ一つの操作とするが、その決まりは境界の SLI（SLI-01〜SLI-06）について書いたもの。SLI-14 の区間は、操作による変化ではシステムがその操作を受けた時刻から始まる（SLI-14 の数え方の規則）。IFC-10 の SLI-14 の出どころは始まりを「ELM-03 の入口がその操作を受けた時刻、境界の出来事 DAT-19 から」とだけ書き、DAT-20 は changeReceivedAt を出来事を書く取引で作る。その取引は送り直しの要求の中で動くため、書かれたとおりに作ると区間は送り直しを受けた時刻から始まり、インスタンスが止まって遅れた 10 秒あまりが SLI-14 から消える。NFR-07 の許される遅れはウィンドウに 0.30〜0.90 件で、報告はインスタンスが落ちることを悪いイベントの道に挙げている
+suggestion: IFC-10 の SLI-14 の出どころと DAT-20 の changeReceivedAt に、操作による変化の区間の始まりは、その変化を書いた要求ではなく、DEC-43 の決まりで同じ操作にまとめた最初の要求を ELM-03 の入口が受けた時刻（同じたどる ID の境界の出来事 DAT-19 から）であることを書く
+resolution: null
