@@ -1,22 +1,23 @@
 # 配車サーバーの詳細設計: 配車サービス
 
-状態: 質問待ち · 更新: 2026-11-13 · 入力の基準: 9dd1e3c · 第 4 段階（全 4 段階） · コンポーネント: ELM-03
+状態: 回答反映済み · 更新: 2026-11-13 · 入力の基準: eb55336 · 第 4 段階（全 4 段階） · コンポーネント: ELM-03
 
 ## 概要
-ELM-03 を 49 のモジュールに分けた。確定の深さは 25 で、お金を動かすもの（MOD-39 料金、MOD-41 EXT-01 のつなぎ口、MOD-42 お金の操作の試み、MOD-43 支払い方法、MOD-56 依頼のお金、MOD-57 返金、MOD-58 配車の依頼、MOD-59 降りる場所の変更）、結果が分からない状態を確かめるもの、同時に動く仕事と状態を分けるもの（MOD-26 冪等キー、MOD-31 期限の来た処理、MOD-32 日々の処理、MOD-33 出来事の届け、MOD-45 依頼と乗車の状態、MOD-47 位置、MOD-52 届いた依頼と許諾）、いくつもの条件の規則を当てるもの（MOD-27 見せる範囲、MOD-36 本人の確かめ、MOD-44 照合、MOD-46 確認コード、MOD-48 走っているかの判断、MOD-51 届ける相手の規則、MOD-67 異常）、戻せない変更を行うもの（MOD-23 鍵と暗号、MOD-68 保持期間）と、ほかのコンポーネントのタイムアウトが頼る答えの期限を守る MOD-20 HTTP の入口。ほかの 24 は枠の深さ。最も難しいのは、ELM-04 の書き込みの取引が一つずつ確定すること（Turso と libSQL）を土台に、重なった許諾と取り消しと停止、同じキーの送り直し、答える前に止まったインスタンス、結果が分からない EXT-01 の試みのどれでも、依頼の状態とお金を一度だけ動かすこと。
+ELM-03 を 49 のモジュールに分けた。確定の深さは 25 で、お金を動かすもの（MOD-39 料金、MOD-41 EXT-01 のつなぎ口、MOD-42 お金の操作の試み、MOD-43 支払い方法、MOD-56 依頼のお金、MOD-57 返金、MOD-58 配車の依頼、MOD-59 降りる場所の変更）、結果が分からない状態を確かめるもの、同時に動く仕事と状態を分けるもの（MOD-26 冪等キー、MOD-31 期限の来た処理、MOD-32 日々の処理、MOD-33 出来事の届け、MOD-45 依頼と乗車の状態、MOD-47 位置、MOD-52 届いた依頼と許諾）、いくつもの条件の規則を当てるもの（MOD-27 見せる範囲、MOD-36 本人の確かめ、MOD-44 照合、MOD-46 確認コード、MOD-48 走っているかの判断、MOD-51 届ける相手の規則、MOD-67 異常）、戻せない変更を行うもの（MOD-23 鍵と暗号、MOD-68 保持期間）と、ほかのコンポーネントのタイムアウトが頼る答えの期限を守る MOD-20 HTTP の入口。ほかの 24 は枠の深さ。最も難しいのは、ELM-04 の書き込みの取引が一つずつ確定すること（Turso と libSQL）を土台に、重なった許諾と取り消しと停止、同じキーの送り直し、答える前に止まったインスタンス、結果が分からない EXT-01 の試みと、取引が変わらないまま処理されなかったとした確定が後で効きうること（DEC-45）のどれでも、依頼の状態とお金を一度だけ動かすこと。
 
-申し送り HND-09、HND-10、HND-12、HND-13、HND-14、HND-19 を決め、HND-07（EXT-02 の呼び出しの値）を実装に送り、実装宛ての HND-20〜HND-22 を書いた。HND-14 の部品の選び方は DEC-47（Stripe の API を fetch で直接呼ぶ）。前の段階に指摘を三つ出した。中の FND-55（確定と解除の試みで 500 の後の読み出しが取引の変わっていないことを示すと、DEC-45 の分け方ではその試みを終えられない）と中の FND-56（迎車の到着を位置で決める前に確認コードが合っても乗車を始める道がない）と軽微の FND-57（決済の結果が分からない依頼の支払い方法の変更の答えがない）で、どれも第 3 段階宛て。模す運賃の定めの中身（QR-62）を、品質チェーンへの要求 QCR-09（影響は高）とともに質問 1 にしたが、この実行の間に答えられる人がいないため「未回答の質問」に書き、報告書は質問待ち。料金の判断表（MOD-39）は下書きのまま答えを待つ。未確認の仮定で最も高いのは、この段階の DAS-22（セッションと止める回数）、DAS-26 と DAS-27（走っているかの判断）で、どれも低、中。
+申し送り HND-09、HND-10、HND-12、HND-13、HND-14、HND-19 を決め、HND-07（EXT-02 の呼び出しの値）を実装に送り、実装宛ての HND-20〜HND-22 を書いた。HND-14 の部品の選び方は DEC-47（Stripe の API を fetch で直接呼ぶ）。模す運賃の定めの中身（QR-62）は質問 1 で尋ね、初乗りと距離の加算だけで求めるという答え（下書きどおり）を MOD-39 に当て、品質チェーンへの要求 QCR-09 に記録した。この段階が出した FND-55〜FND-57 と、ほかが出した FND-50、FND-51、FND-58 を第 3 段階が受け入れて変えた DEC-42、DEC-45、IFC-01、IFC-03、IFC-17、DAT-07、DAT-09、DAT-11、DAT-26 に、MOD-26（キーを最初に受けたアカウントと経路に結び付ける）、MOD-37、MOD-42 と MOD-56（取引が変わらないまま処理されなかったとする確定と、後で効きうる確定のある押さえ）、MOD-45〜MOD-47（迎車の到着の前の乗車の開始）、MOD-66、MOD-67 が従う。ほかに尋ねた点と、この段階が出した未解決の指摘はない。未確認の仮定で最も高いのは、この段階の DAS-22（セッションと止める回数）、DAS-26 と DAS-27（走っているかの判断）で、どれも低、中。
 
 ## 入力
 | 出どころ | 得たもの |
 |---|---|
 | docs/design/elm/、2-architecture.md、dec/ | ELM-03 の責務、functions（FR-01〜FR-13、FR-15〜FR-54）、drivers（32）、decisions（DEC-01、DEC-04〜DEC-27）。お金の決まり（DEC-09、DEC-10、DEC-11）、流れと出来事（DEC-06、DEC-21）、状態を条件にした書き込みと冪等性（DEC-08）、期限の処理（DEC-18）、見せる範囲（DEC-15）、日ごとの鍵（DEC-16、DEC-17）、異常（DEC-20）、届ける相手の規則（DEC-24）、確認コード（DEC-25）、走っているかの判断（DEC-22、DEC-27） |
 | docs/design/2b-technical-policy.md、pol/ | POL-01 の HTTP のサーバーの技術の組み合わせ（Node.js 26、TypeScript 6 の型を外すだけの書き方、Hono 4、Zod と @hono/zod-openapi、Drizzle ORM と @libsql/client、drizzle-kit、pino、node:crypto）、POL-02 の apps/server/src/ の分け方（業務の機能、src/platform/、src/http/、domain/、application/、adapters/）と依存の規則、POL-03 のテストの層と偽物と環境とゲートの出どころ、POL-04 のエラー、ログ、設定、秘密の値、日ごとの鍵、切り替え、マイグレーションの決まり、POL-05（ELM-03 の HTTP と流れの仕様書はコードから生成）。DEC-28〜DEC-34 |
-| docs/design/ifc/、dat/、3-high-level-design.md | ELM-03 が提供する IFC-01〜IFC-16 と利用する IFC-17、IFC-19、IFC-21 の操作、誤りとその符号、冪等性、timing、sli_bindings。データの実体 DAT-01〜DAT-27（持ち主はどれも ELM-03）。共通の約束事 DEC-35〜DEC-44、DEC-45、DEC-46。報告の端から端の流れ、遅延の予算とタイムアウト、要素をまたぐ状態（DAT-07、DAT-11、DAT-26、DAT-12、DAT-05、DAT-08）、受け入れ基準のたどり |
-| docs/design/hnd/ | この段階の ELM-03 に宛てた未決定の申し送り HND-07、HND-09、HND-10、HND-12、HND-13、HND-14、HND-19。実装宛ての未決定の HND-16（ELM-03 のスキーマ） |
-| docs/design/fnd/ | この段階の ELM-03 に宛てた未解決の指摘はない。第 3 段階で未解決の FND-49〜FND-51、第 2 段階の FND-10、FND-11、FND-34、FND-35、第 2b 段階の FND-19〜FND-21、FND-42 は、ELM-03 のモジュールを変えない（FND-50 と FND-51 が直れば MOD-26 と MOD-37 がそれに従う） |
-| docs/design/das/、qcr/、quality-chain-requests.md | 未確認の DAS-01、DAS-02、DAS-04〜DAS-16、確認済みの DAS-03。品質チェーンへの要求は QCR-01、QCR-06、QCR-07 が未回答、QCR-02〜QCR-05、QCR-08 が回答済み。要求書に手で書かれた答えはない。docs/quality/ に反映された要求はない |
-| docs/design/4-detailed-design/ELM-02.md、mod/MOD-01〜MOD-19、reviews/4-detailed-design-ELM-02.md | ELM-02 の MOD-01 のタイムアウト 15 秒と、それが前提にする ELM-03 の答えの期限が 10 秒より短いこと（DAS-16）。ELM-02 が送る返金の送り直しと 503 の扱い |
+| docs/design/ifc/、dat/、3-high-level-design.md | ELM-03 が提供する IFC-01〜IFC-16 と利用する IFC-17、IFC-19、IFC-21 の操作、誤りとその符号、冪等性、timing、sli_bindings。データの実体 DAT-01〜DAT-27（持ち主はどれも ELM-03）。共通の約束事 DEC-35〜DEC-44、DEC-45、DEC-46。報告の端から端の流れ（後で効きうる確定のある押さえの流れを含む）、遅延の予算とタイムアウト、要素をまたぐ状態（DAT-07、DAT-11、DAT-26、DAT-12、DAT-05、DAT-08）、受け入れ基準のたどり。FND-50、FND-51、FND-55〜FND-58 を受けて変わった DEC-42（キーを最初に受けたアカウントと操作に結び付ける）、DEC-45 と IFC-17 と DAT-11（取引の ID が分かっている確定と取り消しで取引が変わっていない試みを処理されなかったとし、その確定は押さえを確定済みか取り消し済みと読むまで後で効きうる）、IFC-01（GET /v1/me のアカウントの ID）、IFC-03 と IFC-22、IFC-23（迎車の到着の前の乗車の開始、PAYMENT_PENDING_CONFIRMATION、確かめで処理されなかった決済）、DAT-07、DAT-09（迎車の到着の段階のない依頼）、DAT-26 |
+| docs/design/hnd/ | この段階の ELM-03 に宛てた申し送り HND-07、HND-09、HND-10、HND-12、HND-13、HND-14、HND-19（どれも決めたか実装に送った。未決定のものはない）。実装宛ての未決定の HND-16（ELM-03 のスキーマ）と、この段階が書いた HND-20〜HND-22 |
+| docs/design/fnd/ | この段階の ELM-03 に宛てた未解決の指摘はない。この段階が出した FND-55〜FND-57 と、FND-49〜FND-51、FND-58 は第 3 段階が受け入れた。第 3 段階に宛てた未解決の FND-59（第 3 段階のレビュー。後で効きうる確定が効いた後の、202 と答えた決済のキーの送り直しへの答え）と FND-60（第 4 段階の ELM-02。ELM-03 がまだキーを受けていない要求のアカウント）は軽微で、決まれば MOD-56 と MOD-26 がそれに従う。第 2 段階の FND-10、FND-11、FND-34、FND-35、第 2b 段階の FND-19〜FND-21、FND-42 は、ELM-03 のモジュールを変えない |
+| docs/design/das/、qcr/、quality-chain-requests.md | 未確認の DAS-01、DAS-04〜DAS-28、確認済みの DAS-02（第 3 段階のレビューの質問 2）と DAS-03。品質チェーンへの要求は QCR-01、QCR-06、QCR-07、QCR-10 が未回答、QCR-02〜QCR-05、QCR-08 と、質問 1 の答えを記録した QCR-09 が回答済み。第 3 段階が出した QCR-10（迎車の到着の前に乗車が始まった依頼の数え方、影響は低）は、どの数え方でも同じ記録から数えられ、ELM-03 のモジュールを変えない。要求書に手で書かれた答えはない。前の実行の後に docs/quality/ は変わっておらず、反映された要求はない |
+| docs/design/4-detailed-design/ELM-02.md、mod/MOD-01〜MOD-19、reviews/4-detailed-design-ELM-02.md | ELM-02 の MOD-01 のタイムアウト 15 秒と、それが前提にする ELM-03 の答えの期限（DAS-16。MOD-20 の 5 秒と通信の余裕の和より長い）。MOD-01 が要求を出す直前にアカウントを確かめ、422 IDEMPOTENCY_KEY_REUSED を受け付けなかった答えとして読み直すこと（DEC-42）。ELM-02 が送る返金の送り直しと 503 の扱い |
+| docs/design/reviews/3-high-level-design.md | 第 3 段階のレビュー（ae25bd3、9ffea05）。質問 2 で DAS-02 を確認済みにし、DAS-05 と DAS-23 の影響の広さを中にし、MOD-26 と MOD-01 がキーの範囲を前の形で書くことを古い段として挙げた（B8） |
 | docs/quality/fr/、qr/、nfr/、sli/、ebp/ | FR-01〜FR-13、FR-15〜FR-54 の受け入れ基準。お金（QR-04、QR-17、QR-24、QR-29、QR-30、QR-45、QR-50）、状態（QR-02、QR-03、QR-51）、届ける相手（QR-16、QR-32、QR-49、QR-54、QR-63、QR-66）、走っているかと確認コード（QR-18、QR-28、QR-55）、個人の情報（QR-34〜QR-36、QR-56〜QR-59）、記録と異常（QR-12、QR-15、QR-33、QR-37、QR-41、QR-44、QR-47、QR-53）、料金（QR-61、QR-62、QR-67）。SLO、ゲート、監査、監視の NFR-01〜NFR-50 と SLI-01〜SLI-14、EBP-01 |
 | docs/quality/context.yaml | CON-01〜CON-08（キャンセル料と不在の料金は 500 円）、EXT-01、EXT-02、OPF-01〜OPF-03、USR-01〜USR-04 |
 
@@ -171,7 +172,7 @@ flowchart TD
 | MOD-46 | 確認コード | 確定 | 内部 | FR-12、FR-27 | — | 新設 | 仮定 |
 | MOD-47 | 位置 | 確定 | 公開 | FR-08、FR-10、FR-13、FR-19、FR-24、FR-49 | IFC-05 POST /v1/positions、IFC-11 position.updated | 新設 | 仮定 |
 | MOD-48 | 走っているかの判断 | 確定 | 内部 | FR-22 | — | 新設 | 仮定 |
-| MOD-49 | 現在地の新しさの確かめ | 枠 | 内部 | — | — | 新設 | 仮定 |
+| MOD-49 | 現在地の新しさの確かめ | 枠 | 内部 | — | — | 新設 | 推定 |
 | MOD-50 | 着く見込みの更新 | 枠 | 内部 | FR-06、FR-08、FR-13 | IFC-11 ride.eta_updated | 新設 | 推定 |
 | MOD-51 | 依頼を届ける相手の規則 | 確定 | 内部 | FR-05、FR-15、FR-16、FR-19、FR-32、FR-43、FR-44 | — | 新設 | 推定 |
 | MOD-52 | 届いた依頼と許諾 | 確定 | 公開 | FR-04、FR-05、FR-06、FR-07、FR-17、FR-18、FR-19、FR-20、FR-21、FR-22、FR-23、FR-43、FR-44、FR-45 | IFC-04 PUT /v1/drivers/me/availability、IFC-04 GET /v1/offers、IFC-04 GET /v1/offers/{rideId}、IFC-04 POST /v1/offers/{rideId}/acceptance、IFC-11 offer.added、IFC-11 offer.removed | 新設 | 推定 |
@@ -188,7 +189,7 @@ flowchart TD
 | MOD-63 | 苦情と返金の求め | 枠 | 公開 | FR-37、FR-42、FR-50 | IFC-09 POST /v1/rides/{rideId}/complaints、IFC-12 GET /v1/console/complaints、IFC-12 POST /v1/console/complaints/{complaintId}/resolution、IFC-11 complaint.received | 新設 | 推定 |
 | MOD-64 | 依頼のたどり | 枠 | 公開 | FR-34、FR-35、FR-49、FR-51、FR-52 | IFC-14 POST /v1/console/traces/search、IFC-14 GET /v1/console/rides/{rideId}/trace、IFC-14 POST /v1/console/rides/{rideId}/disclosures | 新設 | 推定 |
 | MOD-65 | 端末からの報告 | 枠 | 公開 | FR-45、FR-52、FR-53 | IFC-10 POST /v1/device-reports | 新設 | 推定 |
-| MOD-66 | SLI の数え | 枠 | 内部 | — | — | 新設 | 仮定 |
+| MOD-66 | SLI の数え | 枠 | 内部 | — | — | 新設 | 推定 |
 | MOD-67 | 異常の見つけ方と知らせ | 確定 | 公開 | FR-33、FR-34、FR-52 | IFC-14 GET /v1/console/anomalies、IFC-11 anomaly.detected | 新設 | 仮定 |
 | MOD-68 | 保持期間と個人を特定できない形への変換 | 確定 | 内部 | FR-51 | — | 新設 | 仮定 |
 <!-- /generated -->
@@ -240,7 +241,7 @@ ELM-03 が利用する IFC の操作のうち、IFC-21 の push の出来事は 
 | FR-11 | 1 | MOD-62 |
 | FR-11 | 2 | MOD-62（MESSAGING_CLOSED） |
 | FR-12 | 1 | MOD-46（依頼ごとのコード）、MOD-60（乗客にだけ示す） |
-| FR-12 | 2 | MOD-46（照らす）、MOD-45（乗車を始める） |
+| FR-12 | 2 | MOD-46（照らす）、MOD-45（乗車を始める。迎車の到着の前でも） |
 | FR-12 | 3 | MOD-46（CONFIRMATION_CODE_MISMATCH）、MOD-45（始めない） |
 | FR-12 | 4 | MOD-46（一致と合わない試みを依頼の経過に） |
 | FR-13 | 1 | MOD-47、MOD-50、MOD-60 |
@@ -288,7 +289,7 @@ ELM-03 が利用する IFC の操作のうち、IFC-21 の push の出来事は 
 | FR-26 | 1 | MOD-45（no_show と ride.no_show）、MOD-56（不在の料金） |
 | FR-26 | 2 | MOD-45（NO_SHOW_TOO_EARLY と残りの秒） |
 | FR-26 | 3 | MOD-45（PICKUP_NOT_ARRIVED） |
-| FR-27 | 1 | MOD-45（riding と ride.started） |
+| FR-27 | 1 | MOD-45（riding と ride.started。迎車の到着を位置で決める前でも、DAT-07） |
 | FR-27 | 2 | MOD-45、MOD-46（コードが合わなければ、ほかのどの操作でも始めない） |
 | FR-27 | 3 | MOD-45（RIDE_ALREADY_ENDED） |
 | FR-28 | 1 | MOD-45（到着を確認した場所と時刻） |
@@ -296,10 +297,10 @@ ELM-03 が利用する IFC の操作のうち、IFC-21 の push の出来事は 
 | FR-29 | 1 | MOD-56（決済）、MOD-42 |
 | FR-29 | 2 | MOD-56（確定額の押さえの全額） |
 | FR-29 | 3 | MOD-56（乗客の操作なし） |
-| FR-29 | 4 | MOD-56（拒否、支払い方法の変更と押さえ直し、ride.payment_method_changed、やり直し）、MOD-43 |
-| FR-29 | 5 | MOD-56（PAYMENT_PENDING と ride.charge_settled）、MOD-42（確かめ続ける） |
+| FR-29 | 4 | MOD-56（拒否、支払い方法の変更と押さえ直し、ride.payment_method_changed、やり直し。後で効きうる確定のある押さえへのやり直しの拒否は押さえを解いてから示す）、MOD-43 |
+| FR-29 | 5 | MOD-56（PAYMENT_PENDING と ride.charge_settled。確かめで処理されなかったと分かれば到着した状態に戻してやり直させる）、MOD-42（確かめ続ける） |
 | FR-30 | 1 | MOD-56（済んだ決済は新しいキーでも最初の結果）、MOD-26（同じキー） |
-| FR-30 | 2 | MOD-56（分からない決済のやり直しは同じ試みを確かめる）、MOD-42 |
+| FR-30 | 2 | MOD-56（分からない決済のやり直しは試みをその場で確かめ、処理されなかったと分かれば同じ押さえに新しい試み。後で効きうる確定のある間はほかの押さえに移さない）、MOD-42（checkNow） |
 | FR-30 | 3 | MOD-56（乗車ごとの試み） |
 | FR-31 | 1 | MOD-56（ride.charge_settled と支払った額）、MOD-61 |
 | FR-31 | 2 | MOD-61 |
@@ -365,7 +366,7 @@ ELM-03 が利用する IFC の操作のうち、IFC-21 の push の出来事は 
 | FR-46 | 2 | MOD-43（カードの情報を受けない）、MOD-41（metadata に入れない） |
 | FR-46 | 3 | MOD-43（PAYMENT_METHOD_DECLINED） |
 | FR-46 | 4 | MOD-43（PAYMENT_METHOD_PENDING と payment_method.settled）、MOD-42 |
-| FR-46 | 5 | MOD-43（使える支払い方法を置き換える）、MOD-56（依頼の支払い方法の変更と押さえ直し） |
+| FR-46 | 5 | MOD-43（使える支払い方法を置き換える）、MOD-56（依頼の支払い方法の変更と押さえ直し。決済の結果がまだ定まらない間は PAYMENT_PENDING_CONFIRMATION） |
 | FR-47 | 1 | MOD-59、MOD-38（estimate） |
 | FR-47 | 2 | MOD-59（承認、押さえ直し、ride.destination_changed） |
 | FR-47 | 3 | MOD-59（承認しないと変えない） |
@@ -441,10 +442,10 @@ ELM-03 が利用する IFC の操作のうち、IFC-21 の push の出来事は 
 | MovingState | moving、stopped、unknown |
 | AttemptKind | hold、rehold_destination、rehold_method、capture_payment、capture_fee、release、refund、setup_intent、setup_result |
 | AttemptState | unknown、succeeded、refused、not_processed（DAT-11） |
-| Attempt | attemptId、kind、ref（依頼、押さえの試み、返金、登録）、operationKey（MOD-42 の一意の決まりの鍵）、amount、idempotencyKey、ext01ObjectId、state、refusalReason、firstSentAt、lastAnswer（none、no_answer、in_progress、rate_limited、server_error、processing）、nextCheckAt、settledAt、heldAmount、capturedAmount、releasedAmount、testAccount |
+| Attempt | attemptId、kind、ref（依頼、押さえの試み、返金、登録）、operationKey（MOD-42 の一意の決まりの鍵）、purpose（解除の目的: ended 終わった依頼、replaced 押さえ直しで替わった、found_late 後で済んでいたと分かった、decide 後で効きうる確定のある押さえの拒否を決める。MOD-56）、amount、idempotencyKey、ext01ObjectId、state、refusalReason、notProcessedReason（before_execution、unchanged）、observedState（ObservedTransaction）、firstSentAt、lastAnswer（none、no_answer、in_progress、rate_limited、server_error、processing、unrecognized、state_mismatch）、firstCheckAt、nextCheckAt、settledAt、heldAmount、capturedAmount、releasedAmount、testAccount |
 | Ext01Answer | done（求めた状態、取引か返金か登録の ID、額）、refused（reason と、分かれば取引の今の状態）、unknown（なぜ: no_answer、in_progress、rate_limited、server_error、processing、unrecognized、read_rejected。分かれば取引の ID）、notProcessed（なぜ）。MOD-41 |
-| AttemptResult、AttemptOutcome | 試みの終わり（succeeded、refused、not_processed と中身）か unknown。sendWaiting と check が返すのは settled(結果) か stillUnknown |
-| KeyScope、KeyCheck、StoredAnswer | アカウント、経路、キー。proceed、replay、replayPending、reused、inProgress、overdue（MOD-26）。状態の組と、秘密の項目を除いた本文と、試みの ID と、202 で答えたお金の操作か |
+| AttemptResult、AttemptOutcome、ObservedTransaction | 試みの終わり（succeeded、refused、not_processed と中身。not_processed の理由と、確定と解除では読んだ取引）か unknown。sendWaiting、check、checkNow が返すのは settled(結果) か stillUnknown。確定と解除の試みで読んだ取引の状態（requires_capture、succeeded、canceled、processing）と確定した額（MOD-42） |
+| KeyRequest、KeyCheck、StoredAnswer | キーと、送ったアカウント（ないときは none）と経路。proceed、replay、replayPending、reused、inProgress、overdue（MOD-26）。状態の組と、秘密の項目を除いた本文と、試みの ID と、202 で答えたお金の操作か |
 | WorkKind | ride_wait_prompt、ride_no_accept、ride_money、attempt_check、delivery_check、eta_initial、position_check、anomaly_scan、slo_evaluation、registration_expiry（MOD-31 の処理の種類） |
 | NewEvent、Recipient | 出来事の種類（IFC-11 の出来事か、相手のない依頼の経過の段階）、依頼の ID、操作した人、中身、changeReceivedAt のもと。相手のアカウントの ID と役割（乗客、割り当てたドライバー、届けたドライバー、担当者、エンジニア） |
 
@@ -530,22 +531,25 @@ stateDiagram-v2
 #### 振る舞い
 キーの記録の状態は第 3 段階の報告の「要素をまたぐ状態」の DAT-26 のとおり。外部を呼ばない操作のキーは in_progress を持たず、その操作の結果の取引で answered として生まれる。
 
-check の判断表 A:
+check の判断表 A（上から当てる。キーの記録はキーごとに一つで、それを最初に受けたアカウントと経路を持つ、DEC-42）:
 
-| 範囲の記録 | 状態 | 本文のハッシュ | 時刻 | 答え |
-|---|---|---|---|---|
-| ない | — | — | — | proceed |
-| ある | どれも | — | 最初に受けてから 24 時間を過ぎた | proceed（その操作の取引の中で古い記録を消して書く） |
-| ある | どれも | 違う | 24 時間のうち | reused（422 IDEMPOTENCY_KEY_REUSED） |
-| ある | answered（202 で答えたお金の操作でない） | 同じ | 24 時間のうち | replay（最初の答え。秘密の項目は持ち主の rebuild で作り直す） |
-| ある | answered（202 で答えたお金の操作） | 同じ | 24 時間のうち | replayPending（MOD-42 の expedite を呼び、持ち主の overdueAnswer で試みの今の結果を答える。記録の答えは変えない） |
-| ある | in_progress | 同じ | answerDueAt より前 | inProgress（409 OPERATION_IN_PROGRESS、Retry-After 1 秒） |
-| ある | in_progress | 同じ | answerDueAt 以後 | overdue（answerOverdue が持ち主の overdueAnswer で答えを決め、まだ in_progress なら書く） |
+| キーの記録 | 記録のアカウントと経路 | 状態 | 本文のハッシュ | 時刻 | 答え |
+|---|---|---|---|---|---|
+| ない | — | — | — | — | proceed |
+| ある | どれも | どれも | — | 最初に受けてから 24 時間を過ぎた | proceed（その操作の取引の中で古い記録を消して書く） |
+| ある | 要求と違う（ほかのアカウントか経路） | どれも | — | 24 時間のうち | reused（422 IDEMPOTENCY_KEY_REUSED。何も行わない） |
+| ある | 要求と同じ | どれも | 違う | 24 時間のうち | reused（422 IDEMPOTENCY_KEY_REUSED） |
+| ある | 要求と同じ | answered（202 で答えたお金の操作でない） | 同じ | 24 時間のうち | replay（最初の答え。秘密の項目は持ち主の rebuild で作り直す） |
+| ある | 要求と同じ | answered（202 で答えたお金の操作） | 同じ | 24 時間のうち | replayPending（MOD-42 の expedite を呼び、持ち主の overdueAnswer で、キーが結び付く試みの今の結果を答える。記録の答えは変えない） |
+| ある | 要求と同じ | in_progress | 同じ | answerDueAt より前 | inProgress（409 OPERATION_IN_PROGRESS、Retry-After 1 秒） |
+| ある | 要求と同じ | in_progress | 同じ | answerDueAt 以後 | overdue（answerOverdue が持ち主の overdueAnswer で答えを決め、まだ in_progress なら書く） |
+
+送ったアカウントはセッションのアカウント（MOD-36）。キーの要る経路のうちサインインせずに送るもの（設定の符号での設定、IFC-01 の POST /v1/account-setups）は、アカウントのない要求として記録し、アカウントのない要求どうしだけを同じアカウントと見る。
 
 秘密を答える経路と作り直し方: POST /v1/console/accounts と POST …/setup-codes は、答えの設定の符号を書かず、記録には出した回の番号を書き、送り直しには MOD-36 の setupCodeOf で作り直す。POST /v1/payment-method-setups は client secret を書かず、送り直しには MOD-43 が EXT-01 の登録の取引を読み直して client secret を答える。POST …/disclosures は見た情報を書かず、送り直しには MOD-64 が同じ依頼の分を MOD-27 で決め直して答える（見た記録は増やさない）。
 
 #### 並行性とエラー
-外部を呼ばない操作は、操作の結果と recordAnswer を一つの書き込みの取引で書く。同じ範囲の二つの要求が重なると、先に確定した取引だけが範囲の一意の決まりで書け、後の取引は KeyTaken で止まり、取引の中で行った変更はどれも書かれない。後の要求は check からやり直して先の答えを受ける。外部を呼ぶ操作は、取引 A の startExternal の一意の決まりで二つ目の取引 A を退け（二つ目は check で inProgress を受ける）、finishExternal と answerOverdue は「状態が in_progress のときだけ答えを書く」条件つきの書き込みで、先に書いた答えを残す。期限の後に答えを書くのは、受けたインスタンスが止まったか遅れたときで、遅れたインスタンスの結果の取引は alreadyAnswered を受けてその答えで答える（第 3 段階の報告の DEC-42 の計算）。
+外部を呼ばない操作は、操作の結果と recordAnswer を一つの書き込みの取引で書く。同じキーの二つの要求が重なると、先に確定した取引だけがキーの主キーで書け、後の取引は KeyTaken で止まり、取引の中で行った変更はどれも書かれない。後の要求は check からやり直して先の答えを受ける（ほかのアカウントか経路の要求なら reused を受け、何も行わない）。外部を呼ぶ操作は、取引 A の startExternal のキーの主キーで二つ目の取引 A を退け（二つ目は check で inProgress を受ける）、finishExternal と answerOverdue は「状態が in_progress のときだけ答えを書く」条件つきの書き込みで、先に書いた答えを残す。期限の後に答えを書くのは、受けたインスタンスが止まったか遅れたときで、遅れたインスタンスの結果の取引は alreadyAnswered を受けてその答えで答える（第 3 段階の報告の DEC-42 の計算）。
 
 ### MOD-27 使える機能と見せる範囲
 #### 振る舞い
@@ -748,14 +752,14 @@ setPassword の判断表 B:
 
 ### MOD-39 料金の求め方
 #### 振る舞い
-判断表 A（下書き。模す運賃の定めの中身を待つ。質問 1、QCR-09）。運賃表の版の決まりは、初乗りの距離 D0（m）、初乗りの料金 F0（円）、加算の距離の単位 d（m）、加算の料金 f（円）だけで、道の時間は使わない。
+判断表 A（決まりの形は決めたこと 1。模す運賃の定めは初乗りと距離の加算だけで求める）。運賃表の版の決まりは、初乗りの距離 D0（m）、初乗りの料金 F0（円）、加算の距離の単位 d（m）、加算の料金 f（円）だけで、道の時間は使わない。
 
 | 道の長さ（m） | 料金 |
 |---|---|
 | 0 以上 D0 以下 | F0 |
 | D0 より長い | F0 + ⌈(道の長さ − D0) ÷ d⌉ × f |
 
-端数を扱うのは、始まった加算の単位を一つと数える切り上げの一度だけで、額はどれも円の整数のまま（DEC-38）。版の決まりは、D0 ≥ 0、d > 0、f ≥ 0、F0 ≥ 500（模擬の運賃表の最も安い料金は CON-08 の 500 円以上、QCR-05 の答え）の整数で、合わない版は FareTableInvalid として使わない。定めが時間距離併用、迎車料金、割増、ほかの端数の扱いを持つなら、判断表と、見積もりが持つ入力（依頼の時刻、道の区間ごとの速さ）を答えに合わせて直す。
+端数を扱うのは、始まった加算の単位を一つと数える切り上げの一度だけで、額はどれも円の整数のまま（DEC-38）。版の決まりは、D0 ≥ 0、d > 0、f ≥ 0、F0 ≥ 500（模擬の運賃表の最も安い料金は CON-08 の 500 円以上、QCR-05 の答え）の整数で、合わない版は FareTableInvalid として使わない。時間距離併用、迎車料金、割増は持たないので、料金は道の長さと運賃表の版だけから決まり、見積もり（DAT-06）に料金のもと（依頼の時刻、道の区間ごとの速さ）を加える要はない。
 
 #### 並行性とエラー
 状態を持たない。同じ入力に同じ額を返し、見積もりはその額と版を作ったときに書き、後で求め直さない（DEC-38）。運賃表の版を入れるのは開発の作業（DAT-24、HND-22）で、利用者の操作と並ばない。
@@ -786,7 +790,7 @@ setPassword の判断表 B:
 | 読む | 401、403、400、404 | — | unknown（read_rejected。最初の呼び出しが効いたかは分からない、DEC-45） |
 | 読む | なし、429、5xx | — | unknown（no_answer か server_error） |
 
-同じキーの送り直しへの答え（Idempotent-Replayed）は、最初の答えとして同じ表で分ける。どの呼び出しも Stripe-Version を付け（版は HND-20）、metadata に attemptId と traceId と不透明な ID だけを入れる。
+同じキーの送り直しへの答え（Idempotent-Replayed）は、最初の答えとして同じ表で分ける。確定と取り消しの refused（state_mismatch）と、取引の ID が分かっている確定と取り消しの 500 や processing の後に、取引を読んで済んだか拒否か処理されなかったかを決めるのは MOD-42（DEC-45）で、ここは答えを分けるだけ。どの呼び出しも Stripe-Version を付け（版は HND-20）、metadata に attemptId と traceId と不透明な ID だけを入れる。
 
 #### 並行性とエラー
 状態を持たず、一回の call は一つの HTTP の要求で、自動のやり直しをしない（DEC-47）。呼ぶ側の期限で AbortSignal を切り、切れたら unknown（no_answer）。秘密の鍵の読み出しの失敗は notProcessed（何も送っていない）として返し、たどる記録に failureOrigin system で残す。カードの情報を受けず、答えの中の支払い方法の詳しい項目を返さない。
@@ -795,41 +799,50 @@ setPassword の判断表 B:
 #### 振る舞い
 試みの状態は第 3 段階の報告の「要素をまたぐ状態」の DAT-11 のとおり（unknown から succeeded、refused、not_processed のどれかへ一度だけ）。操作の鍵（operationKey）と一意の決まり: 決済は「payment:依頼」、料金は「fee:依頼」、返金は「refund:返金」、押さえの解除は「release:押さえの試み」、登録の確かめは「setup:登録」で、それぞれ unknown か succeeded の試みは一つまで。押さえと押さえ直しは依頼と変更の状態（holding、reholding）で一つに限る。
 
-sendWaiting の判断表 B（end は min(最初に送った時刻 + 8.5 秒, answerDueAt − 0.1 秒)）:
+最初の確かめの時刻（firstCheckAt、IFC-17）: 利用者が待つ試みは待ちを終えた時刻の 30 秒後、利用者が待たない試み（capture_fee、release）は最初の呼び出しを終えた時刻の 30 秒後。作るときは、受けたインスタンスが待ちを終える前に止まったときのために、作った時刻と 8.5 秒と 30 秒の和を書いておき、待ちか最初の呼び出しを終えたときに書き直す。取引の ID が分かっている確定と解除（capture_payment、capture_fee、release）の試みを、読んだ取引が変わっていない（requires_capture のまま）ことで not_processed にするのは、firstCheckAt から後の確かめだけ（DEC-45。その前は、同じキーの送り直しが早めた確かめと checkNow でも unknown のまま）。not_processed の試みは理由（before_execution: 状態を変える呼び出しを EXT-01 が実行の前に退けた、unchanged: 取引が変わっていない）を持ち、確定と解除の試みは読んだ取引の状態と額（observedState）を持つ。持ち主（MOD-56）は、それで押さえに後で効きうる確定があるかを決める。
+
+sendWaiting の判断表 B（end は min(最初に送った時刻 + 8.5 秒, answerDueAt − 0.1 秒)。0.5 秒置いて一度だけ送り直すか読み、そのタイムアウトは end までの残り）:
 
 | 一回目の答え（MOD-41） | 0.5 秒置いてすること | 二回目の答え | 結果 |
 |---|---|---|---|
-| done、refused、notProcessed | — | — | その結果（結果の取引で書く） |
-| unknown（no_answer、in_progress、rate_limited） | 同じキーと同じ中身で送り直す（タイムアウトは end までの残り） | done、refused、notProcessed | その結果 |
+| done、notProcessed | — | — | その結果（notProcessed は before_execution） |
+| refused（確定の state_mismatch のほか） | — | — | refused |
+| refused（確定の state_mismatch） | 取引を読む | 求めた結果（確定した額がある） | succeeded（異常） |
+| refused（確定の state_mismatch） | 同じ | 操作をもうできない状態（canceled） | refused（異常） |
+| refused（確定の state_mismatch） | 同じ | 変わっていない、processing、読めない | stillUnknown |
+| unknown（no_answer、in_progress、rate_limited） | 同じキーと同じ中身で送り直す | done、refused、notProcessed | 一回目の答えと同じ行で分ける（確定の state_mismatch の読み出しは end までに間に合うときだけで、間に合わなければ stillUnknown） |
 | unknown（no_answer、in_progress、rate_limited） | 同じ | unknown | stillUnknown |
 | unknown（server_error、processing、unrecognized） | 取引の ID が分かれば読む。作る呼び出しで分からなければ、一覧から attemptId で探す | 読みで求めた状態 | succeeded |
-| unknown（server_error、processing、unrecognized） | 同じ | 読みで拒否の状態 | refused |
-| unknown（server_error、processing、unrecognized） | 同じ | 見つからない、変わっていない、読めない | stillUnknown（作られていないと決めるのは check の 30 秒の後） |
+| unknown（server_error、processing、unrecognized） | 同じ | 読みで拒否の状態（確定には canceled） | refused（確定は異常） |
+| unknown（server_error、processing、unrecognized） | 同じ | 見つからない、変わっていない、processing、読めない | stillUnknown（作られていない、処理されなかったと決めるのは firstCheckAt から後の check） |
 | end までに一回目の答えがない | — | — | stillUnknown |
 
-stillUnknown のとき、持ち主の applyResult が unknown の答え（押さえと押さえ直しは受け付けなかったか変えなかった、決済と返金と登録は 202）を書き、試みは unknown のまま nextCheckAt に確かめる。
+stillUnknown のとき、持ち主の applyResult が unknown の答え（押さえと押さえ直しは受け付けなかったか変えなかった、決済と返金と登録は 202）を書き、試みは unknown のまま、待ちを終えた時刻の 30 秒後（nextCheckAt と firstCheckAt）に確かめる。利用者が待つ試みのうち確定は capture_payment だけで、ほかは作る呼び出しか登録の読み直し。
 
-check の判断表 C（確かめの時刻は、待ちの後（利用者が待たない試みは最初の呼び出しの後）30 秒、1、2、4、8 分、以後 10 分ごと。IFC-17）:
+check の判断表 C（確かめの時刻は、待ちの後（利用者が待たない試みは最初の呼び出しの後）30 秒、1、2、4、8 分、以後 10 分ごと。IFC-17）。checkNow はこの表の確かめを一回、until までに行う:
 
-| 試みの種類 | 送ったか | 前の答え | 最初に送ってから | 確かめ方 | 確かめの答え | 結果 |
+| 試みの種類 | 送ったか | 前の答え（lastAnswer） | 最初に送ってから | 確かめ方 | 確かめの答え | 結果 |
 |---|---|---|---|---|---|---|
-| どれも | 送っていない（firstSentAt なし） | — | — | 初めて送る | 判断表 A | その分け方 |
+| どれも | 送っていない（firstSentAt なし） | — | — | 初めて送る | 判断表 A | 判断表 B の一回目の答えと同じ行で分け、分からなければ unknown のまま（利用者が待たない試みは firstCheckAt をこの呼び出しの 30 秒後にする） |
 | 作る（hold、rehold_*、refund、setup_intent） | 送った | no_answer、in_progress、rate_limited | 23 時間のうち | 同じキーで送り直す | 判断表 A | その分け方 |
 | 作る | 送った | server_error、processing、unrecognized か、23 時間を過ぎた | — | 一覧から attemptId で探す | 見つかった | 取引の状態で（求めた状態は succeeded、拒否は refused、processing は unknown のまま） |
 | 作る | 送った | 同じ | — | 同じ | 見つからない | refused（作られていない、IFC-17） |
-| 確定と解除（capture_*、release） | 送った | no_answer、in_progress、rate_limited | 23 時間のうち | 同じキーで送り直す | 判断表 A | その分け方（解除が state_mismatch で取引が canceled なら succeeded） |
-| 確定と解除 | 送った | server_error、processing、unrecognized か、23 時間を過ぎた | — | 取引を読む | 確定なら確定した額がある、解除なら canceled | succeeded |
-| 確定と解除 | 送った | 同じ | — | 同じ | 確定で canceled（押さえの期限が切れた）、解除で確定済み | refused（異常） |
-| 確定と解除 | 送った | 同じ | — | 同じ | requires_capture のまま（変わっていない） | unknown のまま確かめ続ける（DEC-45。FND-55 を待つ） |
+| 作る | 送った | 同じ | — | 同じ | 読めない（答えがない、429、5xx） | unknown のまま |
+| 確定と解除（capture_*、release） | 送った | no_answer、in_progress、rate_limited | 23 時間のうち | 同じキーで送り直す | 判断表 A | state_mismatch のほかはその分け方。state_mismatch なら続けて取引を読み、下の行で分ける |
+| 確定と解除 | 送った | server_error、processing、unrecognized、state_mismatch か、23 時間を過ぎた | — | 取引を読む | 求めた結果（確定は確定した額、解除は canceled） | succeeded（前の答えが state_mismatch なら異常） |
+| 確定と解除 | 送った | 同じ | — | 同じ | 操作をもうできない状態（確定に canceled、解除に確定済み） | refused（異常） |
+| 確定と解除 | 送った | 同じ | — | 同じ | processing か、読めない（答えがない、429、5xx） | unknown のまま |
+| 確定と解除 | 送った | 同じ | — | 同じ | 変わっていない（requires_capture）で、今が firstCheckAt より前 | unknown のまま（次の確かめは firstCheckAt） |
+| 確定と解除 | 送った | 同じ | — | 同じ | 変わっていない（requires_capture）で、今が firstCheckAt から後 | not_processed（unchanged。異常） |
 | 読み直し（setup_result） | — | — | — | 登録の取引を読む | succeeded | succeeded |
 | 読み直し | — | — | — | 同じ | requires_payment_method | refused |
 | 読み直し | — | — | — | 同じ | processing、読めない | unknown のまま |
-| どれも | — | — | — | — | 確かめの呼び出しが notProcessed（read_rejected） | unknown のまま確かめ続け、異常 |
+| どれも | — | — | — | — | 確かめの送り直しか読み出しが notProcessed（read_rejected か、送り直しの実行の前の誤り） | unknown のまま確かめ続け、異常 |
 
-結果が not_processed で利用者が待たない試み（capture_fee、release）は、同じ取引で持ち主の nextAttempt が返す新しい試み（新しいキー）を作り、同じ間隔で送る（DEC-45）。決済の not_processed には新しい試みを作らない（ドライバーのやり直しを待つ）。
+結果が not_processed で利用者が待たない試み（capture_fee、release）は、同じ取引で持ち主の nextAttempt が返す新しい試み（新しいキー。同じ押さえへの操作）を作り、同じ間隔で送る（DEC-45）。決済の not_processed には新しい試みを作らない（ドライバーのやり直しを待つ）。結果を持ち主の applyResult に渡すときは、not_processed の理由と observedState を添える。後で効きうる確定のある押さえへの確定のはっきりした拒否で押さえを解くことと、その解除が確定済みに退けられたときにその処理の新しい試みを読んだ額で済んだとすること（createFromRead）は、持ち主の MOD-56 が判断表で決める（DEC-45）。異常は、試みの ID、操作、答えの分け方を持つたどる記録として書き、MOD-67 が判断表 A の payment_not_processed と payment_state_mismatch で異常にする。
 
 #### 並行性とエラー
-試みを作ることは持ち主の取引の中で行い、操作の鍵の一意の決まり（unknown か succeeded の試みに限る部分の一意）で、二つ目の開いた試みを退ける。試みの状態の書き込みは「unknown のときだけ」を条件にするので、確かめと期限の後の答えと遅れた結果の取引が重なっても、一度だけ移る。EXT-01 への呼び出しは取引の外で行い（DAT-11）、結果の取引で試みと持ち主の状態を一緒に書く。確かめは MOD-31 が一つずつ取るので、同じ試みを二つのインスタンスが同時に確かめることはふつうなく、重なっても EXT-01 の同じキーと読み出しは害がない。受けたインスタンスが試みを書いた後に止まっても、試みは unknown のまま nextCheckAt に確かめられ、押さえの試みの持ち主（MOD-56）が依頼を受け付けなかったとする（DEC-45）。試みは消さない（表の決まりで DELETE を断る）。
+試みを作ることは持ち主の取引の中で行い、操作の鍵の一意の決まり（unknown か succeeded の試みに限る部分の一意）で、二つ目の開いた試みを退ける。試みの状態の書き込みは「unknown のときだけ」を条件にし、取引が変わっていないことで not_processed にする書き込みは加えて「firstCheckAt が今以前」を条件にするので、確かめと checkNow と期限の後の答えと遅れた結果の取引が重なっても、一度だけ、決まりのとおりに移る。EXT-01 への呼び出しは取引の外で行い（DAT-11）、結果の取引で試みと持ち主の状態を一緒に書く。確かめは MOD-31 が一つずつ取るので、同じ試みを二つのインスタンスが同時に確かめることはふつうなく、checkNow と重なっても EXT-01 の同じキーと読み出しは害がない。受けたインスタンスが試みを書いた後に止まっても、試みは unknown のまま nextCheckAt に確かめられ、押さえの試みの持ち主（MOD-56）が依頼を受け付けなかったとする（DEC-45）。試みは消さない（表の決まりで DELETE を断る）。
 
 ### MOD-43 支払い方法
 #### 振る舞い
@@ -899,6 +912,7 @@ stateDiagram-v2
   searching --> expired: onNoAccept（T_no_accept）
   assigned --> searching: cancelByDriver。届け直し、期限の処理を書き直す
   assigned --> pickup_arrived: markPickupArrived（MOD-47）
+  assigned --> riding: board（コードが合う。迎車の到着の前で、その時刻、段階、ride.pickup_arrived を書かない）
   assigned --> cancelled_fee: cancelByPassenger（キャンセル料を確かめた）
   pickup_arrived --> searching: cancelByDriver
   pickup_arrived --> cancelled_fee: cancelByPassenger（キャンセル料を確かめた）
@@ -907,11 +921,12 @@ stateDiagram-v2
   riding --> riding: applyMoney（降りる場所の変更の押さえ直しが済んだ）
   riding --> destination_arrived: confirmArrival
   destination_arrived --> completed: applyMoney（決済が済んだ）
-  destination_arrived --> payment_pending: applyMoney（決済が分からない）
+  destination_arrived --> payment_pending: applyMoney（決済が分からないか、後で効きうる確定のある押さえへのやり直しが拒否され、押さえを解いて決める）
   destination_arrived --> payment_declined: applyMoney（決済が拒否）
   destination_arrived --> destination_arrived: applyMoney（決済が処理されなかった）
-  payment_pending --> completed: applyMoney（確かめて済んでいた）
-  payment_pending --> payment_declined: applyMoney（確かめて拒否）
+  payment_pending --> completed: applyMoney（確かめて済んでいたか、解こうとした押さえが確定済みだった）
+  payment_pending --> payment_declined: applyMoney（確かめて拒否か、解いた押さえが取り消された）
+  payment_pending --> destination_arrived: applyMoney（確かめて処理されなかった。ドライバーのやり直しを待つ）
   payment_declined --> destination_arrived: applyMoney（支払い方法を変えて押さえ直した）
   not_accepted --> [*]: moneySettled（押さえていれば解いた）
   cancelled_free --> [*]: moneySettled（押さえを解いた）
@@ -941,10 +956,10 @@ stateDiagram-v2
 | 不在 | pickup_arrived | 過ぎた | 200 | no_show |
 | 不在 | riding 以後 | — | 409 RIDE_ALREADY_STARTED | 変えない |
 | 不在 | 終わり | — | 409 RIDE_ALREADY_ENDED | 変えない |
-| 乗車の開始 | assigned | — | 409 PICKUP_NOT_ARRIVED（FND-56） | 変えない |
+| 乗車の開始 | assigned | MOD-46 が matched | 200 | riding（迎車の到着の時刻、段階、ride.pickup_arrived を書かない、DAT-07） |
 | 乗車の開始 | pickup_arrived | MOD-46 が matched | 200 | riding |
-| 乗車の開始 | pickup_arrived | mismatched | 422 CONFIRMATION_CODE_MISMATCH | 変えない（合わない試みを書く） |
-| 乗車の開始 | pickup_arrived | locked | 429 CONFIRMATION_CODE_LOCKED と retryAfterSeconds | 変えない |
+| 乗車の開始 | assigned、pickup_arrived | mismatched | 422 CONFIRMATION_CODE_MISMATCH | 変えない（合わない試みを書く） |
+| 乗車の開始 | assigned、pickup_arrived | locked | 429 CONFIRMATION_CODE_LOCKED と retryAfterSeconds | 変えない |
 | 乗車の開始 | riding 以後 | — | 409 RIDE_ALREADY_STARTED | 変えない |
 | 乗車の開始 | 終わり | — | 409 RIDE_ALREADY_ENDED | 変えない |
 | 到着の確認 | assigned、pickup_arrived | — | 409 RIDE_NOT_STARTED | 変えない |
@@ -967,21 +982,23 @@ stateDiagram-v2
 | 押さえた | holding | searching、届ける相手を MOD-52 の口で決め、期限の処理を書く |
 | 押さえなかった（拒否、処理されなかった、分からない） | holding | not_accepted（押さえが後で済んでいたと分かれば MOD-56 が解く） |
 | 押さえた（遅れて分かった） | holding でない | 変えない（MOD-56 が解く試みを作る） |
-| 決済が済んだ | destination_arrived、payment_pending | completed |
+| 決済が済んだ（解こうとした押さえが確定済みだったときを含む） | destination_arrived、payment_pending | completed |
 | 決済が分からない | destination_arrived | payment_pending |
-| 決済が拒否 | destination_arrived、payment_pending | payment_declined |
+| 決済のやり直しが拒否され、後で効きうる確定のある押さえを解いて決める（MOD-56） | destination_arrived | payment_pending |
+| 決済が拒否（解いた押さえが取り消されたときを含む） | destination_arrived、payment_pending | payment_declined |
 | 決済が処理されなかった | destination_arrived | 変えない（ドライバーのやり直しを待つ） |
+| 決済が確かめで処理されなかった（取引が変わっていない） | payment_pending | destination_arrived（ドライバーのやり直しを待つ） |
 | 支払い方法の押さえ直しが済んだ | payment_declined | destination_arrived と ride.payment_method_changed（MOD-56） |
 | 支払い方法の押さえ直しが済んだ | searching〜destination_arrived | 状態は変えず、依頼の支払い方法と押さえを替える |
 | 降りる場所の変更の押さえ直しが済んだ | riding | 降りる場所、確定額、承認した到着予定の時刻を替える |
 | 精算が済んだ | 終わりの状態 | moneySettled を真 |
 
 #### 並行性とエラー
-どの移り変わりも、今の状態（と、割り当てたドライバー、探し始めた時刻のうち要るもの）を条件にした一つの書き込みで、出来事と届けの記録（MOD-33）、冪等キーの答え（MOD-26）、操作の記録（MOD-29）と同じ書き込みの取引で書く。書き込みの取引は一つずつ確定する（MOD-25）ので、重なった許諾と取り消しのどちらが先でも、後の方は条件に合わずに今の状態を読み直して判断表 A の答えを返す（許諾が先なら乗客の取り消しは CANCELLATION_FEE_CONFIRMATION_REQUIRED、取り消しが先なら許諾は OFFER_NO_LONGER_AVAILABLE の cancelled）。乗客ごととドライバーごとの一意の決まり（「データ」）が、二つ目の進んでいる依頼を退ける。テストの差し込み（POL-03 の重なり）は、この条件つきの書き込みの直前のポートに入る。届け直しと一覧から除くことは MOD-52 が実装する口を同じ取引で呼び、お金は MOD-31 の ride_money で取引の後に動かす。
+どの移り変わりも、今の状態（と、割り当てたドライバー、探し始めた時刻のうち要るもの）を条件にした一つの書き込みで、出来事と届けの記録（MOD-33）、冪等キーの答え（MOD-26）、操作の記録（MOD-29）と同じ書き込みの取引で書く。書き込みの取引は一つずつ確定する（MOD-25）ので、重なった許諾と取り消しのどちらが先でも、後の方は条件に合わずに今の状態を読み直して判断表 A の答えを返す（許諾が先なら乗客の取り消しは CANCELLATION_FEE_CONFIRMATION_REQUIRED、取り消しが先なら許諾は OFFER_NO_LONGER_AVAILABLE の cancelled）。迎車中の乗車の開始と迎車の到着（MOD-47）が重なっても、どちらも assigned を条件に書くので先に書けた一つだけが効き、乗車の開始が先なら迎車の到着は何も変えず（迎車の到着の段階も知らせもない）、迎車の到着が先なら乗車の開始は条件の pickup_arrived を読み直して始める。乗客ごととドライバーごとの一意の決まり（「データ」）が、二つ目の進んでいる依頼を退ける。テストの差し込み（POL-03 の重なり）は、この条件つきの書き込みの直前のポートに入る。届け直しと一覧から除くことは MOD-52 が実装する口を同じ取引で呼び、お金は MOD-31 の ride_money で取引の後に動かす。
 
 ### MOD-46 確認コード
 #### 振る舞い
-verify の判断表 A（依頼が pickup_arrived のときだけ MOD-45 が呼ぶ）:
+verify の判断表 A（依頼が assigned か pickup_arrived のときだけ MOD-45 が呼ぶ。迎車の到着の前でも照らす、FR-27 の 1）:
 
 | 止めた時刻の終わり | 入れたコード | 続けて合わない数（この試みを含む） | 答え | 書くこと |
 |---|---|---|---|---|
@@ -1012,7 +1029,8 @@ verify の判断表 A（依頼が pickup_arrived のときだけ MOD-45 が呼�
 |---|---|---|---|---|---|
 | 割り当てたドライバー | assigned | T_vehicle_location_lag のうち | 30 m 以下 | D_pickup_position_gap 以下 | 迎車の到着（MOD-45 の markPickupArrived。changeReceivedAt は位置を受けた時刻） |
 | 割り当てたドライバー | assigned | どれかが外れる | — | — | 何もしない |
-| ほか | — | — | — | — | 何もしない |
+| 割り当てたドライバー | pickup_arrived、riding（迎車の到着の前に確認コードで乗車が始まった依頼を含む） | — | — | — | 何もしない（迎車の到着は assigned の依頼だけ、DAT-07） |
+| ほかの送り手（乗客、割り当てていないドライバー） | — | — | — | — | 何もしない |
 
 最新の位置は、直した測った時刻が今の最新より新しいときだけ置き換え、受けた位置は端末と測った時刻ごとに一度だけ記録に足す（DAT-10）。position.updated は、判断表 B（MOD-27）で見てよい相手（乗客には割り当てたドライバーの位置、割り当てたドライバーには assigned と pickup_arrived の乗客の位置）の流れにだけ、記録に残さずに渡す。
 
@@ -1117,52 +1135,85 @@ aggregate は、評価の和と件数を返す。閾値との比べは和と閾�
 
 ### MOD-56 依頼のお金
 #### 振る舞い
-決済の判断表 A:
+後で効きうる確定（DEC-45）: 押さえに、その処理（決済か料金）の確定の試みで not_processed（unchanged。取引が変わらないまま処理されなかったとした）ものがあり、その後のどの試みもその押さえを確定済みか取り消し済みと読んでいない（結果か observedState が確定か canceled でない）間、その押さえには後で効きうる確定がある。その間は、その処理をほかの押さえに移さず（押さえ直しの試みを作らず、依頼の押さえを替えない）、その押さえへのその処理の次の試みがはっきり拒否されても（取り消し済みと読んだときを除く）その処理を拒否で終えずに、押さえを解く試み（目的 decide）を作り、その結果で決める。決済の依頼が destination_arrived か payment_pending にある間に押さえを確定済みと読めば completed、取り消し済みと読めば payment_declined に移るので、この二つの状態では、今の押さえに not_processed（unchanged）の決済の試みがあれば、後で効きうる確定がある。
 
-| 依頼の状態 | 決済の試み（payment:依頼） | 答え | すること |
+決済の判断表 A（上から当てる。呼んだ人が割り当てたドライバーでなければ 404 NOT_FOUND）:
+
+| 依頼の状態 | 決済の試み（payment:依頼）と押さえ | 答え | すること |
 |---|---|---|---|
-| destination_arrived | ないか、どれも refused か not_processed | 試みを作って送る（下の結果） | 取引 A で試み（今の押さえの全額）とキー |
-| payment_pending | unknown | 確かめを早め、今の結果か 202 PAYMENT_PENDING | なし |
+| destination_arrived | ないか、どれも refused か not_processed | 試みを作って送り、下の結果の行で答える | 取引 A で試み（今の押さえの全額）とキー（in_progress） |
+| destination_arrived | unknown（送っている途中） | 202 PAYMENT_PENDING | キーをその試みに結び付けて answered で書く |
+| payment_pending | unknown | MOD-42 の checkNow で確かめ（until は答えの期限から結果の取引の分を引いた時刻）、分かれば下の結果の行で答える。not_processed なら依頼は destination_arrived に戻っているので、一行目の行で新しい試みを作る。分からなければ 202 PAYMENT_PENDING | 202 ならキーをその試みに結び付けて answered で書く |
+| payment_pending | 最後が refused で、今の押さえを解いて決めている（decide の解除が開いている） | 解除の試みを checkNow で確かめ（送っていなければ送る）、下の判断表 C の行で書き、解ければ 402 PAYMENT_DECLINED と最後の拒否の理由、確定済みなら 200 と済んだ額、分からなければ 202 PAYMENT_PENDING | 202 ならキーを最後の決済の試みに結び付けて answered で書く |
 | payment_declined | 最後が refused で、その後に押さえ直していない | 409 PAYMENT_METHOD_CHANGE_REQUIRED | なし |
 | completed | succeeded | 200 最初の結果（新しいキーでも） | なし |
 | assigned、pickup_arrived、riding | — | 409 RIDE_NOT_ARRIVED | なし |
 | ほかの終わり | — | 409 RIDE_ALREADY_ENDED | なし |
-| 試みの結果: succeeded | — | 200 済んだと額 | completed、ride.charge_settled、依頼の経過の「決済が済んだ（額）」と乗客に示した支払った額 |
-| 試みの結果: refused | — | 402 PAYMENT_DECLINED と reason | payment_declined、ride.charge_settled（拒否） |
-| 試みの結果: not_processed | — | 503 PAYMENT_SERVICE_UNAVAILABLE | 到着したまま、ride.charge_settled（済んでいない） |
+| 試みの結果: succeeded | — | 200 済んだと額 | completed、ride.charge_settled（済んだと額）をドライバーと乗客に、依頼の経過の「決済が済んだ（額）」と乗客に示した支払った額 |
+| 試みの結果: refused で、今の押さえに後で効きうる確定がないか、読んだ取引が canceled | — | 402 PAYMENT_DECLINED と reason | payment_declined、ride.charge_settled（拒否と理由）をドライバーと乗客に |
+| 試みの結果: refused で、今の押さえに後で効きうる確定があり、取り消し済みと読んでいない | — | 202 PAYMENT_PENDING | payment_pending、今の押さえの decide の解除の試み（sendLater）、ride.charge_settled（分からない）を乗客に |
+| 試みの結果: not_processed（before_execution） | — | 503 PAYMENT_SERVICE_UNAVAILABLE | 到着したまま、ride.charge_settled（済んでいない）をドライバーと乗客に |
 | 試みの結果: 待ちのうちに分からない | — | 202 PAYMENT_PENDING | payment_pending |
 
-依頼の支払い方法の変更の判断表 B:
+待ちのうちの確かめは firstCheckAt より前なので、待ちのうちに not_processed（unchanged）にはならない（MOD-42）。
 
-| 依頼の状態 | 使える支払い方法 | 押さえ直しの結果 | 答え | すること |
-|---|---|---|---|---|
-| searching〜riding、destination_arrived、payment_declined | ない | — | 409 PAYMENT_METHOD_REQUIRED | なし |
-| 同じ | 依頼のものと同じ | — | 200（変えることがない） | なし |
-| 同じ | ある | 済んだ | 200 | 依頼の支払い方法と押さえを替え、前の押さえの解除の試み、payment_declined なら destination_arrived と ride.payment_method_changed |
-| 同じ | ある | 拒否 | 402 PAYMENT_DECLINED | 変えない |
-| 同じ | ある | 処理されなかった | 503 PAYMENT_SERVICE_UNAVAILABLE | 変えない |
-| 同じ | ある | 分からない | 503 REHOLD_UNCONFIRMED | 変えない（後で済んでいたら新しい押さえを解く） |
-| payment_pending | — | — | 409 RIDE_ALREADY_ARRIVED（FND-57） | なし |
-| completed とほかの終わり | — | — | 409 RIDE_ALREADY_ENDED | なし |
+202 で答えた決済のキーの送り直しと、答えの期限を過ぎたキーへの答えの判断表 D（overdueAnswer。キーが結び付く決済の試みの今の結果で答える、DEC-42、DEC-45）:
 
-後の処理（ride_money）と試みの結果の判断表 C:
+| キーが結び付く試み | 依頼 | 答え |
+|---|---|---|
+| unknown | — | 202 PAYMENT_PENDING（送り直しなら確かめを早める） |
+| succeeded | — | 200 済んだと額 |
+| refused | payment_pending で、その拒否のために今の押さえを解いて決めている | 202 PAYMENT_PENDING |
+| refused | ほか | 402 PAYMENT_DECLINED と reason（解除で後で効きうる確定が効いたと分かり、同じ押さえの新しい試みで済んだときも。第 3 段階の FND-59 を待つ） |
+| not_processed | — | 503 PAYMENT_SERVICE_UNAVAILABLE |
 
-| 依頼 | 押さえ | 料金の試み（fee:依頼） | 解除の試み | すること |
-|---|---|---|---|---|
-| cancelled_free、expired、not_accepted | 済んだ押さえがある | — | ないか、最後が not_processed | 解除の試みを作る（sendLater） |
-| cancelled_fee、no_show | 済んだ押さえがある | ないか、最後が not_processed | — | 料金の試み（その押さえの 500 円の一部の確定。残りは EXT-01 が解く）を作る |
-| cancelled_fee、no_show | — | succeeded | — | ride.charge_settled（料金の額と種類）、精算が済む |
-| cancelled_fee、no_show | — | refused | — | 精算が済む（請求できなかった。異常、照合が見る） |
-| completed | 押さえ直しで替わった前の押さえ | — | どれも succeeded か refused | 精算が済む |
-| どれも | 押さえていない（押さえの試みがどれも refused か not_processed） | — | — | 精算が済む |
-| どれも | — | unknown がある | unknown がある | Again（次の確かめの後） |
-| holding でない依頼の押さえ（hold、rehold_*）の試みが後で succeeded | — | — | — | その押さえの解除の試みを作る |
-| 解除の試みが refused | — | — | — | 異常（すでに確定していた）、精算は済む |
+依頼の支払い方法の変更の判断表 B（上から当てる）:
 
-一つの押さえの取引への操作（押さえ、確定、解除）は、その取引の前の試みが終わってから次を送り（IFC-17 の ordering）、押さえ直しは新しい押さえが済んでから前の押さえを解く（DEC-09）。前の押さえの解除と、今の押さえの決済は、別の取引への操作なので互いを待たない。
+| 依頼の状態 | 決済の試みと押さえ | 使える支払い方法 | 押さえ直しの結果 | 答え | すること |
+|---|---|---|---|---|---|
+| holding | — | — | — | 404 NOT_FOUND（まだ受け付けていない依頼は見せない） | なし |
+| payment_pending | — | — | — | 409 PAYMENT_PENDING_CONFIRMATION | なし |
+| destination_arrived | 決済の試みが unknown（送っている途中）か、今の押さえに後で効きうる確定がある | — | — | 409 PAYMENT_PENDING_CONFIRMATION | なし |
+| searching〜riding、destination_arrived（上の行のほか）、payment_declined | — | ない | — | 409 PAYMENT_METHOD_REQUIRED | なし |
+| 同じ | — | 依頼のものと同じ | — | 200（変えることがない） | なし |
+| 同じ | — | ある | 済んだが、結果の取引で読み直した依頼が終わっているか、依頼の決済の試みに unknown か succeeded がある（押さえ直しの間に依頼が終わったか決済が始まった） | 依頼が終わっていれば 409 RIDE_ALREADY_ENDED、ほかは 409 PAYMENT_PENDING_CONFIRMATION | 依頼を変えず、新しい押さえの解除の試み（目的 replaced）を作る |
+| 同じ | — | ある | 済んだ（上の行のほか） | 200 | 依頼の支払い方法と押さえを替え、前の押さえの解除の試み（目的 replaced。その押さえを解いた試みがすでに済んでいれば作らない）、payment_declined なら destination_arrived と ride.payment_method_changed |
+| 同じ | — | ある | 拒否 | 402 PAYMENT_DECLINED | 変えない |
+| 同じ | — | ある | 処理されなかった | 503 PAYMENT_SERVICE_UNAVAILABLE | 変えない |
+| 同じ | — | ある | 分からない | 503 REHOLD_UNCONFIRMED | 変えない（後で済んでいたら新しい押さえを解く） |
+| completed とほかの終わり | — | — | — | 409 RIDE_ALREADY_ENDED | なし |
+
+payment_declined の依頼の今の押さえには、後で効きうる確定がない（取り消し済みと読んだか、後で効きうる確定のないまま拒否されたときだけ payment_declined になる）ので、押さえ直してよい。
+
+後の処理（ride_money）と、確かめで分かった試みの結果の判断表 C（上から当てる）:
+
+| 依頼 | 試みか押さえ | 結果か今の試み | すること |
+|---|---|---|---|
+| payment_pending | 決済 | succeeded | completed、ride.charge_settled（済んだと額）をドライバーと乗客に、依頼の経過 |
+| payment_pending | 決済 | refused で、今の押さえに後で効きうる確定がないか、読んだ取引が canceled | payment_declined、ride.charge_settled（拒否と理由）をドライバーと乗客に |
+| payment_pending | 決済 | refused で、今の押さえに後で効きうる確定があり、取り消し済みと読んでいない | 今の押さえの decide の解除の試みを作る（payment_pending のまま） |
+| payment_pending | 決済 | not_processed（unchanged） | destination_arrived、ride.charge_settled（済んでいない。やり直せる）をドライバーと乗客に（今の押さえに後で効きうる確定ができる） |
+| payment_pending | decide の解除 | succeeded | 決済を最後の拒否の理由で拒否として終え、payment_declined、ride.charge_settled（拒否と理由）をドライバーと乗客に |
+| payment_pending | decide の解除 | refused（読んだ取引が確定済み） | 同じ押さえに決済の新しい試みを読んだ確定した額で書き（MOD-42 の createFromRead）、completed、ride.charge_settled（済んだと額）をドライバーと乗客に、依頼の経過 |
+| payment_pending | decide の解除 | not_processed | 同じ押さえに新しい解除の試み（nextAttempt）。payment_pending のまま |
+| cancelled_free、expired、not_accepted | 済んだ押さえがある | 解除がないか、最後が not_processed | 解除の試み（目的 ended）を作る（sendLater） |
+| cancelled_fee、no_show | 済んだ押さえがある | 料金がないか、最後が not_processed | 料金の試み（その押さえの 500 円の一部の確定。残りは EXT-01 が解く）を作る |
+| cancelled_fee、no_show | 料金 | succeeded | ride.charge_settled（料金の額と種類）、精算が済む |
+| cancelled_fee、no_show | 料金 | refused で、その押さえに後で効きうる料金の確定がないか、読んだ取引が canceled | 精算が済む（請求できなかった。異常、照合が見る） |
+| cancelled_fee、no_show | 料金 | refused で、その押さえに後で効きうる料金の確定があり、取り消し済みと読んでいない | その押さえの decide の解除の試みを作る（精算は済まない） |
+| cancelled_fee、no_show | decide の解除 | succeeded | 料金を請求できなかったとして精算が済む（異常） |
+| cancelled_fee、no_show | decide の解除 | refused（読んだ取引が確定済み） | 同じ押さえに料金の新しい試みを読んだ確定した額で書き（createFromRead）、ride.charge_settled（料金の額と種類）、精算が済む |
+| cancelled_fee、no_show | decide の解除 | not_processed | 同じ押さえに新しい解除の試み（nextAttempt。精算は済まない） |
+| completed | 押さえ直しで替わった前の押さえ | 解除がどれも succeeded か refused | 精算が済む |
+| どれも | 押さえていない（押さえの試みがどれも refused か not_processed） | — | 精算が済む |
+| どれも | — | 料金か解除に unknown がある | Again（次の確かめの後） |
+| holding でない依頼の押さえ（hold、rehold_*） | 試みが後で succeeded | — | その押さえの解除の試み（目的 found_late）を作る |
+| どれも | decide のほかの解除 | refused（読んだ取引が確定済み） | 異常（すでに確定していた）、精算は済む |
+
+一つの押さえの取引への操作（押さえ、確定、解除）は、その取引の前の試みが終わってから次を送り（IFC-17 の ordering）、押さえ直しは新しい押さえが済んでから前の押さえを解く（DEC-09）。前の押さえの解除と、今の押さえの決済は、別の取引への操作なので互いを待たない。今の押さえに後で効きうる確定がある間は押さえ直しを作らず（判断表 B）、押さえ直しを送っている間に始まった決済は今の押さえに向かい、押さえ直しが済んでも依頼の押さえを替えずに新しい押さえを解く（判断表 B）ので、前の押さえへの確定とほかの押さえの確定は重ならない（DEC-45）。
 
 #### 並行性とエラー
-決済の新しい試みは、操作の鍵 payment:依頼 の一意の決まり（unknown か succeeded の試みは一つ）と、依頼の状態を条件にした取引 A で、重なったやり直しを一つにする。新しいキーの決済でも、済んでいれば判断表 A のとおり最初の結果を答える（FR-30 の 1）。料金は fee:依頼 の一意の決まりで二度にならず、許諾の前に終わった依頼（cancelled_free、expired、not_accepted）には料金の試みを作らない。結果は MOD-42 の結果の取引で依頼の状態と一緒に書く。後の処理は MOD-31 が一つずつ取り、どの判断も今の試みの状態を同じ取引で読む。
+決済の新しい試みは、操作の鍵 payment:依頼 の一意の決まり（unknown か succeeded の試みは一つ）と、依頼の状態を条件にした取引 A で、重なったやり直しを一つにする。新しいキーの決済でも、済んでいれば判断表 A のとおり最初の結果を答える（FR-30 の 1）。新しいキーの checkNow が期限の処理の確かめと重なっても、試みの状態の書き込みは unknown のときだけなので一度だけ移り、後の方は今の状態を読み直して判断表 A の行で答える。料金は fee:依頼 の一意の決まりで二度にならず、許諾の前に終わった依頼（cancelled_free、expired、not_accepted）には料金の試みを作らない。後で効きうる確定があるかは、押さえ直しの取引 A と結果の取引、決済と料金の結果の取引の中で、その押さえへの試みを読んで決めるので、書き込みの取引が一つずつ確定する（MOD-25）間に変わらない。結果は MOD-42 の結果の取引で依頼の状態と一緒に書く。後の処理は MOD-31 が一つずつ取り、どの判断も今の試みの状態を同じ取引で読む。
 
 ### MOD-57 返金
 #### 振る舞い
@@ -1263,14 +1314,15 @@ sequenceDiagram
 | 境界の出来事 | outcome が system_error | operation_error | scan | page（担当者の操作は ticket、NFR-44） |
 | 境界の出来事 | 受けてから答えの期限と 1 分を過ぎても答えのない行 | no_response | scan | page（担当者の操作は ticket、NFR-44） |
 | たどる記録 | failureOrigin が EXT-01、EXT-02、ELM-07 の失敗か無応答 | external_failure | scan | page |
-| たどる記録 | EXT-01 が処理しなかった試み（DEC-45） | payment_not_processed | scan | page |
+| たどる記録 | EXT-01 が処理しなかった試み（実行の前に退けたものと、取引が変わらないまま not_processed にした確定と解除。DEC-45） | payment_not_processed | scan | page |
+| たどる記録 | 確定か解除の試みが取引の状態に退けられたか、確かめの読み出しが操作をもうできない状態を示した（読んで済んだとしたときを含む。DEC-45） | payment_state_mismatch | scan | page |
 | たどる記録 | failureOrigin が system（鍵、SealedCorrupted、Web Push の送り手の誤り、照合の食い違い、確かめの読み出しが処理されなかった） | system_error | scan | page |
 | 端末のエラー | どれも | device_error | scan | page |
 | お金の試み | 最初に送ってから 10 分を過ぎて unknown | payment_unknown | scan | page |
 | 日々の処理 | 仕事の失敗 | daily_job_failed | scan | page |
 | ログ | MOD-24 が書かなかった値（NFR-45） | unmasked_log | 聞き手 | page |
 | NFR-10 | 一つの依頼に二つの割り当てか、取り消しの後の許諾（依頼の経過） | ride_inconsistency | scan | page |
-| NFR-14 | 終わった依頼の経過の欠け（段階、時刻、示した到着予定時刻、終えた人）と、依頼と結び付かないか状態のない苦情 | record_gap | scan と daily | page |
+| NFR-14 | 終わった依頼の経過の欠け（段階、時刻、示した到着予定時刻、終えた人。迎車の到着の前に確認コードで乗車が始まった依頼の迎車の到着の段階は、起きていない段階で欠けとしない、DAT-09）と、依頼と結び付かないか状態のない苦情 | record_gap | scan と daily | page |
 | NFR-17 | 場所の候補、見積もり、依頼の境界の出来事で答えまで 3 秒を超えた | slow_response | scan | page |
 | NFR-18 | 試験用のアカウントの依頼、乗車、評価、決済、苦情で試験用の区別がない | test_flag_missing | scan | page |
 | NFR-24 | 照合の食い違い、二つ目の済んだ決済か料金、許諾の前に終わった依頼への請求、一つの返金の二度目、支払われた額を超える返金の合計 | money_mismatch | scan と daily | page（エンジニアと担当者） |
@@ -1347,6 +1399,8 @@ scan は MOD-31 が一つずつ取るので、同じ記録を二つのインス�
 | 状態は状態遷移図の矢印でだけ移る | check（state が DAT-07 の状態のどれか）と、状態を書くどの書き込みも移る前の状態（と要るときは割り当てたドライバーと探し始めた時刻）を条件にし、変わっていれば何も変えない | MOD-45 |
 | 確認コードはハッシュだけ | 列は code_hash、code_key_version、code_failures、code_locked_until で、コードそのものの列を作らない | MOD-46 |
 | 精算が済むまで moneySettled は偽 | money_settled を真にするのは、開いた試みがないことを同じ取引で読んだ MOD-56 の後の処理だけ | MOD-56 |
+| 今の押さえに後で効きうる確定がある間は、依頼の押さえを替えず、その処理を拒否で終えない（DEC-45） | 押さえ直しの取引 A と結果の取引、決済と料金の結果の取引の中で、今の押さえへの確定の試みの not_processed の理由と、その後に読んだ取引の状態を読んで比べてから書く（BEGIN IMMEDIATE で、確定までほかに変えられない） | MOD-56 |
+| 依頼の押さえを押さえ直しで替えるのは、依頼が終わっておらず、依頼の決済の試みに unknown も succeeded もないときだけ | 押さえ直し（rehold_method）の結果の取引の中で、依頼と依頼の決済の試みを読んで比べてから替え、合わなければ新しい押さえを解く試みを作る | MOD-56 |
 
 ### money_attempts（DAT-11）
 | 不変条件 | 保つもの | MOD |
@@ -1356,11 +1410,13 @@ scan は MOD-31 が一つずつ取るので、同じ記録を二つのインス�
 | 状態は unknown から一度だけ移る | check（state が unknown、succeeded、refused、not_processed のどれか）と、状態を書くどの書き込みも state = 'unknown' を条件にする | MOD-42 |
 | 試みは消えず、キーと額と種類は変わらない | DELETE と、kind、operation_key、amount、idempotency_key の UPDATE を断るトリガー | MOD-42 |
 | 額は正の円の整数 | check amount > 0 | MOD-42 |
+| 取引が変わっていないことで not_processed にするのは firstCheckAt から後だけ | その書き込みは state = 'unknown' と first_check_at ≤ 今を条件にする | MOD-42 |
+| not_processed の試みは理由を持つ | check（state が not_processed なら not_processed_reason が before_execution か unchanged） | MOD-42 |
 
 ### idempotency_keys（DAT-26）
 | 不変条件 | 保つもの | MOD |
 |---|---|---|
-| 範囲ごとにキーの記録は一つ | (account_id, route, idempotency_key) の主キー | MOD-26 |
+| キーごとに記録は一つで、最初に受けたアカウントと経路を持ち続ける | idempotency_key の主キーと、account_id と route の UPDATE を断るトリガー（ほかのアカウントか経路の要求は check が reused にする） | MOD-26 |
 | 外部を呼ぶ操作の答えは一度だけ書かれる | 答えを書く書き込みは status = 'in_progress' を条件にする | MOD-26 |
 
 ### payment_methods と setups（DAT-05）
@@ -1464,19 +1520,19 @@ scan は MOD-31 が一つずつ取るので、同じ記録を二つのインス�
 ELM-03 は画面を持たない。画面は ELM-01 と ELM-02 のもの（IFC-22〜IFC-25）で、ELM-03 はそれらの静的なファイルを配るだけ（MOD-20）。
 
 ## 確かめ方
-ELM-03 のチェックが使う層は、単体の層（検査の手順で、Node.js の上の Vitest）、結合の層（検査の手順で、HTTP の境界からマイグレーションを当てた libSQL のデータベースのファイルとともに。二つのインスタンスを同じファイルに向けるテストを含む）、契約の層（リリースの手順で、試験の環境の本物の外部サービスの設定から、試験用の Stripe のサンドボックスと Google Maps Platform に）、端から端の層（リリースの手順で、試験の環境に。偽物の設定と、NFR-47 だけ本物の外部サービスの設定）、運用の予行の層（NFR-16、NFR-38、NFR-41、NFR-42）、実機の受け入れの層（NFR-15 と DAS-27 の走っているかの判断）。偽物は POL-03 のもの（EXT-01、EXT-02、Web Push の配信サービス、時計、ID と乱数、端末とのつながり、許諾と取り消しの重なり、端末が測る位置と速さ、秘密の置き場所、日々の呼び出し）だけを使い、新しい偽物は要らない。EXT-01 の偽物は、POL-03 の「設計が扱うどの結果も起こせる」のとおり、判断表 A（MOD-41）のどの答え（500、processing、実行の前の 400、状態の合わない 400、読み出しで取引が変わっていない）も起こせるものとする。
+ELM-03 のチェックが使う層は、単体の層（検査の手順で、Node.js の上の Vitest）、結合の層（検査の手順で、HTTP の境界からマイグレーションを当てた libSQL のデータベースのファイルとともに。二つのインスタンスを同じファイルに向けるテストを含む）、契約の層（リリースの手順で、試験の環境の本物の外部サービスの設定から、試験用の Stripe のサンドボックスと Google Maps Platform に）、端から端の層（リリースの手順で、試験の環境に。偽物の設定と、NFR-47 だけ本物の外部サービスの設定）、運用の予行の層（NFR-16、NFR-38、NFR-41、NFR-42）、実機の受け入れの層（NFR-15 と DAS-27 の走っているかの判断）。偽物は POL-03 のもの（EXT-01、EXT-02、Web Push の配信サービス、時計、ID と乱数、端末とのつながり、許諾と取り消しの重なり、端末が測る位置と速さ、秘密の置き場所、日々の呼び出し）だけを使い、新しい偽物は要らない。EXT-01 の偽物は、POL-03 の「設計が扱うどの結果も起こせる」のとおり、判断表 A（MOD-41）のどの答え（500、processing、実行の前の 400、状態の合わない 400、読み出しで取引が変わっていない）も起こせ、取引が変わっていないと読ませた後に確定済みと見せられる（後で効きうる確定、DEC-45）ものとする。
 
 いくつものモジュールが一緒に通る場面:
 
 | 場面 | 確かめること | 層 | MOD |
 |---|---|---|---|
-| 依頼から決済まで | 乗客が見積もって依頼し、押さえてから届き、ドライバーが選んで許諾し、迎車が着き、コードで乗車を始め、到着を確かめて決済し、乗客に支払った額が示される（CUJ-01〜CUJ-03、CUJ-06〜CUJ-08） | 端から端 | MOD-38、MOD-58、MOD-52、MOD-45、MOD-47、MOD-46、MOD-56、MOD-33 |
+| 依頼から決済まで | 乗客が見積もって依頼し、押さえてから届き、ドライバーが選んで許諾し、迎車が着き（着く前の道も）、コードで乗車を始め、到着を確かめて決済し、乗客に支払った額が示される（CUJ-01〜CUJ-03、CUJ-06〜CUJ-08、FR-27 の 1） | 端から端 | MOD-38、MOD-58、MOD-52、MOD-45、MOD-47、MOD-46、MOD-56、MOD-33 |
 | 依頼の状態の変化を相手に示すまで | 依頼、許諾、取り消し、迎車の到着が相手の一覧、画面、知らせに示され、示した時刻が記録される。画面から外れた相手に Web Push が届く（SLI-14、NFR-07） | 端から端 | MOD-33、MOD-34、MOD-35、MOD-45、MOD-47、MOD-52、MOD-65 |
 | 押さえが分からない依頼 | EXT-01 の偽物が押さえに答えず HOLD_UNCONFIRMED、後で済んでいたと見せると解く試みができ、依頼は受け付けないまま（FR-54 の 3） | 結合 | MOD-58、MOD-42、MOD-56、MOD-45 |
 | 許諾と取り消しの重なり | 差し込みで許諾と取り消し、二人の許諾、許諾と停止を重ね、どの順でも一つに定まる（NFR-11、NFR-10） | 結合 | MOD-45、MOD-52、MOD-55、MOD-26 |
 | 答えを落とした操作 | 書き終えた後の応答を落とし、同じキーの送り直しが一度だけ効き、つなぎ直した画面が今の状態を示す（NFR-11、QR-02） | 結合、端から端 | MOD-20、MOD-26、MOD-45、MOD-34 |
 | 止めて再開する | 依頼、乗車、決済の途中で ELM-03 を止めて起こし直し、押さえ中の依頼が受け付けなかったとされ、結果が分からない試みが確かめられ、日々の処理が取り直され、現在地の確かめの抜けた分が書かれる（NFR-16） | 運用の予行 | MOD-31、MOD-32、MOD-42、MOD-49、MOD-56、MOD-58 |
-| 決済が分からない | 偽物が決済に答えず PAYMENT_PENDING、後で済んでいたと見せると ride.charge_settled、やり直しで二度請求しない（FR-29 の 5、FR-30） | 結合 | MOD-56、MOD-42、MOD-26 |
+| 決済が分からない | 偽物が決済に答えず PAYMENT_PENDING、後で済んでいたと見せると ride.charge_settled、やり直しで二度請求しない。取引が変わっていないと見せ続けると処理されなかったとして到着した状態に戻り、その押さえでは支払い方法を変えられず、やり直しの拒否は押さえを解いて決まり、前の確定を遅れて効かせても二度請求しない（FR-29 の 5、FR-30、DEC-45） | 結合 | MOD-56、MOD-42、MOD-26、MOD-45 |
 | 料金と押さえの解除 | 許諾の前と後の取り消しの境目（届け直している間を含む）、不在の料金、処理されなかった解除と料金の新しい試み、押さえた額と解いた額（NFR-25、SLI-11） | 単体、結合 | MOD-56、MOD-42、MOD-45 |
 | 返金 | 返金、拒否、処理されなかった、分からない、やり直し、二人の重なった返金（CUJ-15、QR-45） | 結合、端から端 | MOD-57、MOD-42 |
 | ドライバーの停止 | 停止した時から一覧、内容、許諾、受付が使えず、進んでいる乗車は続く（CUJ-18、QR-49） | 結合、端から端 | MOD-55、MOD-52、MOD-45 |
@@ -1584,12 +1640,12 @@ sign-in: 5 failures lock 15 min, with the 20/min rate limit per source: at most 
 <!-- generated: findings -->
 | FND | 名前 | 重さ | 出した段 | 宛先 | 状態 | 変えた項目 |
 |---|---|---|---|---|---|---|
-| FND-55 | 確定と解除の試みで、500 の後の読み出しが取引の変わっていないことを示すと、DEC-45 の分け方ではその試みを終えられず、決済、料金、押さえの解除が進まない | 中 | high-level-design-to-detailed-design | architecture-to-high-level-design | 未解決 | MOD-42 |
-| FND-56 | 迎車の到着を位置で決める前（assigned）に確認コードが合っても、DAT-07 の状態遷移と IFC-03 には乗車を始める道がない | 中 | high-level-design-to-detailed-design | architecture-to-high-level-design | 未解決 | MOD-45 |
-| FND-57 | IFC-03 の依頼の支払い方法の変更が、決済の結果が分からない依頼（payment_pending）への答えを持たない | 軽微 | high-level-design-to-detailed-design | architecture-to-high-level-design | 未解決 | MOD-56 |
+| FND-55 | 確定と解除の試みで、500 の後の読み出しが取引の変わっていないことを示すと、DEC-45 の分け方ではその試みを終えられず、決済、料金、押さえの解除が進まない | 中 | high-level-design-to-detailed-design | architecture-to-high-level-design | 受け入れ | DAT-07、DAT-11、DEC-45、IFC-03、IFC-17、IFC-22、IFC-23、MOD-42、MOD-45、MOD-56、MOD-67 |
+| FND-56 | 迎車の到着を位置で決める前（assigned）に確認コードが合っても、DAT-07 の状態遷移と IFC-03 には乗車を始める道がない | 中 | high-level-design-to-detailed-design | architecture-to-high-level-design | 受け入れ | DAT-07、DAT-09、IFC-03、MOD-45、MOD-47、MOD-66、MOD-67 |
+| FND-57 | IFC-03 の依頼の支払い方法の変更が、決済の結果が分からない依頼（payment_pending）への答えを持たない | 軽微 | high-level-design-to-detailed-design | architecture-to-high-level-design | 受け入れ | IFC-03、IFC-22、MOD-56 |
 <!-- /generated -->
 
-この段階の ELM-03 に宛てた未解決の指摘はなかった。この実行は第 3 段階に三つの指摘を出した。中の FND-55 は、確定と取り消しの試みで 500 の後の読み出しが取引の変わっていないことを示したとき、DEC-45 が処理されなかったとするのを状態を変える呼び出しへの答えに限り、IFC-17 の「見つからなければ作られていない」は作る呼び出しのためのものなので、その試みを終える道がなく、決済が payment_pending から出られず（乗客は次の依頼を RIDE_ALREADY_ACTIVE で断られ続ける）、料金と押さえの解除が済まないこと。refused とすれば決済の依頼が要らない支払い方法の変更を求める。MOD-42 は今、DEC-45 のとおり unknown のまま確かめ続け、10 分で異常にしている。中の FND-56 は、FR-27 の 1 が迎車の到着を条件にしないのに、DAT-07 の状態遷移が乗車の開始を pickup_arrived からだけ許すため、位置が D_pickup_position_gap に入らないと、乗客が車にいてコードが合っても乗車を始められないこと。MOD-45 は今、assigned の乗車の開始に PICKUP_NOT_ARRIVED で答えている。軽微の FND-57 は、IFC-03 の依頼の支払い方法の変更が決済の結果を確かめている依頼への答えを持たないことで、MOD-56 は RIDE_ALREADY_ARRIVED で答えている。どれも、前の段階の項目を変えずにこの段階のモジュールの中で閉じられない。
+この段階の ELM-03 に宛てた未解決の指摘はない。表は、この段階が ELM-03 の実行で出した指摘で、どれも第 3 段階が受け入れた。中の FND-55（取引の ID が分かっている確定と取り消しで、500 の後の読み出しが取引の変わっていないことを示すと試みを終えられない）は DEC-45、IFC-17、DAT-11 が、待ちの後の最初の確かめからも変わっていなければ処理されなかったとして受け、中の FND-56（迎車の到着を位置で決める前の乗車の開始）は DAT-07、DAT-09、IFC-03 が、確認コードが合えば assigned からも始めるとして受け、軽微の FND-57（決済の結果が分からない依頼の支払い方法の変更）は IFC-03 が PAYMENT_PENDING_CONFIRMATION で受けた。第 3 段階のレビューが出した FND-58（処理されなかったとした確定が遅れて効いたときの二度の請求）も受け入れられ、後で効きうる確定のある押さえの決まり（DEC-45）になった。MOD-26、MOD-37、MOD-42、MOD-45〜MOD-47、MOD-56、MOD-66、MOD-67 は、それらと FND-50、FND-51 を受けた変更に従う。第 3 段階に宛てた軽微な FND-59 と FND-60 は未解決で、決まるまでの扱いは「未解決の点」に書いた。
 
 ## 申し送り
 <!-- generated: handoffs -->
@@ -1600,58 +1656,53 @@ sign-in: 5 failures lock 15 min, with the 20/min rate limit per source: at most 
 | HND-12 | 本人の確かめの失敗を止めるまでの回数、セッションの長さ、設定の符号の有効期間 | architecture-drivers-to-architecture | high-level-design-to-detailed-design | ELM-03 | 決定済み | DAT-02、DEC-40、MOD-36 |
 | HND-13 | 確認コードの長さと、合わない試みを止めるまでの回数 | architecture-drivers-to-architecture | high-level-design-to-detailed-design | ELM-03 | 決定済み | MOD-46 |
 | HND-14 | EXT-01 を呼ぶクライアントの部品と、そのやり直しと時間切れの設定 | architecture-to-technical-policy | high-level-design-to-detailed-design | ELM-03 | 決定済み | DEC-47、FND-14、MOD-41 |
-| HND-19 | ELM-03 の値のうち、時間のしきい値の SLO とお金の道にないもの | architecture-to-high-level-design | high-level-design-to-detailed-design | ELM-03 | 決定済み | FND-26、MOD-20、MOD-32、MOD-33 |
+| HND-19 | ELM-03 の値のうち、時間のしきい値の SLO とお金の道にないもの | architecture-to-high-level-design | high-level-design-to-detailed-design | ELM-03 | 決定済み | FND-26、MOD-01、MOD-20、MOD-32、MOD-33 |
 | HND-20 | EXT-01 の API の版と、要求と応答の型 | high-level-design-to-detailed-design | implementation | ELM-03 | 未決定 | MOD-41 |
 | HND-21 | 鍵の置き場所の名前と、写しの置き方 | high-level-design-to-detailed-design | implementation | ELM-03 | 未決定 | MOD-23 |
 | HND-22 | 模擬の運賃表の決まりの形と入れ方 | high-level-design-to-detailed-design | implementation | ELM-03 | 未決定 | MOD-39 |
 <!-- /generated -->
 
-この段階の ELM-03 に宛てた申し送り 7 のうち、6 を決めた。HND-09（走っているかの判断の値）は MOD-48、HND-10（異常とみなす条件と間隔、終えた記録を待つ時間）は MOD-67、MOD-32、MOD-20、HND-12（本人の確かめの値）は MOD-36、HND-13（確認コードの値）は MOD-46、HND-14（EXT-01 のクライアントの部品）は DEC-47 と MOD-41、HND-19（答えの期限、TTL、日々の処理の値、生存確認の値）は MOD-20、MOD-32、MOD-33 が決めた。HND-09 の iPhone の Safari の速さの確かめは、実機で確かめていないため DAS-27 にし、実機の受け入れの層で確かめる。HND-07（EXT-02 の呼び出しのタイムアウトとやり直し）は、枠の深さの MOD-40 の中にあり、読むだけの呼び出しで評価が低いため実装に送り、枠を MOD-40 と MOD-20 に足した。この実行は、確定の深さのモジュールの中で開けたままにした点を実装に送る HND-20（EXT-01 の API の版と型、MOD-41）、HND-21（鍵の置き場所の名前と写しの置き方、MOD-23）、HND-22（模擬の運賃表の決まりの形と入れ方、MOD-39。質問 1 の答えの後）を書いた。実装宛ての HND-16（ELM-03 のスキーマ）は未決定のまま。表の「決めた項目」は申し送りを basis_note で引く項目で、前の段階の項目（DAT-02、DAT-22、DEC-40、FND-14、FND-26）と、実装宛ての HND-20〜HND-22 に出る項目は、申し送りを決めたものではない。HND-07 は実装に送ったので、この段階の表に出ない（索引の実装への申し送りに出る）。
-
-## 未回答の質問
-| # | 質問 | 確かでない理由 | 選べる答え | 項目 | 回答 |
-|---|---|---|---|---|---|
-| 1 | 模す運賃の定め（QR-62）の中身は何か。MOD-39 は下書きで、運賃表の版ごとの初乗りの距離と額と、距離の加算の単位と額だけで料金を求め（加算は始まった単位ごとに一回数え、ほかの丸めはせず、額は円の整数のまま）、時間距離併用、迎車料金、割増を持たない。定めがほかの決まりを持つなら、判断表と、見積もりが持つ入力（依頼の時刻、道の区間ごとの速さ）が変わる | QR-61、QR-62、NFR-48 が「模す運賃の定め」を名指して中身を与えず、品質チェーンも設計の第 1 段階も未解決の点に挙げている。お金を動かす額を決める確定の深さの MOD-39 の判断表がそれに頼り、品質チェーンへの要求 QCR-09（影響は高）で品質チェーンにも書いてもらう | 1. 初乗りと距離の加算だけで求める（下書き） 2. 初乗りと距離の加算に時間距離併用（低い速さの時間を距離に換える）を加える 3. 2 に迎車料金と深夜などの割増を加える 4. 特定の地域と車の区分の運賃の定めを模す（地域と区分を書く） | MOD-39、MOD-38、QCR-09 | |
-
-料金の判断表（MOD-39）の決まりの形はこの質問を待つ。答えは、ここか、要求書（quality-chain-requests.md）の QCR-09 の「Answer:」の後に書けばよく、この段階の次の ELM-03 の実行が当てる。
+この段階の ELM-03 に宛てた申し送り 7 のうち、6 を決めた。HND-09（走っているかの判断の値）は MOD-48、HND-10（異常とみなす条件と間隔、終えた記録を待つ時間）は MOD-67、MOD-32、MOD-20、HND-12（本人の確かめの値）は MOD-36、HND-13（確認コードの値）は MOD-46、HND-14（EXT-01 のクライアントの部品）は DEC-47 と MOD-41、HND-19（答えの期限、TTL、日々の処理の値、生存確認の値）は MOD-20、MOD-32、MOD-33 が決めた。HND-09 の iPhone の Safari の速さの確かめは、実機で確かめていないため DAS-27 にし、実機の受け入れの層で確かめる。HND-07（EXT-02 の呼び出しのタイムアウトとやり直し）は、枠の深さの MOD-40 の中にあり、読むだけの呼び出しで評価が低いため実装に送り、枠を MOD-40 と MOD-20 に足した。この段階は、確定の深さのモジュールの中で開けたままにした点を実装に送る HND-20（EXT-01 の API の版と型、MOD-41）、HND-21（鍵の置き場所の名前と写しの置き方、MOD-23）、HND-22（模擬の運賃表の決まりの形と入れ方、MOD-39。決まりの形は決めたこと 1）を書いた。実装宛ての HND-16（ELM-03 のスキーマ）は未決定のまま。表の「決めた項目」は申し送りを basis_note で引く項目で、前の段階の項目（DAT-02、DAT-22、DEC-40、FND-14、FND-26）と、実装宛ての HND-20〜HND-22 に出る項目は、申し送りを決めたものではない。HND-07 は実装に送ったので、この段階の表に出ない（索引の実装への申し送りに出る）。
 
 ## 決めたこと
 | # | 質問 | 回答 | 項目 |
 |---|---|---|---|
+| 1 | 模す運賃の定め（QR-62）の中身は何か。MOD-39 は下書きで、運賃表の版ごとの初乗りの距離と額と、距離の加算の単位と額だけで料金を求め（加算は始まった単位ごとに一回数え、ほかの丸めはせず、額は円の整数のまま）、時間距離併用、迎車料金、割増を持たない。定めがほかの決まりを持つなら、判断表と、見積もりが持つ入力（依頼の時刻、道の区間ごとの速さ）が変わる | 初乗りと距離の加算だけで求める（下書きどおり。試行の模擬回答） | MOD-39、MOD-38、QCR-09 |
 
-答えを受けた質問はまだない。質問 1 のほかに尋ねる基準（影響の広さか重大さが高、入力の食い違い、入力が名指して中身を与えない法令と決まり、影響が高の品質チェーンへの要求）に当たる点はなかった。モジュールの分け方と深さ、状態遷移と判断表と並行性は、modules.md と behaviour-and-data.md の決まりと、DEC-08、DEC-10、DEC-15、DEC-18、DEC-24、DEC-42、DEC-45、各 IFC と DAT から決まり、推定のまま。確認コードと設定の符号を目的の鍵から作ること（DAT-07 と DAT-02 のハッシュだけを持つ決まりと、IFC-03 の乗客が開くたびにコードを示すこと、DEC-42 の送り直しに最初の答えを返すことをともに守る道）、流れのない相手を確定の後の待ちで決めること（流れの在りかの表を持たずに、いくつものインスタンスで IFC-11 を守る道）、許諾の当て直しと割り当てを一つの書き込みの取引で行うこと（QR-49 の「停止した時から」を守る道）は、入力から一つに決まり、推定のまま。値はどれも、一つか少しのモジュールの中にあり運用で直すもので、DAS-17〜DAS-26、DAS-28 にした（影響の広さは中か低、重大さは中か低）。DAS-22（セッションと止める回数）、DAS-26、DAS-27（走っているかの判断）は重大さが中で、どれも高でないため尋ねていない（DAS-27 は実機の受け入れで確かめる）。DEC-47 は一つのモジュールの中の部品の選び方で、変えても MOD-41 の中だけが変わるため尋ねていない。依存する第 3 段階の DAS-10〜DAS-15 と品質チェーンの QAS は評価し直したが、高になったものはない（「未確認の仮定」）。
+質問 1 の答えは下書きどおりなので、MOD-39 の判断表 A（初乗りと距離の加算だけで求め、加算は始まった単位ごとに数え、ほかの丸めをしない）は答えで確認したものになり、MOD-38 の見積もりの入力（道の長さと時間）も変わらない。答えは QCR-09 に記録してあり（回答済み）、品質チェーンが当てるまで MOD-39 と HND-22 は QCR-09 を前提に残す。QCR-09 を前提に挙げる第 3 段階の IFC-19 と DAT-06 は、第 3 段階が次に走るときにこの答えを引く（項目は加わらない）。
+
+質問 1 のほかに、尋ねる基準（影響の広さか重大さが高、入力の食い違い、入力が名指して中身を与えない法令と決まり、影響が高の品質チェーンへの要求）に当たる点はない。第 3 段階が受け入れた指摘に従う変更（キーを最初に受けたアカウントと経路に結び付けること、取引が変わらないまま処理されなかったとする確定と後で効きうる確定のある押さえの扱い、迎車の到着の前の乗車の開始、PAYMENT_PENDING_CONFIRMATION）は、DEC-42、DEC-45、IFC-03、IFC-17、DAT-07、DAT-09、DAT-11、DAT-26 から一つに決まる。payment_pending の依頼への新しいキーの決済を、その場の確かめ（MOD-42 の checkNow）で答えることは IFC-03 の idempotency から、押さえ直しの結果の取引で依頼の決済の試みを読み直し、その間に決済が始まっていれば依頼の押さえを替えずに新しい押さえを解くことは、IFC-17 の ordering と DEC-45 の、前の押さえへの確定とほかの押さえの確定を重ねない決まりから決まり、どれも推定のまま。モジュールの分け方と深さ、状態遷移と判断表と並行性は、modules.md と behaviour-and-data.md の決まりと、DEC-08、DEC-10、DEC-15、DEC-18、DEC-24、DEC-42、DEC-45、各 IFC と DAT から決まり、推定のまま。確認コードと設定の符号を目的の鍵から作ること（DAT-07 と DAT-02 のハッシュだけを持つ決まりと、IFC-03 の乗客が開くたびにコードを示すこと、DEC-42 の送り直しに最初の答えを返すことをともに守る道）、流れのない相手を確定の後の待ちで決めること（流れの在りかの表を持たずに、いくつものインスタンスで IFC-11 を守る道）、許諾の当て直しと割り当てを一つの書き込みの取引で行うこと（QR-49 の「停止した時から」を守る道）は、入力から一つに決まり、推定のまま。値はどれも、一つか少しのモジュールの中にあり運用で直すもので、DAS-17〜DAS-26、DAS-28 にした（影響の広さは中か低、重大さは中か低）。DAS-22（セッションと止める回数）、DAS-26、DAS-27（走っているかの判断）は重大さが中で、どれも高でないため尋ねていない（DAS-27 は実機の受け入れで確かめる）。DEC-47 は一つのモジュールの中の部品の選び方で、変えても MOD-41 の中だけが変わるため尋ねていない。依存するほかの段階の仮定と品質チェーンの QAS は評価し直したが、高になったものはない（「未確認の仮定」）。
 
 ## 未確認の仮定
 <!-- generated: assumptions -->
 | ID | 名前 | 種類 | 影響の広さ | 重大さ | 依存する項目 |
 |---|---|---|---|---|---|
-| DAS-05 | エンジニアは異常の知らせを Web アプリへの Web Push とその一覧で受け、想定の本番のプラットフォームからの知らせはメールで受ける | 判断 | 低 | 低 | DEC-20、MOD-67 |
 | DAS-18 | 前もって作る鍵の日数、鍵をメモリに持つ長さ、仮の名の長さを暫定に採る | 暫定の決定 | 低 | 低 | MOD-23 |
 | DAS-19 | 期限の来た処理を取る長さ、一度に取る数、失敗の後の間を暫定に採る | 暫定の決定 | 低 | 低 | MOD-31 |
 | DAS-21 | Web Push の知らせの TTL を暫定に採る | 暫定の決定 | 低 | 低 | MOD-33 |
-| DAS-23 | 確かめられない支払い方法の登録を見捨てるまでの時間と、降りる場所の変更の見積もりの有効期間を暫定に採る | 暫定の決定 | 低 | 低 | MOD-43、MOD-59 |
 | DAS-24 | 確認コードの長さと、合わない試みで照らし合わせを止める回数と時間を暫定に採る | 暫定の決定 | 低 | 低 | MOD-46 |
 | DAS-25 | 迎車の到着に使う位置の確からしさの上限を暫定に採る | 暫定の決定 | 低 | 低 | MOD-47 |
 | DAS-28 | 異常を見つけて知らせる間隔とまとめ方の値を暫定に採る | 暫定の決定 | 低 | 低 | MOD-67 |
 | QAS-25 | 依頼の状態の変化を届ける速さのしきい値と最初の目標値 | 暫定の決定 | 低 | 低 | DEC-46、DRV-03、IFC-11 |
 | QAS-32 | 決済の記録と決済サービスの処理の一致の最初の目標値と突き合わせの時点 | 暫定の決定 | 低 | 低 | DAT-13、DRV-07、IFC-15 |
 | QAS-33 | 決済の結果を示すまでの速さのしきい値 | 暫定の決定 | 低 | 低 | DEC-46、DRV-07、IFC-03 |
-| DAS-02 | デモの回の間は Cloud Run のインスタンスを一つ、回の外は 0 にし、落ちたときの失敗と回を閉じた後の期限の遅れを受け入れる | 暫定の決定 | 中 | 低 | DEC-05、DEC-18、DEC-20、ELM-08、FND-05、FND-09、MOD-49、MOD-66 |
+| DAS-05 | エンジニアは異常の知らせを Web アプリへの Web Push とその一覧で受け、想定の本番のプラットフォームからの知らせはメールで受ける | 判断 | 中 | 低 | DEC-20、MOD-67 |
 | DAS-10 | EXT-01 への呼び出しのタイムアウト、同じキーでのやり直し、待ち、確かめの間隔を暫定に採る | 暫定の決定 | 中 | 低 | DEC-46、IFC-17 |
 | DAS-11 | 端末、通信、自身の処理の時間と、流れ、位置、着く見込みの間隔を暫定に採る | 暫定の決定 | 中 | 低 | DEC-46、IFC-05、IFC-11、IFC-19 |
 | DAS-12 | 日々の処理の時刻と照合で読む期間、期限の来た処理を拾う間隔を暫定に採る | 暫定の決定 | 中 | 低 | DAT-13、DEC-46、IFC-15 |
 | DAS-15 | 流れで送った変化を Web Push でも知らせるまでの待ちと、Web Push を送る呼び出しと配信の時間を暫定に採る | 暫定の決定 | 中 | 低 | DEC-46、IFC-11、IFC-21 |
 | DAS-16 | ELM-02 の呼び出しのタイムアウトと、答えのない操作の送り直し、持つ長さと数を暫定に採る | 暫定の決定 | 中 | 低 | MOD-01、MOD-20 |
-| DAS-17 | ELM-03 が答える期限、入口の回数の限り、外からの生存確認の値を暫定に採る | 暫定の決定 | 中 | 低 | MOD-20 |
+| DAS-17 | ELM-03 が答える期限、入口の回数の限り、外からの生存確認の値を暫定に採る | 暫定の決定 | 中 | 低 | MOD-01、MOD-20 |
 | DAS-20 | 日々の処理の時間の上限、呼び出しの期限と再試行、終えた記録を待つ時間、一覧の 1 ページと一つの取引の行の数を暫定に採る | 暫定の決定 | 中 | 低 | MOD-32、MOD-44、MOD-68 |
 | DAS-22 | サインインに続けて失敗したときに止める回数と時間、セッションの長さ、設定の符号の有効期間と形、パスワードの長さを暫定に採る | 暫定の決定 | 低 | 中 | MOD-36 |
+| DAS-23 | 確かめられない支払い方法の登録を見捨てるまでの時間と、降りる場所の変更の見積もりの有効期間を暫定に採る | 暫定の決定 | 中 | 低 | MOD-43、MOD-59 |
 | DAS-26 | 走っているかの判断に使う位置の新しさと窓を暫定に採る | 暫定の決定 | 低 | 中 | MOD-48 |
 | DAS-27 | 参加者の iPhone の Safari が返す速さで、V_moving_lock の上と下を分けられる | 判断 | 低 | 中 | MOD-48 |
 | QAS-54 | 状態の変化を相手の画面に示した時刻の記録（FRP-11）を今期作る | 暫定の決定 | 中 | 低 | DAT-20、DEC-46、DRV-03、DRV-26、IFC-10、IFC-11、IFC-21 |
 | DAS-06 | EXT-01 のテスト環境で、後で確定する押さえ、一部の確定、取り消し、返金を円で使える | 判断 | 中 | 中 | DEC-09、ELM-05、IFC-17 |
 <!-- /generated -->
 
-この段階が書いた仮定は DAS-17〜DAS-28 で、DAS-27 のほかは暫定の決定。DAS-22（本人の確かめの値）、DAS-26（走っているかの判断の値）、DAS-27（iPhone の Safari の速さ）は、誤ると個人の情報か安全に届きうるので重大さを中にしたが、どれも一つのモジュール（と、それを使う二つ）だけが依存し、判断表が分からないときに受け付けない側に倒すか、テストが境目を確かめるため、高にしていない。依存する第 2 段階の DAS-02（インスタンスが一つで回の外は 0）は、MOD-49 と MOD-66 がデモの回の間をインスタンスの動いている間として読むため前提に挙げ、DAS-05（エンジニアは Web Push と一覧で知らせを受ける）は MOD-67 が前提に挙げた。どちらも評価は中、低と低、低のまま。第 3 段階の DAS-10、DAS-11、DAS-12、DAS-13、DAS-14、DAS-15 は IFC と DEC を通して ELM-03 の値の前提になり（MOD-42 は IFC-17 の値を、MOD-33 は IFC-11 と IFC-21 の値を使う）、この段階の評価も中、低のまま。第 4 段階の ELM-02 の DAS-16（MOD-01 のタイムアウト 15 秒）は、MOD-20 の外部を呼ばない操作の期限をそれに合わせて 10 秒より短くしたため MOD-20 の前提に挙げ、評価し直して中、低のまま（rating_note に HND-19 で決めた値を書いた）。品質チェーンの仮定の評価（表の影響の広さと重大さ）は、このコンポーネントが評価したもの。QAS-54（FR-53 を今期作る）は第 3 段階のレビューの質問 1 で成り立つと答えを受け（QCR-08）、覆れば MOD-33 の届けの記録と示した時刻、MOD-65 の示した時刻の報告、MOD-66 の SLI-14 の数えを直すので中、低（内側の記録だけで、利用者に害はない）。QAS-25（T_dispatch_propagation）と QAS-33（T_payment_response）は、値が変われば第 3 段階の IFC-11、IFC-17、IFC-03 の値が変わり、このコンポーネントはその値を ID で引くだけなので低、低。QAS-32（SLI-12 の突き合わせの時点）は、変われば MOD-44 の決める日（2 日後）を直すだけなので低、低。どの仮定にも答えは要らない。訂正があれば、回答と同じように次の実行で反映する。
+この段階が書いた仮定は DAS-17〜DAS-28 で、DAS-27 のほかは暫定の決定。DAS-22（本人の確かめの値）、DAS-26（走っているかの判断の値）、DAS-27（iPhone の Safari の速さ）は、誤ると個人の情報か安全に届きうるので重大さを中にしたが、どれも一つのモジュール（と、それを使う二つ）だけが依存し、判断表が分からないときに受け付けない側に倒すか、テストが境目を確かめるため、高にしていない。依存する第 2 段階の DAS-02（インスタンスが一つで回の外は 0）は、MOD-49 と MOD-66 がデモの回の間をインスタンスの動いている間として読むため前提に挙げ、第 3 段階のレビューの質問 2 で確認済みになったので、MOD-49 と MOD-66 は仮定でなくなった（推定）。DAS-05（エンジニアは Web Push と一覧で知らせを受ける）は MOD-67 が前提に挙げ、第 3 段階のレビューが依存する項目の二つ（DEC-20、MOD-67）から影響の広さを中にした。中、低のまま。この段階の DAS-23（登録を見捨てる時間と降りる場所の変更の見積もりの有効期間）も、依存する MOD-43 と MOD-59 の二つから、第 3 段階のレビューが影響の広さを中にした。中、低のまま。第 3 段階の DAS-10、DAS-11、DAS-12、DAS-13、DAS-14、DAS-15 は IFC と DEC を通して ELM-03 の値の前提になり（MOD-42 は IFC-17 の値を、MOD-33 は IFC-11 と IFC-21 の値を使う）、この段階の評価も中、低のまま。DAS-10 の確かめの間隔は、取引の ID が分かっている確定と取り消しを処理されなかったとする最初の確かめの時刻（MOD-42 の firstCheckAt）にもなるが、早すぎても同じ押さえへの次の試みが取引の状態に退けられて読み直しが増え、支払い方法を変えられない場面が増えるだけで、後で効きうる確定の決まり（MOD-56）によりお金は二度動かないため、重大さは低のまま。第 4 段階の ELM-02 の DAS-16（MOD-01 のタイムアウト 15 秒）は、MOD-20 の外部を呼ばない操作の期限をそれに合わせて 10 秒より短くしたため MOD-20 の前提に挙げ、評価し直して中、低のまま（rating_note に HND-19 で決めた値を書いた）。品質チェーンの仮定の評価（表の影響の広さと重大さ）は、このコンポーネントが評価したもの。QAS-54（FR-53 を今期作る）は第 3 段階のレビューの質問 1 で成り立つと答えを受け（QCR-08）、覆れば MOD-33 の届けの記録と示した時刻、MOD-65 の示した時刻の報告、MOD-66 の SLI-14 の数えを直すので中、低（内側の記録だけで、利用者に害はない）。QAS-25（T_dispatch_propagation）と QAS-33（T_payment_response）は、値が変われば第 3 段階の IFC-11、IFC-17、IFC-03 の値が変わり、このコンポーネントはその値を ID で引くだけなので低、低。QAS-32（SLI-12 の突き合わせの時点）は、変われば MOD-44 の決める日（2 日後）を直すだけなので低、低。どの仮定にも答えは要らない。訂正があれば、回答と同じように次の実行で反映する。
 
 ## 未定の値
 新しい未定の値はない。このコンポーネントのモジュールが使う未定の値と品質チェーンの値:
@@ -1671,9 +1722,8 @@ sign-in: 5 failures lock 15 min, with the 20/min rate limit per source: at most 
 | N_message_retention_days | 連絡のメッセージを持つ日数（第 3 段階の未定の値） | MOD-62、MOD-68 |
 
 ## 未解決の点
-- 料金の判断表（MOD-39）は、模す運賃の定めの中身を待つ（質問 1、QCR-09）。
-- 確定と取り消しの試みで、500 の後の読み出しが取引の変わっていないことを示したときの終え方は、第 3 段階が FND-55 で決めるまで、MOD-42 が結果が分からないまま確かめ続けて異常にする。
-- 迎車の到着を位置で決める前の乗車の開始は、第 3 段階が FND-56 で決めるまで受け付けない。
+- 押さえの解除で後で効きうる確定が効いたと分かり、同じ押さえの新しい試みで決済が済んだとき、それより前に 202 PAYMENT_PENDING と答えた決済のキーの送り直しへの答えは、第 3 段階が FND-59 で決めるまで、DEC-45 のとおりキーが結び付く試みの今の結果（402 PAYMENT_DECLINED）で答える（MOD-56 の判断表 D）。お金は一度だけ動き、流れの ride.charge_settled と今の状態は済んだことを示す。
+- ELM-03 がまだキーを受けていない要求が、同じブラウザのほかのアカウントのセッションで送られたときにどのアカウントの操作として行うかは、第 3 段階が FND-60 で決める。それまで MOD-20 と MOD-26 は DEC-42 のとおり、キーを最初に受けたアカウントと経路に結び付け、ほかのアカウントか経路で受けたキーを行わない。
 
 ## 範囲外
 - 模擬の運賃表の数を模す運賃の定めと照らし合わせること（NFR-48）: 人が行う照合で、POL-03 が置き場所を決めている。
@@ -1681,4 +1731,4 @@ sign-in: 5 failures lock 15 min, with the 20/min rate limit per source: at most 
 - 参加者に、ドライバーが車を止めてから依頼を選ぶよう案内すること: 第 2 段階の範囲外の参加者への案内に加わる。ソフトウェアは走っている間の操作を受け付けないことまでを受け持つ（MOD-48）。
 
 ## 次
-質問 1 の答えを待っている。「未回答の質問」の回答の欄か、要求書の QCR-09 の「Answer:」の後に答えを書いたら、この段階を ELM-03 でもう一度実行して答えを当てる。それまで、この実行は再開を待つ。この実行は第 3 段階に中の指摘 FND-55 と FND-56 を出したので、第 3 段階（`architecture-to-high-level-design`）を実行して取り上げる（同じ実行で軽微の FND-57 も取り上げる）。第 3 段階がそれを受け入れて DEC-45、IFC-17、IFC-03、DAT-07 を変えたら、この段階の ELM-03 の次の実行がそれに従う。詳細設計の索引で未着手の ELM-01 には、この段階をいつでも実行できる（ELM-01 の実行は、HND-17 で、ELM-03 の答えの期限（外部を呼ばない操作 5 秒、EXT-02 を呼ぶ操作 8 秒）に通信の余裕を足したものより長いタイムアウトを決める）。品質チェーンへの要求は `docs/design/quality-chain-requests.md` が挙げる（この実行が出した QCR-09 と、QCR-01、QCR-06、QCR-07 が未回答、QCR-02〜QCR-05、QCR-08 が回答済み）。それを品質チェーンに渡すかどうかと、その時期は利用者が決める。
+答えを待つ質問はない。ELM-03 はまだレビューされていないので、別の文脈で `design-review` を第 4 段階の ELM-03 に実行する。レビューがこの段階の ELM-03 に重大か中の指摘を出したら、この段階を ELM-03 でもう一度実行する（軽微な指摘のためには走らせない）。この報告が前の段階に宛てた未解決の指摘はない。質問 1 の答えを記録した QCR-09 を前提に挙げる第 3 段階の IFC-19 と DAT-06 は、第 3 段階が次に走るときにその答えに従う（下書きどおりなので項目は加わらない）。第 3 段階に宛てた軽微な FND-59、FND-60 は、第 3 段階がほかの理由で走るときに取り上げる。詳細設計の索引で未着手の ELM-01 には、この段階をいつでも実行できる（ELM-01 の実行は、HND-17 で、ELM-03 の答えの期限（外部を呼ばない操作 5 秒、EXT-02 を呼ぶ操作 8 秒）に通信の余裕を足したものより長いタイムアウトを決める）。品質チェーンへの要求は `docs/design/quality-chain-requests.md` が挙げる（QCR-01、QCR-06、QCR-07、QCR-10 が未回答、QCR-02〜QCR-05、QCR-08、QCR-09 が回答済み）。それを品質チェーンに渡すかどうかと、その時期は利用者が決める。

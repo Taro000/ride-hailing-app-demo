@@ -1,13 +1,13 @@
 # 詳細設計の索引: 配車サービス
 
-更新: 2026-11-13 · 入力の基準: 9ffea05
+更新: 2026-11-13 · 入力の基準: eb55336
 
 <!-- generated: components -->
 | コンポーネント | 名前 | 状態 | 報告書 | 確定のモジュール | 枠のモジュール |
 |---|---|---|---|---|---|
 | ELM-01 | 乗客とドライバーの Web アプリ | 未着手 | — | — | — |
 | ELM-02 | 担当者とエンジニアの Web アプリ | 回答反映済み | 4-detailed-design/ELM-02.md | MOD-01〜MOD-02 | MOD-03〜MOD-19 |
-| ELM-03 | 配車サーバー | 質問待ち | 4-detailed-design/ELM-03.md | MOD-20、MOD-23、MOD-26〜MOD-27、MOD-31〜MOD-33、MOD-36、MOD-39、MOD-41〜MOD-48、MOD-51〜MOD-52、MOD-56〜MOD-59、MOD-67〜MOD-68 | MOD-21〜MOD-22、MOD-24〜MOD-25、MOD-28〜MOD-30、MOD-34〜MOD-35、MOD-37〜MOD-38、MOD-40、MOD-49〜MOD-50、MOD-53〜MOD-55、MOD-60〜MOD-66 |
+| ELM-03 | 配車サーバー | 回答反映済み | 4-detailed-design/ELM-03.md | MOD-20、MOD-23、MOD-26〜MOD-27、MOD-31〜MOD-33、MOD-36、MOD-39、MOD-41〜MOD-48、MOD-51〜MOD-52、MOD-56〜MOD-59、MOD-67〜MOD-68 | MOD-21〜MOD-22、MOD-24〜MOD-25、MOD-28〜MOD-30、MOD-34〜MOD-35、MOD-37〜MOD-38、MOD-40、MOD-49〜MOD-50、MOD-53〜MOD-55、MOD-60〜MOD-66 |
 <!-- /generated -->
 
 ## 実装への申し送り
@@ -26,5 +26,5 @@
 | HND-16 | ELM-03 | ELM-03 が提供する HTTP と流れのインタフェースのスキーマ | ELM-03 の各インタフェースの経路を実装するとき |
 | HND-20 | ELM-03 | EXT-01 の API の版と、要求と応答の型 | MOD-41（EXT-01 のつなぎ口）を実装するとき |
 | HND-21 | ELM-03 | 鍵の置き場所の名前と、写しの置き方 | MOD-23（鍵と暗号）を実装するとき |
-| HND-22 | ELM-03 | 模擬の運賃表の決まりの形と入れ方 | MOD-39（料金の求め方）を実装するとき（第 4 段階の ELM-03 の質問 1 に答えが出た後） |
+| HND-22 | ELM-03 | 模擬の運賃表の決まりの形と入れ方 | MOD-39（料金の求め方）を実装するとき |
 <!-- /generated -->

@@ -566,7 +566,7 @@ kept operation dropped before ELM-03 forgets its key: 23 h < 24 h: True (margin 
 | FND-46 | MOD-01 のタブの保存の項目が、kept() が返す答えの種類を不変条件で除き、答えのない送りの後に 401 を受けた操作の種類と、版が変わった後の読み方を決めていない | 軽微 | design-review | high-level-design-to-detailed-design | 受け入れ | FND-52、MOD-01、MOD-02 |
 | FND-47 | MOD-02 の読み込み中に、一覧の読みが 429 か知らない符号の 4xx で答えたときの移り先がない | 軽微 | design-review | high-level-design-to-detailed-design | 受け入れ | MOD-02 |
 | FND-48 | 報告の割り当てと MOD-01、MOD-09 の functions が、FR-49 で食い違う | 軽微 | design-review | high-level-design-to-detailed-design | 受け入れ | MOD-09 |
-| FND-50 | 冪等キーの範囲はアカウントを含むが、セッションのクッキーは同じ origin のどのタブと二つの Web アプリにも共通で、端末は一つの操作のどの要求も同じアカウントで送ることを確かめられても保てない | 軽微 | high-level-design-to-detailed-design | architecture-to-high-level-design | 受け入れ | DAT-26、DEC-42、FND-60、MOD-01、MOD-02 |
+| FND-50 | 冪等キーの範囲はアカウントを含むが、セッションのクッキーは同じ origin のどのタブと二つの Web アプリにも共通で、端末は一つの操作のどの要求も同じアカウントで送ることを確かめられても保てない | 軽微 | high-level-design-to-detailed-design | architecture-to-high-level-design | 受け入れ | DAT-26、DEC-42、FND-60、MOD-01、MOD-02、MOD-26 |
 | FND-51 | IFC-01 の GET /v1/me が返すものに、本人のアカウントの ID がない | 軽微 | high-level-design-to-detailed-design | architecture-to-high-level-design | 受け入れ | IFC-01、MOD-01、MOD-37 |
 | FND-52 | MOD-01 の kept() が、最初の変える要求の答えを待っている返金の操作を evidence が notDone のため捨て、画面を開き直すと新しい返金を受け付ける | 中 | design-review | high-level-design-to-detailed-design | 受け入れ | MOD-01、MOD-02 |
 | FND-53 | MOD-02 の判断表 C に、evidence が unanswered の操作で送る前の確かめが 503 か 4xx で答えた failed の行がない | 軽微 | design-review | high-level-design-to-detailed-design | 受け入れ | MOD-01、MOD-02 |

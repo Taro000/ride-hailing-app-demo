@@ -2,7 +2,7 @@ id: MOD-56
 title: 依頼のお金
 status: active
 basis: inferred
-basis_note: 依頼ごとに確定額を後で確定する取引で押さえ、確定額か支払い方法が変わったら新しい取引で押さえ直してから前の取引を取り消し、決済はその時の押さえの全額の確定、料金は押さえの一部の確定、無料の終わりは取り消しで解くことは DEC-09、押さえ、押さえ直し、決済の答えと、結果が分からない決済に同じ試みを確かめた結果を答えること、処理されなかった決済をドライバーのやり直しで新しい試みにし、拒否の後は乗客が押さえ直したときだけ新しい試みを作ることは IFC-03 と DEC-45、料金の請求と押さえを解くことは期限の処理が送り、処理されなかったら確かめと同じ間隔で新しい試みを作ることは IFC-03、IFC-17、DEC-45、キャンセル料と不在の料金は CON-08 の 500 円で、確定額はそれを下回らないことは CON-08 と DEC-09（QCR-05 の答え）、一つの依頼の押さえ、押さえ直し、確定、解除の順は IFC-17 の ordering、依頼ごとに押さえた額、請求した額とその種類、解いた額を残すことは FR-54 の 10 と DAT-11（SLI-11）（どれも入力）。IFC-17 の ordering の「前の試み」を、同じ押さえの取引にかかわる試みとして読み、押さえ直しの後の前の押さえの解除は今の押さえの決済を待たせないこと（DEC-09 の順を保つ）は推定。決済の結果が分からない依頼の支払い方法の変更は、IFC-03 に答えがないため RIDE_ALREADY_ARRIVED で受け付けず、FND-57 で第 3 段階に出した
+basis_note: 依頼ごとに確定額を後で確定する取引で押さえ、確定額か支払い方法が変わったら新しい取引で押さえ直してから前の取引を取り消し、決済はその時の押さえの全額の確定、料金は押さえの一部の確定、無料の終わりは取り消しで解くことは DEC-09、押さえ、押さえ直し、決済の答えと、結果が分からない決済に新しいキーでも依頼の決済を確かめた結果を答えること、処理されなかった決済をドライバーのやり直しで新しい試みにし、拒否の後は乗客が押さえ直したときだけ新しい試みを作ることは IFC-03 と DEC-45、料金の請求と押さえを解くことは期限の処理が送り、処理されなかったら確かめと同じ間隔で新しい試みを作ることは IFC-03、IFC-17、DEC-45、キャンセル料と不在の料金は CON-08 の 500 円で、確定額はそれを下回らないことは CON-08 と DEC-09（QCR-05 の答え）、一つの依頼の押さえ、押さえ直し、確定、解除の順は IFC-17 の ordering、依頼ごとに押さえた額、請求した額とその種類、解いた額を残すことは FR-54 の 10 と DAT-11（SLI-11）（どれも入力）。結果が分からなかった決済が確かめで処理されなかったと分かれば依頼を到着した状態に戻し、ドライバーと乗客に知らせ、同じキーの送り直しに 503 PAYMENT_SERVICE_UNAVAILABLE で答えることは DEC-45、DAT-07、IFC-03（FND-55 を受けた第 3 段階の変更、入力）。決済の試みが動いているか結果が分からない依頼の支払い方法の変更に 409 PAYMENT_PENDING_CONFIRMATION で答えることは IFC-03（FND-57 を受けた第 3 段階の変更、入力）。取引が変わらないまま処理されなかったとした確定の要求がその押さえで後で効きうる間は、その処理をほかの押さえに移さず（支払い方法の変更は 409 PAYMENT_PENDING_CONFIRMATION）、その押さえへの次の確定がはっきり拒否されても拒否で終えずに押さえを解き、解ければその拒否で、確定済みならその処理の新しい試みを読んだ額で済んだとすること（決済は待つ間 payment_pending と 202 PAYMENT_PENDING、料金も同じ）は DEC-45、IFC-03、IFC-17、DAT-07、DAT-11（FND-58 を受けた第 3 段階の変更、入力）。202 で答えた決済のキーの送り直しに、キーが結び付く試みの今の結果で答えることは DEC-45 と IFC-03 の idempotency（入力）で、後で効きうる確定が押さえの解除で効いたと分かって別の試みで済んだときの答えは、第 3 段階の FND-59（未解決）を待つ。IFC-17 の ordering の「前の試み」を、同じ押さえの取引にかかわる試みとして読み、押さえ直しの後の前の押さえの解除は今の押さえの決済を待たせないこと（DEC-09 の順を保つ）、依頼の決済が分からない間の新しいキーの決済で、試みか押さえを解く試みをその場で確かめること（MOD-42 の checkNow）、押さえ直しの結果の取引で依頼の決済の試みを読み直し、その間に決済が始まっていれば依頼の押さえを替えずに新しい押さえを解くこと（二つの押さえの確定を重ねない道）、後で効きうる確定を押さえへの確定の試みの not_processed の理由とその後に読んだ取引の状態から決めることは推定
 premises: [CON-08]
 component: ELM-03
 name: 依頼のお金
@@ -17,12 +17,12 @@ interface:
     errors: []
   - operation: "pay(actor: Actor, rideId: RideId, key: IdempotencyKey) -> PaymentAnswer"
     pre: null
-    post: POST /v1/rides/{rideId}/payment で、判断表 A で答え、新しい試みを作るなら取引 A で決済の試み（capture_payment、今の押さえの全額）と冪等キー（MOD-26）を書いて MOD-42 の sendWaiting で送る。済めば completed、拒否なら payment_declined、処理されなかったなら到着したまま、分からなければ payment_pending と 202 にし、ride.charge_settled を乗客とドライバーに、依頼の経過の「決済が済んだ（その額）」と乗客に示した支払った額を書く
-    errors: ["PAYMENT_DECLINED: 402 と reason", "PAYMENT_METHOD_CHANGE_REQUIRED: 409", "PAYMENT_SERVICE_UNAVAILABLE: 503（何も請求していない。同じキーで送り直さない）", "PAYMENT_PENDING: 202", "RIDE_NOT_ARRIVED: 409", "RIDE_ALREADY_ENDED: 409", "NOT_FOUND: 404", "OPERATION_IN_PROGRESS: 409（MOD-26）"]
+    post: POST /v1/rides/{rideId}/payment で、判断表 A で答える。新しい試みを作るなら取引 A で決済の試み（capture_payment、今の押さえの全額）と冪等キー（MOD-26）を書いて MOD-42 の sendWaiting で送り、payment_pending の依頼では、結果が分からない試みか押さえを解く試みを MOD-42 の checkNow で確かめた結果を答える。済めば completed、拒否なら payment_declined か、今の押さえに後で効きうる確定があれば押さえを解く試みと payment_pending と 202、処理されなかったなら到着したまま、分からなければ payment_pending と 202 にし、ride.charge_settled を乗客とドライバーに、依頼の経過の「決済が済んだ（その額）」と乗客に示した支払った額を書く
+    errors: ["PAYMENT_DECLINED: 402 と reason", "PAYMENT_METHOD_CHANGE_REQUIRED: 409", "PAYMENT_SERVICE_UNAVAILABLE: 503（何も請求していない。同じキーで送り直さない）", "PAYMENT_PENDING: 202（今の押さえに後で効きうる確定があり、押さえを解いて決めている間も）", "RIDE_NOT_ARRIVED: 409", "RIDE_ALREADY_ENDED: 409", "NOT_FOUND: 404", "OPERATION_IN_PROGRESS: 409（MOD-26）"]
   - operation: "changeMethod(actor: Actor, rideId: RideId, key: IdempotencyKey) -> MethodChanged"
     pre: null
-    post: PUT /v1/rides/{rideId}/payment-method で、判断表 B で答え、押さえ直すなら取引 A で新しい支払い方法（MOD-43 の usableMethod）の押さえの試み（rehold_method）を書いて送り、済めば同じ取引で依頼の支払い方法を変え、前の押さえを解く試みを作り（sendLater）、拒否の後の依頼なら到着したままに戻して ride.payment_method_changed をドライバーに書く。済まなければ何も変えない
-    errors: ["PAYMENT_DECLINED: 402 と reason", "REHOLD_UNCONFIRMED: 503", "PAYMENT_SERVICE_UNAVAILABLE: 503", "PAYMENT_METHOD_REQUIRED: 409（使える支払い方法がない）", "RIDE_ALREADY_ARRIVED: 409（決済の結果を確かめている依頼。FND-57）", "RIDE_ALREADY_ENDED: 409", "NOT_FOUND: 404"]
+    post: PUT /v1/rides/{rideId}/payment-method で、判断表 B で答え、押さえ直すなら取引 A で新しい支払い方法（MOD-43 の usableMethod）の押さえの試み（rehold_method）を書いて送る。済めば結果の取引で依頼と依頼の決済の試みを読み直し、依頼が終わっておらず決済が始まっていなければ依頼の支払い方法と押さえを変え、前の押さえを解く試みを作り（まだ解いていなければ。sendLater）、拒否の後の依頼なら到着したままに戻して ride.payment_method_changed をドライバーに書く。依頼が終わったか決済が始まっていれば、依頼を変えずに新しい押さえを解く試みを作る。済まなければ何も変えない
+    errors: ["PAYMENT_DECLINED: 402 と reason", "REHOLD_UNCONFIRMED: 503", "PAYMENT_SERVICE_UNAVAILABLE: 503", "PAYMENT_METHOD_REQUIRED: 409（使える支払い方法がない）", "PAYMENT_PENDING_CONFIRMATION: 409（決済の試みが動いているか結果が分からないか、今の押さえに後で効きうる確定がある）", "RIDE_ALREADY_ENDED: 409", "NOT_FOUND: 404"]
   - operation: "rehold(tx: Tx, rideId: RideId, amount: Money, purpose: ReholdPurpose) -> Attempt"
     pre: 呼ぶのは MOD-59 だけで、降りる場所の変更を reholding にする取引 A の中
     post: 今の支払い方法で新しい確定額の押さえの試み（rehold_destination）を作る
@@ -33,17 +33,23 @@ interface:
     errors: []
   - operation: "applyResult(tx: Tx, attempt: Attempt, result: AttemptResult) -> none; nextAttempt(tx: Tx, attempt: Attempt) -> NewAttempt or none"
     pre: MOD-42 の持ち主として（hold、rehold_method、capture_payment、capture_fee、release）
-    post: 判断表 C の行のとおり、試みの結果と同じ取引で依頼の状態（MOD-45 の settleHold と applyMoney）、出来事、届け、moneySettled を書き、処理されなかった料金と解除の次の試みを返す（決済は返さない。ドライバーのやり直しを待つ）
+    post: 判断表 A の結果の行と判断表 C の行のとおり、試みの結果と同じ取引で依頼の状態（MOD-45 の settleHold と applyMoney）、出来事、届け、moneySettled を書く。後で効きうる確定のある押さえへの確定がはっきり拒否されたら、その処理を拒否で終えずに押さえを解く試み（decide）を作り、その解除が確定済みに退けられたら、その処理の新しい試みを MOD-42 の createFromRead で書く。処理されなかった料金と解除の次の試みを返す（決済は返さない。ドライバーのやり直しを待つ）
+    errors: []
+  - operation: "overdueAnswer(route: RouteName, attemptId: AttemptId) -> StoredAnswer"
+    pre: MOD-26 が、決済と支払い方法の変更の経路の答えの期限の後と、202 で答えた決済のキーの送り直しで呼ぶ（registerRoute で渡す）
+    post: 決済は判断表 D で、キーが結び付く決済の試みの今の結果から答える。支払い方法の変更は押さえ直しの試みの今の状態から DEC-45 のとおり答える（依頼の押さえが替わっていれば 200、はっきり拒否は 402 PAYMENT_DECLINED、処理されなかったは 503 PAYMENT_SERVICE_UNAVAILABLE、ほかは 503 REHOLD_UNCONFIRMED）
     errors: []
   - operation: "moneyOf(rideId: RideId) -> RideMoney"
     pre: null
-    post: 押さえた額、請求した額とその種類、解いた額、支払われた額（返金できる額のもと）、決済の状態（今の状態の示し方、MOD-60、MOD-61、MOD-57）
+    post: 押さえた額、請求した額とその種類、解いた額、支払われた額（返金できる額のもと）、決済の状態（済んだ、拒否されて乗客の支払い方法の変更を待つ、乗客が押さえ直してやり直せる、決済サービスが処理せず済んでいないのでやり直せる、分からない。今の状態の示し方、MOD-60、MOD-61、MOD-57）
     errors: []
 invariants:
   - 一つの乗車に済んだ決済は一つ。一つの依頼に済んだキャンセル料か不在の料金は一つで、許諾の前に終わった依頼には請求しない
   - 押さえ直しは新しい押さえが済んでから前の押さえを解き、済まなければ依頼を変えない
   - 請求する額は確定額か CON-08 の料金で、その時の押さえの額を超えない
   - 要る押さえの解除と料金の請求が済むか拒否で終わるまで、依頼の moneySettled は偽
+  - 今の押さえに後で効きうる確定（取引が変わらないまま not_processed にした決済か料金の確定）がある間は、その処理をほかの押さえに移さず（押さえ直しを作らず、依頼の押さえを替えない）、その押さえへの確定のはっきりした拒否でその処理を拒否で終えない
+  - 依頼の押さえを押さえ直しで替えるのは、依頼が終わっておらず、依頼の決済の試みに unknown も succeeded もないときだけ（二つの押さえの確定は重ならない）
 depends_on: [MOD-21, MOD-25, MOD-26, MOD-28, MOD-29, MOD-31, MOD-33, MOD-42, MOD-43, MOD-45]
 functions: [FR-07, FR-26, FR-29, FR-30, FR-31, FR-45, FR-46, FR-54]
 realizes:
@@ -61,6 +67,10 @@ verification:
     how: 結合の層（EXT-01 の偽物、時計の偽物）
   - checks: 拒否の後に乗客が支払い方法を変えて押さえ直し、ドライバーがやり直す。処理されなかった決済をドライバーがすぐやり直す（FR-29 の 4、DEC-45）
     how: 結合の層と端から端の層
+  - checks: 結果が分からない決済が、確かめで取引が変わっていないと分かると到着した状態に戻ってやり直せ、同じキーの送り直しは 503 PAYMENT_SERVICE_UNAVAILABLE を受ける。その押さえでは、支払い方法の変更が 409 PAYMENT_PENDING_CONFIRMATION を受け、やり直しのはっきりした拒否は押さえを解いて決まり（解ければ payment_declined、確定済みなら completed）、偽物が前の確定を遅れて効かせても二度請求しない。キャンセル料と不在の料金も同じ（FR-29 の 4、5、FR-30 の 2、DRV-32、FND-55、FND-58）
+    how: 結合の層（EXT-01 の偽物が、取引が変わっていないと読ませた後に確定済みと見せる。時計の偽物）
+  - checks: 支払い方法の押さえ直しを送っている間にドライバーが決済すると、決済は今の押さえに向かい、押さえ直しが済んでも依頼の押さえを替えずに新しい押さえを解き、409 PAYMENT_PENDING_CONFIRMATION で答える。決済を送っている間の支払い方法の変更も 409 PAYMENT_PENDING_CONFIRMATION（FR-46 の 5）
+    how: 結合の層（EXT-01 の偽物が押さえ直しに遅れて答える間に決済を送る）
   - checks: キャンセル料と不在の料金を一度だけ、押さえから請求して残りを解き、処理されなかった解除と料金を新しい試みで続ける（FR-54 の 6〜9）
     how: 結合の層
   - checks: SLI-11 の項目（押さえた額、示した額、請求した額、解いた額、数える日）がそろう
